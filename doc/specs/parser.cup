@@ -54,7 +54,27 @@ parser code {:
 
 terminal Token PLUS;
 terminal Token MINUS;
-terminal Token COMMENT;
+terminal Token AND;
+terminal Token ARRAY;
+terminal Token CONSTANTE_CADENA;
+terminal Token CONSTANTE_NUMERICA;
+terminal Token IDENTIFICADOR;
+terminal Token PROCEDURE;
+terminal Token ABRE_PARENTESIS;
+terminal Token CIERRA_PARENTESIS;
+terminal Token IS;
+terminal Token CONSTANT;
+terminal Token DECLARACION;
+terminal Token ASIGNACION;
+terminal Token PUNTOYCOMA;
+terminal Token INTEGER;
+terminal Token FUNCTION;
+terminal Token OUT;
+terminal Token RETURN;
+terminal Token BEGIN;
+terminal Token COMA;
+terminal Token PUT_LINE;
+terminal Token END;
 // ...
 
 
