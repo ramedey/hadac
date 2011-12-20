@@ -63,17 +63,20 @@ terminal Token CONSTANT;
 terminal Token CONSTANTE_CADENA;
 terminal Token CONSTANTE_NUMERICA;
 terminal Token DECLARACION;
+terminal Token PUNTOPUNTO;
 terminal Token ELSE;
 terminal Token END;
 terminal Token FALSE;
 terminal Token FOR;
 terminal Token FUNCTION;
 terminal Token IDENTIFICADOR;
+terminal Token IGUAL;
 terminal Token INTEGER;
 terminal Token IN;
 terminal Token IF;
 terminal Token IS;
 terminal Token LOOP;
+terminal Token MAYORQUE;
 terminal Token OF;
 terminal Token OR;
 terminal Token OUT;
@@ -114,8 +117,8 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
-  		List intermediateCode = ax.getIntermediateCode ();
-  		finalCodeFactory.create (intermediateCode);
+  		// List intermediateCode = ax.getIntermediateCode ();
+  		// finalCodeFactory.create (intermediateCode);
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.

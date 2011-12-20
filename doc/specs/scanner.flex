@@ -105,6 +105,20 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
                                token.setLexema (yytext ());
                                return token;
                             }
+    "="                     {  
+                               Token token = new Token (sym.IGUAL);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ">"                     {  
+                               Token token = new Token (sym.MAYORQUE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
     ";"                     {  
                                Token token = new Token (sym.PUNTOYCOMA);
                                token.setLine (yyline + 1);
@@ -119,6 +133,13 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
                                token.setLexema (yytext ());
                                return token;
                             }
+    ".."                    {  
+                               Token token = new Token (sym.PUNTOPUNTO);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }        
     {ARRAY}                 {  
                                Token token = new Token (sym.ARRAY);
                                token.setLine (yyline + 1);
