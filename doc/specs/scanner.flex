@@ -23,7 +23,6 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 %implements ScannerIF
 %scanerror LexicalError
 
-AND = and   
 ARRAY = array
 BEGIN = begin
 BOOLEAN = Boolean
@@ -48,7 +47,6 @@ RETURN = return
 THEN = then
 TRUE = True
 TYPE = type
-WHILE = while
 SALTODELINEA = \r\n
 COMENTARIO = --.*\r\n
 DIGITO = [0-9]
@@ -68,150 +66,263 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
 
 <YYINITIAL> 
 {
-           			       
-    "+"                {  
-                           Token token = new Token (sym.PLUS);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-           			       return token;
-                        }
-    " "|\t              { /* Ignorar espacios en blanco y tabulaciones */ }
-    \r\n                { /* Ignorar saltos de línea */ }
-    {COMENTARIO}        { /* Ignorar comentarios */ }
-    {CONSTANTE_CADENA}    {  
-                           Token token = new Token (sym.CONSTANTE_CADENA);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {CONSTANTE_NUMERICA}  {  
-                           Token token = new Token (sym.CONSTANTE_NUMERICA);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }                                          
-    {CONSTANT}            {  
-                           Token token = new Token (sym.CONSTANT);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }            
-    {IS}                  {  
-                           Token token = new Token (sym.IS);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {PROCEDURE}           {  
-                           Token token = new Token (sym.PROCEDURE);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    "("                 {  
-                           Token token = new Token (sym.ABRE_PARENTESIS);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    ")"                 {  
-                           Token token = new Token (sym.CIERRA_PARENTESIS);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    ":"                 {  
-                           Token token = new Token (sym.DECLARACION);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    ":="                {  
-                           Token token = new Token (sym.ASIGNACION);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    ";"                 {  
-                           Token token = new Token (sym.PUNTOYCOMA);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-   {INTEGER}              {  
-                           Token token = new Token (sym.INTEGER);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-   {FUNCTION}             {  
-                           Token token = new Token (sym.FUNCTION);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-   {OUT}                  {  
-                           Token token = new Token (sym.OUT);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {RETURN}              {  
-                           Token token = new Token (sym.RETURN);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {BEGIN}               {  
-                           Token token = new Token (sym.BEGIN);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    ","                {  
-                           Token token = new Token (sym.COMA);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {PUT_LINE}            {  
-                           Token token = new Token (sym.PUT_LINE);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {END}                 {  
-                           Token token = new Token (sym.END);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        }
-    {IDENTIFICADOR}     {  
-                           Token token = new Token (sym.IDENTIFICADOR);
-                           token.setLine (yyline + 1);
-                           token.setColumn (yycolumn + 1);
-                           token.setLexema (yytext ());
-                           return token;
-                        } 
+           			   
+    " "|\t                  { /* Ignorar espacios en blanco y tabulaciones */ }
+    {SALTODELINEA}          { /* Ignorar saltos de línea */ }
+    {COMENTARIO}            { /* Ignorar comentarios */ }    
+    "+"                     {  
+                               Token token = new Token (sym.PLUS);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+               			       return token;
+                            }
+    "("                     {  
+                               Token token = new Token (sym.ABRE_PARENTESIS);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ")"                     {  
+                               Token token = new Token (sym.CIERRA_PARENTESIS);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ":"                     {  
+                               Token token = new Token (sym.DECLARACION);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ":="                    {  
+                               Token token = new Token (sym.ASIGNACION);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ";"                     {  
+                               Token token = new Token (sym.PUNTOYCOMA);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    ","                     {  
+                               Token token = new Token (sym.COMA);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {ARRAY}                 {  
+                               Token token = new Token (sym.ARRAY);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {BEGIN}                 {  
+                               Token token = new Token (sym.BEGIN);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {BOOLEAN}               {  
+                               Token token = new Token (sym.BOOLEAN);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {CONSTANT}              {  
+                               Token token = new Token (sym.CONSTANT);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {CONSTANTE_CADENA}      {  
+                               Token token = new Token (sym.CONSTANTE_CADENA);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {CONSTANTE_NUMERICA}    {  
+                                Token token = new Token (sym.CONSTANTE_NUMERICA);
+                                token.setLine (yyline + 1);
+                                token.setColumn (yycolumn + 1);
+                                token.setLexema (yytext ());
+                                return token;
+                            }
+    {ELSE}                  {  
+                               Token token = new Token (sym.ELSE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {END}                   {  
+                               Token token = new Token (sym.END);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {FALSE}                 {  
+                               Token token = new Token (sym.FALSE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {FOR}                   {  
+                               Token token = new Token (sym.FOR);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {FUNCTION}              {  
+                               Token token = new Token (sym.FUNCTION);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {IF}                    {  
+                               Token token = new Token (sym.IF);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {IN}                    {  
+                               Token token = new Token (sym.IN);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {IS}                    {  
+                               Token token = new Token (sym.IS);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {PROCEDURE}             {  
+                               Token token = new Token (sym.PROCEDURE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {INTEGER}               {  
+                               Token token = new Token (sym.INTEGER);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {FUNCTION}              {  
+                               Token token = new Token (sym.FUNCTION);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {LOOP}                  {  
+                               Token token = new Token (sym.LOOP);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {OF}                    {  
+                               Token token = new Token (sym.OF);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {OR}                    {  
+                               Token token = new Token (sym.OR);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }                            
+    {OUT}                   {  
+                               Token token = new Token (sym.OUT);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {PROCEDURE}             {  
+                               Token token = new Token (sym.PROCEDURE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {PUT_LINE}              {  
+                               Token token = new Token (sym.PUT_LINE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {RECORD}                {  
+                               Token token = new Token (sym.RECORD);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {RETURN}                {  
+                               Token token = new Token (sym.RETURN);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {THEN}                  {  
+                               Token token = new Token (sym.THEN);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {TRUE}                  {  
+                               Token token = new Token (sym.TRUE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+    {TYPE}                  {  
+                               Token token = new Token (sym.TYPE);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+   {IDENTIFICADOR}          {  
+                               Token token = new Token (sym.IDENTIFICADOR);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
+ 
     
     // incluir aqui el resto de las reglas patron - accion
     

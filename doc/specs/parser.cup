@@ -52,29 +52,40 @@ parser code {:
 
 // Declaración de terminales (Ejemplo)
 
-terminal Token PLUS;
-terminal Token MINUS;
-terminal Token AND;
+terminal Token ABRE_PARENTESIS;
 terminal Token ARRAY;
+terminal Token ASIGNACION;
+terminal Token BEGIN;
+terminal Token BOOLEAN;
+terminal Token CIERRA_PARENTESIS;
+terminal Token COMA;
+terminal Token CONSTANT;
 terminal Token CONSTANTE_CADENA;
 terminal Token CONSTANTE_NUMERICA;
-terminal Token IDENTIFICADOR;
-terminal Token PROCEDURE;
-terminal Token ABRE_PARENTESIS;
-terminal Token CIERRA_PARENTESIS;
-terminal Token IS;
-terminal Token CONSTANT;
 terminal Token DECLARACION;
-terminal Token ASIGNACION;
-terminal Token PUNTOYCOMA;
-terminal Token INTEGER;
-terminal Token FUNCTION;
-terminal Token OUT;
-terminal Token RETURN;
-terminal Token BEGIN;
-terminal Token COMA;
-terminal Token PUT_LINE;
+terminal Token ELSE;
 terminal Token END;
+terminal Token FALSE;
+terminal Token FOR;
+terminal Token FUNCTION;
+terminal Token IDENTIFICADOR;
+terminal Token INTEGER;
+terminal Token IN;
+terminal Token IF;
+terminal Token IS;
+terminal Token LOOP;
+terminal Token OF;
+terminal Token OR;
+terminal Token OUT;
+terminal Token PLUS;
+terminal Token PROCEDURE;
+terminal Token PUNTOYCOMA;
+terminal Token PUT_LINE;
+terminal Token RECORD;
+terminal Token RETURN;
+terminal Token THEN;
+terminal Token TRUE;
+terminal Token TYPE;
 // ...
 
 
@@ -87,8 +98,7 @@ non terminal Axiom		axiom;
 
 
 // Declaración de relaciones de precedencia
-precedence left     PLUS,
-                    MINUS;
+precedence left     PLUS;
 // ...
 
 // Declaración de reglas de producción
