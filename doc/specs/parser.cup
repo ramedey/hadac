@@ -97,6 +97,7 @@ terminal Token TYPE;
 
 non terminal  			program;
 non terminal Axiom		axiom;
+non terminal            declaraciones, lista_sentencias, dec_const_simbolica;
 // ...
 
 
@@ -128,4 +129,13 @@ program ::=
    :};
 
 
-axiom ::= ;
+axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+
+declaraciones ::= dec_const_simbolica
+
+dec_const_simbolica ::= IDENTIFICADOR DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA |
+                        IDENTIFICADOR DECLARACION CONSTANT ASIGNACION TRUE |
+                        IDENTIFICADOR DECLARACION CONSTANT ASIGNACION FALSE;
+
+
+ 
