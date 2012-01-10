@@ -97,7 +97,8 @@ terminal Token TYPE;
 
 non terminal  			program;
 non terminal Axiom		axiom;
-non terminal            declaraciones, lista_sentencias, dec_const_simbolica;
+non terminal            declaraciones, lista_sentencias, dec_const_simbolica, dec_tipo, dec_subprograma, lista_campos;
+non terminal            tipo_simple, tipo_registro, lista_identificadores, tipo_retorno;
 // ...
 
 
@@ -131,11 +132,24 @@ program ::=
 
 axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-declaraciones ::= dec_const_simbolica
+declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma | ;
 
-dec_const_simbolica ::= IDENTIFICADOR DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA |
-                        IDENTIFICADOR DECLARACION CONSTANT ASIGNACION TRUE |
-                        IDENTIFICADOR DECLARACION CONSTANT ASIGNACION FALSE;
+dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE;
 
+dec_tipo ::= tipo_simple | tipo_registro | ;
 
+tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA | lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA;
+
+lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR | ;
+
+tipo_registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTOYCOMA;
  
+lista_campos ::= tipo_simple | IDENTIFICADOR PUNTOYCOMA | tipo_registro;
+
+dec_subprograma ::=  funcion | procedimiento;
+
+funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS dec_tipo CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+
+declaraciones_subprograma ::= dec_const_simbolica | dec_tipo;
