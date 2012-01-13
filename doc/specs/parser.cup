@@ -82,6 +82,7 @@ terminal Token OR;
 terminal Token OUT;
 terminal Token PLUS;
 terminal Token PROCEDURE;
+terminal Token PUNTO;
 terminal Token PUNTOYCOMA;
 terminal Token PUT_LINE;
 terminal Token RECORD;
@@ -98,12 +99,15 @@ terminal Token TYPE;
 non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones, lista_sentencias, dec_const_simbolica, dec_tipo, dec_subprograma, lista_campos;
-non terminal            tipo_simple, tipo_registro, lista_identificadores, tipo_retorno;
+non terminal            tipo_simple, tipo_registro, lista_identificadores, tipo_retorno, cuerpo_funcion, sentencia_return;
+non terminal            funcion, procedimiento, declaraciones_subprograma;
+non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_funcion, parametros;
+non terminal            sentencia, sentencia_asignacion;
 // ...
 
 
 // Declaración de relaciones de precedencia
-precedence left     PLUS;
+precedence left     PUNTO, ABRE_PARENTESIS, CIERRA_PARENTESIS, PLUS, MAYORQUE, IGUAL, OR;
 // ...
 
 // Declaración de reglas de producción
@@ -140,9 +144,9 @@ dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CO
 
 dec_tipo ::= tipo_simple | tipo_registro | ;
 
-tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA | lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA;
+tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA | lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA |;
 
-lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR | ;
+lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
 
 tipo_registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTOYCOMA;
  
@@ -150,6 +154,28 @@ lista_campos ::= tipo_simple | IDENTIFICADOR PUNTOYCOMA | tipo_registro;
 
 dec_subprograma ::=  funcion | procedimiento;
 
-funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS dec_tipo CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS tipo_simple CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN cuerpo_funcion END IDENTIFICADOR PUNTOYCOMA;
 
-declaraciones_subprograma ::= dec_const_simbolica | dec_tipo;
+tipo_retorno ::= INTEGER | BOOLEAN;
+
+declaraciones_subprograma ::= dec_const_simbolica | dec_tipo | dec_subprograma |;
+
+cuerpo_funcion ::= lista_sentencias sentencia_return lista_sentencias | sentencia_return;
+
+procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS tipo_simple CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+
+lista_sentencias ::= sentencia lista_sentencias | sentencia expresion lista_sentencias | ;
+
+expresion ::= expresion_aritmetica | expresion_logica | acceso_registro;
+
+expresion_aritmetica ::= CONSTANTE_NUMERICA | IDENTIFICADOR | llamada_funcion | expresion_aritmetica PLUS expresion_aritmetica;
+
+expresion_logica ::= TRUE | FALSE | IDENTIFICADOR | llamada_funcion | expresion_aritmetica IGUAL expresion_aritmetica | expresion_logica OR expresion_logica | expresion_aritmetica MAYORQUE expresion_aritmetica;
+
+acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro | ;
+
+llamada_funcion ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
+
+parametros ::= parametros COMA IDENTIFICADOR | parametros COMA acceso_registro | parametros COMA llamada_funcion | parametros COMA expresion | ;
+
+sentencia ::= sentencia_asignacion;

@@ -126,6 +126,13 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
                                token.setLexema (yytext ());
                                return token;
                             }
+    "."                     {  
+                               Token token = new Token (sym.PUNTO);
+                               token.setLine (yyline + 1);
+                               token.setColumn (yycolumn + 1);
+                               token.setLexema (yytext ());
+                               return token;
+                            }
     ","                     {  
                                Token token = new Token (sym.COMA);
                                token.setLine (yyline + 1);
