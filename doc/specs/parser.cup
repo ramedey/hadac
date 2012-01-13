@@ -53,7 +53,6 @@ parser code {:
 // Declaración de terminales (Ejemplo)
 
 terminal Token ABRE_PARENTESIS;
-terminal Token ARRAY;
 terminal Token ASIGNACION;
 terminal Token BEGIN;
 terminal Token BOOLEAN;
@@ -77,9 +76,7 @@ terminal Token IF;
 terminal Token IS;
 terminal Token LOOP;
 terminal Token MAYORQUE;
-terminal Token OF;
 terminal Token OR;
-terminal Token OUT;
 terminal Token PLUS;
 terminal Token PROCEDURE;
 terminal Token PUNTO;
@@ -102,7 +99,9 @@ non terminal            declaraciones, lista_sentencias, dec_const_simbolica, de
 non terminal            tipo_simple, tipo_registro, lista_identificadores, tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
 non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_funcion, parametros;
-non terminal            sentencia, sentencia_asignacion;
+non terminal            sentencia, sentencia_asignacion, elemento_a_asignar, sentencia_if, 
+parte_else, sentencia_for, expresion_numerica, llamada_procedimiento, parametro;
+non terminal            sentencia_put_line;
 // ...
 
 
@@ -178,4 +177,22 @@ llamada_funcion ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
 
 parametros ::= parametros COMA IDENTIFICADOR | parametros COMA acceso_registro | parametros COMA llamada_funcion | parametros COMA expresion | ;
 
-sentencia ::= sentencia_asignacion;
+sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_procedimiento | sentencia_put_line;
+
+sentencia_asignacion ::= elemento_a_asignar ASIGNACION expresion;
+
+elemento_a_asignar ::= IDENTIFICADOR | acceso_registro;
+
+sentencia_if ::= IF expresion_logica THEN lista_sentencias parte_else;
+
+parte_else ::= END IF | ELSE lista_sentencias END IF;
+
+sentencia_for ::= FOR IDENTIFICADOR IN expresion_numerica PUNTOPUNTO expresion_numerica LOOP lista_sentencias END LOOP PUNTOYCOMA;
+
+expresion_numerica ::= CONSTANTE_NUMERICA | IDENTIFICADOR;
+
+llamada_procedimiento ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
+
+sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
+
+parametro ::= expresion | CONSTANTE_CADENA;
