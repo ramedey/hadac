@@ -146,13 +146,6 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
                                token.setColumn (yycolumn + 1);
                                token.setLexema (yytext ());
                                return token;
-                            }        
-    {ARRAY}                 {  
-                               Token token = new Token (sym.ARRAY);
-                               token.setLine (yyline + 1);
-                               token.setColumn (yycolumn + 1);
-                               token.setLexema (yytext ());
-                               return token;
                             }
     {BEGIN}                 {  
                                Token token = new Token (sym.BEGIN);
@@ -273,22 +266,8 @@ IDENTIFICADOR = {CARACTER}({CARACTER}|{DIGITO})*
                                token.setLexema (yytext ());
                                return token;
                             }
-    {OF}                    {  
-                               Token token = new Token (sym.OF);
-                               token.setLine (yyline + 1);
-                               token.setColumn (yycolumn + 1);
-                               token.setLexema (yytext ());
-                               return token;
-                            }
     {OR}                    {  
                                Token token = new Token (sym.OR);
-                               token.setLine (yyline + 1);
-                               token.setColumn (yycolumn + 1);
-                               token.setLexema (yytext ());
-                               return token;
-                            }                            
-    {OUT}                   {  
-                               Token token = new Token (sym.OUT);
                                token.setLine (yyline + 1);
                                token.setColumn (yycolumn + 1);
                                token.setLexema (yytext ());
