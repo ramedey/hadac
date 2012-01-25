@@ -101,8 +101,8 @@ non terminal            lista_identificadores;
 non terminal            tipo_simple, tipo_registro;
 non terminal            tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
-non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_funcion, parametros;
-non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, llamada_procedimiento, parametro;
+non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_subprograma, parametros;
+non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, parametro;
 non terminal            sentencia_put_line, elemento_aritmetico, elemento_logico, elemento;
 // ...
 
@@ -139,14 +139,14 @@ axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraci
 
 declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma | ;
 
-dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE;
+dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA;
 
-dec_tipo ::= tipo_simple | tipo_registro | ;
+dec_tipo ::= tipo_simple | tipo_registro ;
 
 tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA | 
-                lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA |;
+                lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA;
 
 lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
 
@@ -176,17 +176,17 @@ expresion_logica ::= elemento_logico | expresion_aritmetica IGUAL expresion_arit
 
 acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro ;
 
-llamada_funcion ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
+llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
 
 parametros ::= elemento_aritmetico COMA parametros | elemento_aritmetico;
 
-elemento ::= IDENTIFICADOR | elemento_aritmetico | elemento_logico;
+elemento ::= llamada_subprograma | IDENTIFICADOR | elemento_aritmetico | elemento_logico;
 
-elemento_logico ::= TRUE | FALSE | llamada_funcion;
+elemento_logico ::= TRUE | FALSE ;
                
-elemento_aritmetico ::= llamada_funcion | CONSTANTE_NUMERICA;
+elemento_aritmetico ::= CONSTANTE_NUMERICA;
 
-sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_procedimiento | sentencia_put_line;
+sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_subprograma | sentencia_put_line;
 
 sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion | acceso_registro ASIGNACION expresion;
 
@@ -195,8 +195,6 @@ sentencia_if ::= IF expresion_logica THEN lista_sentencias END IF | IF expresion
 sentencia_for ::= FOR IDENTIFICADOR IN expresion_numerica PUNTOPUNTO expresion_numerica LOOP lista_sentencias END LOOP PUNTOYCOMA;
 
 expresion_numerica ::= CONSTANTE_NUMERICA | IDENTIFICADOR;
-
-llamada_procedimiento ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
 
 sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
 
