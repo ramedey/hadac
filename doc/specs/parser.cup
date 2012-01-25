@@ -180,11 +180,11 @@ llamada_funcion ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
 
 parametros ::= elemento_aritmetico COMA parametros | elemento_aritmetico;
 
-elemento ::= elemento_aritmetico | elemento_logico;
+elemento ::= IDENTIFICADOR | elemento_aritmetico | elemento_logico;
 
-elemento_logico ::= TRUE | FALSE | IDENTIFICADOR | llamada_funcion | expresion_logica;
+elemento_logico ::= TRUE | FALSE | llamada_funcion;
                
-elemento_aritmetico ::= IDENTIFICADOR | acceso_registro | llamada_funcion | CONSTANTE_NUMERICA;
+elemento_aritmetico ::= llamada_funcion | CONSTANTE_NUMERICA;
 
 sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_procedimiento | sentencia_put_line;
 
