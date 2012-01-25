@@ -95,13 +95,15 @@ terminal Token TYPE;
 
 non terminal  			program;
 non terminal Axiom		axiom;
-non terminal            declaraciones, lista_sentencias, dec_const_simbolica, dec_tipo, dec_subprograma, lista_campos;
-non terminal            tipo_simple, tipo_registro, lista_identificadores, tipo_retorno, cuerpo_funcion, sentencia_return;
+non terminal            declaraciones, lista_sentencias;
+non terminal            dec_const_simbolica, dec_tipo, dec_subprograma, lista_campos;
+non terminal            lista_identificadores;
+non terminal            tipo_simple, tipo_registro;
+non terminal            tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
 non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_funcion, parametros;
-non terminal            sentencia, sentencia_asignacion, elemento_a_asignar, sentencia_if, 
-parte_else, sentencia_for, expresion_numerica, llamada_procedimiento, parametro;
-non terminal            sentencia_put_line, identificador, elemento;
+non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, llamada_procedimiento, parametro;
+non terminal            sentencia_put_line, elemento_aritmetico, elemento_logico, elemento;
 // ...
 
 
@@ -168,27 +170,27 @@ lista_sentencias ::= sentencia lista_sentencias | sentencia expresion lista_sent
 
 expresion ::= expresion_aritmetica | expresion_logica | acceso_registro;
 
-expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica;
+expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica | elemento_aritmetico;
 
-expresion_logica ::= TRUE | FALSE | identificador | llamada_funcion | expresion_aritmetica IGUAL expresion_aritmetica | expresion_logica OR expresion_logica | expresion_aritmetica MAYORQUE expresion_aritmetica;
+expresion_logica ::= elemento_logico | expresion_aritmetica IGUAL expresion_aritmetica | expresion_logica OR expresion_logica | expresion_aritmetica MAYORQUE expresion_aritmetica;
 
-acceso_registro ::= identificador PUNTO acceso_registro | ;
+acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro ;
 
 llamada_funcion ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENTESIS;
 
-parametros ::= elemento COMA parametros | elemento;
+parametros ::= elemento_aritmetico COMA parametros | elemento_aritmetico;
+
+elemento ::= elemento_aritmetico | elemento_logico;
+
+elemento_logico ::= TRUE | FALSE | IDENTIFICADOR | llamada_funcion | expresion_logica;
                
-elemento ::= elemento_a_asignar | llamada_funcion | CONSTANTE_NUMERICA | expresion;
+elemento_aritmetico ::= IDENTIFICADOR | acceso_registro | llamada_funcion | CONSTANTE_NUMERICA;
 
 sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_procedimiento | sentencia_put_line;
 
-sentencia_asignacion ::= elemento_a_asignar ASIGNACION expresion;
+sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion | acceso_registro ASIGNACION expresion;
 
-elemento_a_asignar ::= identificador | acceso_registro;
-
-sentencia_if ::= IF expresion_logica THEN lista_sentencias parte_else;
-
-parte_else ::= END IF | ELSE lista_sentencias END IF;
+sentencia_if ::= IF expresion_logica THEN lista_sentencias END IF | IF expresion_logica THEN lista_sentencias ELSE lista_sentencias END IF;
 
 sentencia_for ::= FOR IDENTIFICADOR IN expresion_numerica PUNTOPUNTO expresion_numerica LOOP lista_sentencias END LOOP PUNTOYCOMA;
 
@@ -199,5 +201,3 @@ llamada_procedimiento ::= IDENTIFICADOR ABRE_PARENTESIS parametros CIERRA_PARENT
 sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
 
 parametro ::= expresion | CONSTANTE_CADENA;
-
-identificador ::= IDENTIFICADOR;
