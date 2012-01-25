@@ -23,7 +23,6 @@ import es.uned.lsi.compiler.lexical.LexicalErrorManager;
 %implements ScannerIF
 %scanerror LexicalError
 
-ARRAY = array
 BEGIN = begin
 BOOLEAN = Boolean
 CONSTANT = constant
@@ -37,9 +36,7 @@ IN = in
 INTEGER = Integer
 IS = is
 LOOP = loop
-OF = of
 OR = or
-OUT = out
 PROCEDURE = procedure
 PUT_LINE = Put_line
 RECORD = record
