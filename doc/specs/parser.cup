@@ -103,7 +103,7 @@ non terminal            tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, parametros_formales, parametro_formal, declaraciones_subprograma;
 non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_subprograma, parametros_actuales;
 non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, parametro;
-non terminal            sentencia_put_line, elemento_aritmetico, elemento_logico;
+non terminal            sentencia_put_line, elemento, elemento_aritmetico, elemento_logico;
 // ...
 
 
@@ -170,11 +170,11 @@ tipo_retorno ::= INTEGER | BOOLEAN;
 
 declaraciones_subprograma ::= dec_const_simbolica | dec_tipo | dec_subprograma |;
 
-cuerpo_funcion ::= lista_sentencias sentencia_return lista_sentencias | sentencia_return;
+cuerpo_funcion ::= lista_sentencias RETURN expresion PUNTOYCOMA lista_sentencias | ;
 
 procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-lista_sentencias ::= sentencia lista_sentencias | sentencia expresion lista_sentencias | ;
+lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias | sentencia expresion PUNTOYCOMA lista_sentencias | ;
 
 expresion ::= expresion_aritmetica | expresion_logica | acceso_registro;
 
@@ -188,9 +188,11 @@ llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA
 
 parametros_actuales ::= elemento_aritmetico COMA parametros_actuales | elemento_aritmetico;
 
+elemento ::= llamada_subprograma | IDENTIFICADOR | elemento_aritmetico | elemento_logico;
+
 elemento_logico ::= TRUE | FALSE ;
                
-elemento_aritmetico ::= CONSTANTE_NUMERICA;
+elemento_aritmetico ::= CONSTANTE_NUMERICA | IDENTIFICADOR;
 
 sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_subprograma | sentencia_put_line;
 
