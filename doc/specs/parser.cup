@@ -146,12 +146,12 @@ dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CO
 dec_tipo ::= lista_identificadores DECLARACION tipo_simple | tipo_registro ;
 
 tipo_simple ::= INTEGER PUNTOYCOMA declaraciones | 
+                IDENTIFICADOR PUNTOYCOMA declaraciones | 
                 BOOLEAN PUNTOYCOMA declaraciones;
 
 lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
 
-tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones |
-                  TYPE IDENTIFICADOR IS RECORD lista_identificadores DECLARACION IDENTIFICADOR PUNTOYCOMA END RECORD PUNTOYCOMA declaraciones;
+tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;
 
  
 lista_campos ::= tipo_simple | IDENTIFICADOR PUNTOYCOMA | tipo_registro;
