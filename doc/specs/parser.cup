@@ -139,22 +139,22 @@ axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraci
 
 declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma | ;
 
-dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA;
+dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones |
+                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
 
 dec_tipo ::= tipo_simple | tipo_registro ;
 
-tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA | 
-                lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA;
+tipo_simple ::= lista_identificadores DECLARACION INTEGER PUNTOYCOMA declaraciones | 
+                lista_identificadores DECLARACION BOOLEAN PUNTOYCOMA declaraciones;
 
 lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
 
-tipo_registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTOYCOMA;
+tipo_registro ::= TYPE IDENTIFICADOR IS RECORD lista_campos END RECORD PUNTOYCOMA declaraciones;
  
 lista_campos ::= tipo_simple | IDENTIFICADOR PUNTOYCOMA | tipo_registro;
 
-dec_subprograma ::=  funcion | procedimiento;
+dec_subprograma ::=  funcion declaraciones | procedimiento declaraciones;
 
 funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS tipo_simple CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN cuerpo_funcion END IDENTIFICADOR PUNTOYCOMA;
 
