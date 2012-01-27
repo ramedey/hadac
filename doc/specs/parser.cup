@@ -103,7 +103,7 @@ non terminal            tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, parametros_formales, parametro_formal, declaraciones_subprograma;
 non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_subprograma, parametros_actuales;
 non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, parametro;
-non terminal            sentencia_put_line, elemento, elemento_aritmetico, elemento_logico;
+non terminal            sentencia_put_line, elemento, elemento_aritmetico, elemento_logico, resto;
 // ...
 
 
@@ -170,7 +170,7 @@ tipo_retorno ::= INTEGER | BOOLEAN;
 
 declaraciones_subprograma ::= dec_const_simbolica | dec_tipo | dec_subprograma |;
 
-cuerpo_funcion ::= lista_sentencias RETURN expresion PUNTOYCOMA lista_sentencias | ;
+cuerpo_funcion ::= lista_sentencias RETURN expresion PUNTOYCOMA lista_sentencias ;
 
 procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
@@ -178,7 +178,7 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias | sentencia expresion
 
 expresion ::= expresion_aritmetica | expresion_logica | acceso_registro;
 
-expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica | elemento_aritmetico;
+expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica | elemento;
 
 expresion_logica ::= elemento_logico | expresion_aritmetica IGUAL expresion_aritmetica | expresion_logica OR expresion_logica | expresion_aritmetica MAYORQUE expresion_aritmetica;
 
@@ -186,13 +186,17 @@ acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro ;
 
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS;
 
-parametros_actuales ::= elemento_aritmetico COMA parametros_actuales | elemento_aritmetico;
+parametros_actuales ::= elemento COMA parametros_actuales | 
+                        elemento_logico COMA parametros_actuales |
+                        elemento | elemento_logico;
 
-elemento ::= llamada_subprograma | IDENTIFICADOR | elemento_aritmetico | elemento_logico;
+elemento ::= IDENTIFICADOR resto | elemento_aritmetico;
+
+resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS | ;
 
 elemento_logico ::= TRUE | FALSE ;
                
-elemento_aritmetico ::= CONSTANTE_NUMERICA | IDENTIFICADOR;
+elemento_aritmetico ::= CONSTANTE_NUMERICA;
 
 sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_subprograma | sentencia_put_line;
 
