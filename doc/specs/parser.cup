@@ -103,7 +103,7 @@ non terminal            tipo_retorno, cuerpo_funcion, sentencia_return;
 non terminal            funcion, procedimiento, parametros_formales, parametro_formal, declaraciones_subprograma;
 non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_subprograma, parametros_actuales;
 non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, expresion_numerica, parametro;
-non terminal            sentencia_put_line, elemento_aritmetico, elemento_logico, elemento;
+non terminal            sentencia_put_line, elemento_aritmetico, elemento_logico;
 // ...
 
 
@@ -187,8 +187,6 @@ acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro ;
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS;
 
 parametros_actuales ::= elemento_aritmetico COMA parametros_actuales | elemento_aritmetico;
-
-elemento ::= llamada_subprograma | IDENTIFICADOR | elemento_aritmetico | elemento_logico;
 
 elemento_logico ::= TRUE | FALSE ;
                
