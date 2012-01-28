@@ -184,7 +184,7 @@ expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica | elemen
 
 expresion_logica ::= elemento_logico | expresion_aritmetica IGUAL expresion_aritmetica | expresion_logica OR expresion_logica | expresion_aritmetica MAYORQUE expresion_aritmetica;
 
-acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro | IDENTIFICADOR PUNTO;
+acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro | IDENTIFICADOR PUNTO IDENTIFICADOR;
 
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS;
 
@@ -202,7 +202,7 @@ elemento_aritmetico ::= CONSTANTE_NUMERICA;
 
 sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_subprograma | sentencia_put_line;
 
-sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion | acceso_registro IDENTIFICADOR ASIGNACION expresion;
+sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion | acceso_registro ASIGNACION expresion;
 
 sentencia_if ::= IF expresion_logica THEN lista_sentencias END IF | IF expresion_logica THEN lista_sentencias ELSE lista_sentencias END IF;
 
