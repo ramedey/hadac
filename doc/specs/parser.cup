@@ -178,7 +178,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CI
 
 lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias | sentencia expresion PUNTOYCOMA lista_sentencias | ;
 
-expresion ::= expresion_aritmetica | expresion_logica | acceso_registro;
+expresion ::= expresion_aritmetica | expresion_logica;
 
 expresion_aritmetica ::= expresion_aritmetica PLUS expresion_aritmetica | elemento;
 
@@ -192,7 +192,7 @@ parametros_actuales ::= elemento COMA parametros_actuales |
                         elemento_logico COMA parametros_actuales |
                         elemento | elemento_logico;
 
-elemento ::= IDENTIFICADOR resto | elemento_aritmetico;
+elemento ::= IDENTIFICADOR resto | elemento_aritmetico | acceso_registro;
 
 resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS | ;
 
