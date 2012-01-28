@@ -96,7 +96,7 @@ terminal Token TYPE;
 non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones, lista_sentencias;
-non terminal            dec_const_simbolica, dec_tipo, dec_subprograma, lista_campos;
+non terminal            dec_const_simbolica, dec_tipo, dec_subprograma;
 non terminal            lista_identificadores;
 non terminal            tipo_simple, tipo_registro;
 non terminal            tipo_retorno, cuerpo_funcion;
@@ -152,9 +152,6 @@ tipo_simple ::= INTEGER PUNTOYCOMA declaraciones |
 lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
 
 tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;
-
- 
-lista_campos ::= tipo_simple | IDENTIFICADOR PUNTOYCOMA | tipo_registro;
 
 dec_subprograma ::=  funcion declaraciones | procedimiento declaraciones;
 
