@@ -172,9 +172,9 @@ procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CI
 
 lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias | sentencia expresion PUNTOYCOMA lista_sentencias | ;
 
-expresion ::= expresion_aritmetica | expresion_logica | elemento | ABRE_PARENTESIS expresion CIERRA_PARENTESIS;
+expresion ::= expresion_aritmetica | expresion_logica | elemento | ABRE_PARENTESIS expresion CIERRA_PARENTESIS | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
-expresion_aritmetica ::= expresion PLUS expresion | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion aritmetica."); :};
+expresion_aritmetica ::= expresion PLUS expresion;
 
 expresion_logica ::= expresion IGUAL expresion | expresion OR expresion | expresion MAYORQUE expresion;
 
