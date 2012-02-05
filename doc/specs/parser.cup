@@ -136,67 +136,105 @@ program ::=
 
 axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma  | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  |;
+declaraciones ::= dec_const_simbolica 
+                | dec_tipo 
+                | dec_subprograma  
+                | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
+                |;
 
-dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones |
-                        lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
+dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones 
+                      | lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones
+                      | lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
 
-dec_tipo ::= lista_identificadores DECLARACION tipo_simple | tipo_registro;
+dec_tipo ::= lista_identificadores DECLARACION tipo_simple 
+           | tipo_registro;
 
-tipo_simple ::= INTEGER PUNTOYCOMA declaraciones | 
-                IDENTIFICADOR PUNTOYCOMA declaraciones | 
-                BOOLEAN PUNTOYCOMA declaraciones;
+tipo_simple ::= INTEGER PUNTOYCOMA declaraciones 
+              | IDENTIFICADOR PUNTOYCOMA declaraciones 
+              | BOOLEAN PUNTOYCOMA declaraciones;
 
-lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores | IDENTIFICADOR;
+lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores 
+                        | IDENTIFICADOR;
 
 tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;
 
-dec_subprograma ::=  funcion declaraciones | procedimiento declaraciones;
+dec_subprograma ::= funcion declaraciones 
+                  | procedimiento declaraciones;
 
 funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-parametros_formales ::= parametro_formal PUNTOYCOMA parametros_formales |
-                        parametro_formal | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de parametros formales."); :};
+parametros_formales ::= parametro_formal PUNTOYCOMA parametros_formales 
+                      | parametro_formal 
+                      | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de parametros formales."); :};
                         
                        
-parametro_formal ::= lista_identificadores DECLARACION INTEGER |
-                        lista_identificadores DECLARACION BOOLEAN | ;
+parametro_formal ::= lista_identificadores DECLARACION INTEGER 
+                   | lista_identificadores DECLARACION BOOLEAN 
+                   |;
                         
 
-tipo_retorno ::= INTEGER | BOOLEAN | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
+tipo_retorno ::= INTEGER 
+               | BOOLEAN 
+               | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
-declaraciones_subprograma ::= dec_const_simbolica | dec_tipo | dec_subprograma |;
+declaraciones_subprograma ::= dec_const_simbolica 
+                            | dec_tipo 
+                            | dec_subprograma 
+                            |;
 
 procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias | sentencia expresion PUNTOYCOMA lista_sentencias | ;
+lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias 
+                   | sentencia expresion PUNTOYCOMA lista_sentencias 
+                   | ;
 
-expresion ::= expresion_aritmetica | expresion_logica | elemento | ABRE_PARENTESIS expresion CIERRA_PARENTESIS | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
+expresion ::= expresion_aritmetica 
+            | expresion_logica 
+            | elemento 
+            | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
+            | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
 expresion_aritmetica ::= expresion PLUS expresion;
 
-expresion_logica ::= expresion IGUAL expresion | expresion OR expresion | expresion MAYORQUE expresion;
+expresion_logica ::= expresion IGUAL expresion 
+                   | expresion OR expresion 
+                   | expresion MAYORQUE expresion;
 
-acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro | IDENTIFICADOR PUNTO IDENTIFICADOR;
+acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro 
+                  | IDENTIFICADOR PUNTO IDENTIFICADOR;
 
 llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS;
 
-parametros_actuales ::= expresion COMA parametros_actuales | 
-                        expresion | ;
+parametros_actuales ::= expresion COMA parametros_actuales 
+                      | expresion 
+                      |;
 
-elemento ::= IDENTIFICADOR resto | acceso_registro | TRUE | FALSE | CONSTANTE_NUMERICA;
+elemento ::= IDENTIFICADOR resto 
+           | acceso_registro 
+           | TRUE 
+           | FALSE 
+           | CONSTANTE_NUMERICA;
 
-resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS | ;
+resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS 
+        | ;
 
-sentencia ::= sentencia_asignacion | sentencia_if | sentencia_for | llamada_subprograma | sentencia_put_line | RETURN expresion;
+sentencia ::= sentencia_asignacion 
+            | sentencia_if 
+            | sentencia_for 
+            | llamada_subprograma 
+            | sentencia_put_line 
+            | RETURN expresion 
+            | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
-sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion | acceso_registro ASIGNACION expresion | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia de asignacion."); :};
+sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion 
+                       | acceso_registro ASIGNACION expresion;
 
-sentencia_if ::= IF expresion THEN lista_sentencias END IF | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF;
+sentencia_if ::= IF expresion THEN lista_sentencias END IF 
+               | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF;
 
 sentencia_for ::= FOR expresion IN expresion PUNTOPUNTO expresion LOOP lista_sentencias END LOOP;
 
 sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
 
-parametro ::= expresion | CONSTANTE_CADENA;
+parametro ::= expresion 
+            | CONSTANTE_CADENA;
