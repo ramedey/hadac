@@ -136,7 +136,7 @@ program ::=
 
 axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
 
-declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma |;
+declaraciones ::= dec_const_simbolica | dec_tipo | dec_subprograma  | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  |;
 
 dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones |
                         lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones |
