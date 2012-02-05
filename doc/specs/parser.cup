@@ -117,7 +117,7 @@ start with program;
 
 program ::= 
   {: 
-        syntaxErrorManager.syntaxInfo ("Starting parsing..."); 
+        syntaxErrorManager.syntaxInfo ("Comenzando analisis..."); 
    :}
   axiom:ax
   {: 
@@ -130,16 +130,17 @@ program ::=
   		// aún no se tendrá implementada la generación de código intermedio ni final.
   		// Para la entrega de Junio deberán descomentarse y usarse.
   		
-  		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
+  		syntaxErrorManager.syntaxInfo ("Proceso de analisis terminado.");
    :};
 
 
-axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+        | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 declaraciones ::= dec_const_simbolica 
                 | dec_tipo 
                 | dec_subprograma  
-                | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
+                | error declaraciones{: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
                 |;
 
 dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones 
