@@ -107,7 +107,11 @@ non terminal            sentencia_put_line, elemento, resto;
 
 
 // Declaración de relaciones de precedencia
-precedence left     PUNTO, ABRE_PARENTESIS, CIERRA_PARENTESIS, PLUS, MAYORQUE, IGUAL, OR;
+precedence left     OR;
+precedence left     IGUAL;
+precedence left     MAYORQUE;
+precedence left     PLUS;
+precedence left     PUNTO, ABRE_PARENTESIS, CIERRA_PARENTESIS;
 // ...
 
 // Declaración de reglas de producción
