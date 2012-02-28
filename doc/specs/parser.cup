@@ -127,8 +127,8 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
-  		// List intermediateCode = ax.getIntermediateCode ();
-  		// finalCodeFactory.create (intermediateCode);
+  		 List intermediateCode = ax.getIntermediateCode ();
+  		 finalCodeFactory.create (intermediateCode);
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.
