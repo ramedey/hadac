@@ -29,6 +29,7 @@ public class ListaIdentificadores extends NonTerminal {
 	
 	public void addIdentificador(SymbolVariable symbol)
 	{
+		//TODO: comprobar que no se inserte dos veces el mism símbolo
 		listaIdentificadores.add(symbol);		
 	}
 }

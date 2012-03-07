@@ -1,5 +1,7 @@
 package compiler.semantic.symbol;
 
+import compiler.lexical.Token;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
@@ -26,5 +28,17 @@ public class SymbolVariable
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
+    
+    /**
+     * Constructor de copia para la clase Token 
+     * @param scope ámboto
+     * @param token token
+     * @param type tipo
+     */
+    public SymbolVariable(ScopeIF scope, Token token, TypeIF type)
+    {
+    	super(scope, token.getLexema(), type);
+    }
+    
 }

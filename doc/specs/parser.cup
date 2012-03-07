@@ -189,8 +189,14 @@ tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones
               | IDENTIFICADOR PUNTOYCOMA declaraciones 
               | BOOLEAN PUNTOYCOMA declaraciones;
 
-lista_identificadores ::= IDENTIFICADOR COMA lista_identificadores 
-                        | IDENTIFICADOR;
+lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
+                            {:
+                                // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
+                            :} 
+                        | IDENTIFICADOR:id
+                            {:
+                                
+                            :};
 
 tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;
 
