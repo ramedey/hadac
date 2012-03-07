@@ -26,6 +26,11 @@ public class TypeSimple
         super (scope);
     }
     
+    public TypeSimple (ScopeIF scope, String name)
+    {
+        super (scope, name);
+    }
+    
     /**
      * Returns the size of the type.
      * @return the size of the type.

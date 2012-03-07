@@ -97,12 +97,15 @@ non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones, lista_sentencias;
 non terminal            dec_const_simbolica, dec_tipo, dec_subprograma;
-non terminal            lista_identificadores;
-non terminal            tipo_simple, tipo_registro, tipo_retorno;
+non terminal ListaIdentificadores lista_identificadores;
+non terminal TipoSimple tipo_simple;
+non terminal            tipo_registro, tipo_retorno;
+non terminal Expresion  expresion, expresion_logica, elemento;
+non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal            funcion, procedimiento, parametros_formales, parametro_formal, declaraciones_subprograma;
-non terminal            expresion, expresion_aritmetica, expresion_logica, acceso_registro, llamada_subprograma, parametros_actuales;
+non terminal            acceso_registro, llamada_subprograma, parametros_actuales;
 non terminal            sentencia, sentencia_asignacion, sentencia_if, sentencia_for, parametro;
-non terminal            sentencia_put_line, elemento, resto;
+non terminal            sentencia_put_line, resto;
 // ...
 
 
@@ -138,7 +141,12 @@ program ::=
    :};
 
 
-axiom ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+axiom ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+        {:
+            //Crear el ámbito global del programa asociado al nombre del procedimiento.
+            String name = id.getLexema();
+            scopeManager.openScope(name);
+        :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 declaraciones ::= dec_const_simbolica 
@@ -151,10 +159,33 @@ dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CO
                       | lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones
                       | lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
 
-dec_tipo ::= lista_identificadores DECLARACION tipo_simple 
+dec_tipo ::= lista_identificadores:lista DECLARACION tipo_simple:tSimple
+                {:
+                    // Consultar en el ámbito actual si está el tipo resgitrado.
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TypeTableIF typeTable = scope.getTypeTable();
+                    if(!typeTable.containsType(tSimple.getTipo()))
+                    {
+                        typeTable.addType(tSimple.getTipo());
+                    }
+                    ArrayList<SymbolVariable> identificadores = lista.getListaIdentificadores();
+                    // Agregar los identificadores a la tabla de símbolos
+                    SymbolTableIF symbolTable = scope.getSymbolTable();
+                    for(int i = 0; i < identificadores.size(); i++)
+                    {
+                       if(!symbolTable.containsSymbol(identificadores.get(i)))
+                       {
+                           symbolTable.addSymbol(identificadores.get(i));
+                       }
+                    }
+                :} 
            | tipo_registro;
 
-tipo_simple ::= INTEGER PUNTOYCOMA declaraciones 
+tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones 
+                {: 
+                    TypeSimple tipoSimple = new TypeSimple(scopeManager.getCurrentScope(), id.getLexema());
+                    RESULT = new TipoSimple(tipoSimple); 
+                :}
               | IDENTIFICADOR PUNTOYCOMA declaraciones 
               | BOOLEAN PUNTOYCOMA declaraciones;
 
@@ -193,13 +224,23 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
                    | sentencia expresion PUNTOYCOMA lista_sentencias 
                    | ;
 
-expresion ::= expresion_aritmetica 
+expresion ::= expresion_aritmetica:expa {: Expresion exp = new Expresion(expa); RESULT = exp; :}
             | expresion_logica 
             | elemento 
             | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
-expresion_aritmetica ::= expresion PLUS expresion;
+expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
+        {:
+            ExpresionAritmetica exp = new ExpresionAritmetica();
+            
+            if(!e1.getTipoInstruccion().equals(e2.getTipoInstruccion()))
+            {
+                semanticErrorManager.semanticFatalError("Los tipos no coinciden");
+            }
+            
+            RESULT = exp;
+        :};
 
 expresion_logica ::= expresion IGUAL expresion 
                    | expresion OR expresion 
@@ -218,7 +259,14 @@ elemento ::= IDENTIFICADOR resto
            | acceso_registro 
            | TRUE 
            | FALSE 
-           | CONSTANTE_NUMERICA;
+           | CONSTANTE_NUMERICA:id
+                {:
+                    Expresion exp = new Expresion(new TypeSimple(scopeManager.getCurrentScope(), "ENTERO"));
+
+                    Value resultado=new Value(Integer.parseInt(id.getLexema()));
+                    exp.setResultado(resultado);
+                    RESULT=exp;
+                :};
 
 resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS 
         | ;
