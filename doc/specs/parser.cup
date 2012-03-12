@@ -155,7 +155,36 @@ declaraciones ::= dec_const_simbolica
                 | error declaraciones{: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
                 |;
 
-dec_const_simbolica ::= lista_identificadores DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA PUNTOYCOMA declaraciones 
+dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA declaraciones
+                        {:
+                            // Ámbito actual
+                            ScopeIF scope = scopeManager.getCurrentScope();
+                            
+                            // Al ser una constante numérica, su tipo es entero
+                            TypeIF tipo = new TypeSimpleInteger(scopeManager.getCurrentScope());
+                            
+                            // Añadir el tipo a la tabla de tipos
+                            TypeTableIF typeTable = scope.getTypeTable();
+                            if(!typeTable.containsType(tipo))
+                            {
+                                typeTable.addType(tipo);
+                            }
+                            
+                            // Añadir los identificadores a la tabla de símbolos
+                            List<Token> identificadores = lista.getListaIdentificadores();
+                            SymbolTableIF symbolTable = scope.getSymbolTable();
+                            for(int i = 0; i < identificadores.size(); i++)
+                            {
+                                if(!symbolTable.containsSymbol(identificadores.get(i).getLexema()))
+                                {
+                                    symbolTable.addSymbol(new SymbolIntegerConstant(scope, 
+                                                                identificadores.get(i).getLexema(), 
+                                                                tipo,
+                                                                Integer.parseInt(numero.getLexema())));
+                                }
+                            }
+                    
+                        :} 
                       | lista_identificadores DECLARACION CONSTANT ASIGNACION TRUE PUNTOYCOMA declaraciones
                       | lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
 
@@ -183,8 +212,8 @@ dec_tipo ::= lista_identificadores:lista DECLARACION tipo_simple:tSimple
 
 tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones 
                 {: 
-                    TypeSimple tipoSimple = new TypeSimple(scopeManager.getCurrentScope(), id.getLexema());
-                    RESULT = new TipoSimple(tipoSimple); 
+                    TypeSimpleInteger tipoSimpleInteger = new TypeSimpleInteger(scopeManager.getCurrentScope());
+                    RESULT = new TipoSimple(tipoSimpleInteger); 
                 :}
               | IDENTIFICADOR PUNTOYCOMA declaraciones 
               | BOOLEAN:id PUNTOYCOMA declaraciones                
