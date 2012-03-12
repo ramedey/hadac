@@ -168,14 +168,14 @@ dec_tipo ::= lista_identificadores:lista DECLARACION tipo_simple:tSimple
                     {
                         typeTable.addType(tSimple.getTipo());
                     }
-                    ArrayList<SymbolVariable> identificadores = lista.getListaIdentificadores();
+                    List<Token> identificadores = lista.getListaIdentificadores();
                     // Agregar los identificadores a la tabla de símbolos
                     SymbolTableIF symbolTable = scope.getSymbolTable();
                     for(int i = 0; i < identificadores.size(); i++)
                     {
-                       if(!symbolTable.containsSymbol(identificadores.get(i)))
+                       if(!symbolTable.containsSymbol(identificadores.get(i).getLexema()))
                        {
-                           symbolTable.addSymbol(identificadores.get(i));
+                           symbolTable.addSymbol(new SymbolVariable(scope, identificadores.get(i), tSimple.getTipo()));
                        }
                     }
                 :} 
@@ -192,10 +192,15 @@ tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
+                                if(lista.contiene(id))
+                                    semanticErrorManager.semanticFatalError("El identificador ya está declarado en el ámbito actual.");
+                                lista.addIdentificador(id);
                             :} 
                         | IDENTIFICADOR:id
                             {:
-                                
+                                ListaIdentificadores resultado = new ListaIdentificadores();
+                                resultado.addIdentificador(id);
+                                RESULT = resultado;
                             :};
 
 tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;

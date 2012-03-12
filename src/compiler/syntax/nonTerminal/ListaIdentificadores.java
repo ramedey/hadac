@@ -1,17 +1,24 @@
 package compiler.syntax.nonTerminal;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import compiler.semantic.symbol.SymbolVariable;
+import compiler.lexical.Token;
 
+/**
+ * 
+ * Lista de identificadores de clase Token
+ * @author amedey
+ *
+ */
 public class ListaIdentificadores extends NonTerminal {
 
-	private ArrayList<SymbolVariable> listaIdentificadores = new ArrayList<SymbolVariable>(); //Lista de identificadores
+	private List<Token> listaIdentificadores = new ArrayList<Token>(); //Lista de identificadores
 	
 	/**
 	 * @return the listaIdentificadores
 	 */
-	public ArrayList<SymbolVariable> getListaIdentificadores() {
+	public List<Token> getListaIdentificadores() {
 		return listaIdentificadores;
 	}
 
@@ -19,7 +26,7 @@ public class ListaIdentificadores extends NonTerminal {
 	 * @param listaIdentificadores the listaIdentificadores to set
 	 */
 	public void setListaIdentificadores(
-			ArrayList<SymbolVariable> listaIdentificadores) {
+			List<Token> listaIdentificadores) {
 		this.listaIdentificadores = listaIdentificadores;
 	}
 
@@ -27,9 +34,14 @@ public class ListaIdentificadores extends NonTerminal {
 		super();
 	}
 	
-	public void addIdentificador(SymbolVariable symbol)
+	public void addIdentificador(Token token)
 	{
-		//TODO: comprobar que no se inserte dos veces el mism símbolo
-		listaIdentificadores.add(symbol);		
+		//TODO: comprobar que no se inserte dos veces el mism símbolo		
+		listaIdentificadores.add(token);		
+	}
+	
+	public boolean contiene(Token token)
+	{
+		return listaIdentificadores.contains(token);
 	}
 }
