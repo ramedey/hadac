@@ -187,7 +187,11 @@ tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones
                     RESULT = new TipoSimple(tipoSimple); 
                 :}
               | IDENTIFICADOR PUNTOYCOMA declaraciones 
-              | BOOLEAN PUNTOYCOMA declaraciones;
+              | BOOLEAN:id PUNTOYCOMA declaraciones                
+                {: 
+                    TypeSimple tipoSimple = new TypeSimple(scopeManager.getCurrentScope(), id.getLexema());
+                    RESULT = new TipoSimple(tipoSimple); 
+                :};
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
