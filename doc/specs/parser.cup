@@ -236,7 +236,22 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                                 RESULT = resultado;
                             :};
 
-tipo_registro ::= TYPE IDENTIFICADOR IS RECORD dec_tipo END RECORD PUNTOYCOMA declaraciones ;
+tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_tipo END RECORD PUNTOYCOMA declaraciones 
+                    {:
+                        // Consultar en el ámbito actual si está el tipo resgitrado.
+                        ScopeIF scope = scopeManager.getCurrentScope();
+                        TypeTableIF typeTable = scope.getTypeTable();
+                        TypeRecord tipoRecord = new TypeRecord(scope, id.getLexema());
+                        if(!typeTable.containsType(tipo.getLexema()))
+                        {
+                            typeTable.addType(tipoRecord);
+                        }
+                        SymbolTableIF symbolTable = scope.getSymbolTable();
+                        if(!symbolTable.containsSymbol(id.getLexema()))
+                        {
+                           symbolTable.addSymbol(new SymbolVariable(scope,id, tipoRecord));
+                        }
+                    :};
 
 dec_subprograma ::= funcion declaraciones 
                   | procedimiento declaraciones;
