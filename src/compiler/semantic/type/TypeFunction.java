@@ -1,6 +1,9 @@
 package compiler.semantic.type;
 
+import java.util.HashMap;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeFunction.
@@ -12,7 +15,9 @@ import es.uned.lsi.compiler.semantic.ScopeIF;
 public class TypeFunction
     extends TypeProcedure
 {   
-    
+    TypeIF tipoRetorno;
+	HashMap<String, TypeIF> parametros;
+	
     /**
      * Constructor for TypeFunction.
      * @param scope The declaration scope.
@@ -20,6 +25,7 @@ public class TypeFunction
     public TypeFunction (ScopeIF scope)
     {
         super (scope);
+        parametros = new HashMap<String, TypeIF>();
     }
 
     /**
@@ -30,6 +36,7 @@ public class TypeFunction
     public TypeFunction (ScopeIF scope, String name)
     {
         super (scope, name);
+        parametros = new HashMap<String, TypeIF>();
     }
     
     /**
@@ -42,4 +49,33 @@ public class TypeFunction
         // TODO: Student work
         return 1;
     }
+    
+    /**
+	 * @return the tipoRetorno
+	 */
+	public TypeIF getTipoRetorno() {
+		return tipoRetorno;
+	}
+
+	/**
+	 * @param tipoRetorno the tipoRetorno to set
+	 */
+	public void setTipoRetorno(TypeIF tipoRetorno) {
+		this.tipoRetorno = tipoRetorno;
+	}
+
+	/**
+	 * @return the parametros
+	 */
+	public HashMap<String, TypeIF> getParametros() {
+		return parametros;
+	}
+
+	/**
+	 * @param parametros the parametros to set
+	 */
+	public void setParametros(HashMap<String, TypeIF> parametros) {
+		this.parametros = parametros;
+	}
+
 }

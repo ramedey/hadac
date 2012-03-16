@@ -20,6 +20,7 @@ import compiler.syntax.nonTerminal.*;
 import compiler.semantic.*;
 import compiler.semantic.symbol.*;
 import compiler.semantic.type.*;
+import compiler.semantic.util.*;
 import compiler.intermediate.*;
 import compiler.code.*;
 
@@ -98,8 +99,8 @@ non terminal Axiom		axiom;
 non terminal            declaraciones, lista_sentencias;
 non terminal            dec_const_simbolica, dec_tipo, dec_subprograma;
 non terminal ListaIdentificadores lista_identificadores;
-non terminal TipoSimple tipo_simple;
-non terminal            tipo_registro, tipo_retorno;
+non terminal TipoSimple tipo_simple, tipo_retorno;
+non terminal            tipo_registro;
 non terminal Expresion  expresion, expresion_logica, elemento;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal            funcion, procedimiento, parametros_formales, parametro_formal, declaraciones_subprograma;
@@ -249,14 +250,23 @@ tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_tipo END RECORD PUNTO
                         SymbolTableIF symbolTable = scope.getSymbolTable();
                         if(!symbolTable.containsSymbol(id.getLexema()))
                         {
-                           symbolTable.addSymbol(new SymbolVariable(scope,id, tipoRecord));
+                           symbolTable.addSymbol(new SymbolVariable(scope, id, tipoRecord));
                         }
                     :};
 
 dec_subprograma ::= funcion declaraciones 
                   | procedimiento declaraciones;
 
-funcion ::= FUNCTION IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS RETURN tipo_retorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+                {:
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TypeFunction function = new TypeFunction(scope, id.getLexema());
+                    function.setTipoRetorno(tipoRetorno.getTipo());
+                    Util.actualizarTablasSimbolosYTipos(scope, id, function);
+                    ScopeIF newScope = scopeManager.openScope(id.getLexema());
+                    
+                :};
+
 
 parametros_formales ::= parametro_formal PUNTOYCOMA parametros_formales 
                       | parametro_formal 
@@ -268,8 +278,8 @@ parametro_formal ::= lista_identificadores DECLARACION INTEGER
                    |;
                         
 
-tipo_retorno ::= INTEGER 
-               | BOOLEAN 
+tipo_retorno ::= INTEGER {: RESULT = new TipoSimple(new TypeSimpleInteger(scopeManager.getCurrentScope()));:}
+               | BOOLEAN {: RESULT = new TipoSimple(new TypeSimpleBoolean(scopeManager.getCurrentScope()));:}
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica 
