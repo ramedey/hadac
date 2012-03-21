@@ -77,5 +77,10 @@ public class TypeFunction
 	public void setParametros(HashMap<String, TypeIF> parametros) {
 		this.parametros = parametros;
 	}
+	
+	public void setParametro(String nombre, TypeIF tipo)
+	{
+		this.parametros.put(nombre, tipo);
+	}
 
 }
