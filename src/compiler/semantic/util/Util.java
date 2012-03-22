@@ -32,4 +32,16 @@ public class Util {
 		
 	}
 	
+	
+	public static boolean convertirStringABoolean(String cadena) throws Exception
+	{
+		if(cadena.toLowerCase() == "true")
+		{
+			return true;
+		}else if(cadena.toLowerCase() == "false")
+		{
+			return false;
+		}
+		throw new Exception("La cadena de entrada no se puede convertir: " + cadena);
+	}
 }
