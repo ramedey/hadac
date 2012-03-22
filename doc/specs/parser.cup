@@ -261,16 +261,25 @@ dec_subprograma ::= funcion declaraciones
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
+                    // registrar la funcion en el ambito actual
                     ScopeIF scope = scopeManager.getCurrentScope();
                     TypeFunction function = new TypeFunction(scope, id.getLexema());
                     function.setTipoRetorno(tipoRetorno.getTipo());
                     Util.actualizarTablasSimbolosYTipos(scope, id, function);
                     ScopeIF newScope = scopeManager.openScope(id.getLexema());
+                    function.setParametros(parametros.getParametros());
+                    
+                    //Registrar las declaraciones en el ambito actual
+                    
+                    //Comprobar que en el cuerpo existe la sentencia "return".
                     
                 :};
 
 
-parametros_formales ::= parametro_formal PUNTOYCOMA parametros_formales 
+parametros_formales ::= parametro_formal:parametro PUNTOYCOMA parametros_formales:parametros
+                        {:
+                            parametros.addParametro(parametro);
+                        :}
                       | parametro_formal:parametro 
                         {:
                             ParametrosFormales parametros = new ParametrosFormales();
@@ -297,7 +306,17 @@ declaraciones_subprograma ::= dec_const_simbolica
                             | dec_subprograma 
                             |;
 
-procedimiento ::= PROCEDURE IDENTIFICADOR ABRE_PARENTESIS parametros_formales CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA;
+procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+                    {:
+                         // registrar la funcion en el ambito actual
+                        ScopeIF scope = scopeManager.getCurrentScope();
+                        TypeProcedure procedure = new TypeProcedure(scope, id.getLexema());
+                        Util.actualizarTablasSimbolosYTipos(scope, id, procedure);
+                        ScopeIF newScope = scopeManager.openScope(id.getLexema());
+                        procedure.setParametros(parametros.getParametros());
+                    
+                        //Registrar las declaraciones en el ambito actual
+                    :};
 
 lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias 
                    | sentencia expresion PUNTOYCOMA lista_sentencias 
