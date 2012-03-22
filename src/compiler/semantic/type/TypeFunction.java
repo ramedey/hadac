@@ -16,9 +16,7 @@ public class TypeFunction
     extends TypeProcedure
 {   
     TypeIF tipoRetorno;
-	HashMap<String, TypeIF> parametros;
-	
-    /**
+	/**
      * Constructor for TypeFunction.
      * @param scope The declaration scope.
      */
@@ -62,25 +60,6 @@ public class TypeFunction
 	 */
 	public void setTipoRetorno(TypeIF tipoRetorno) {
 		this.tipoRetorno = tipoRetorno;
-	}
-
-	/**
-	 * @return the parametros
-	 */
-	public HashMap<String, TypeIF> getParametros() {
-		return parametros;
-	}
-
-	/**
-	 * @param parametros the parametros to set
-	 */
-	public void setParametros(HashMap<String, TypeIF> parametros) {
-		this.parametros = parametros;
-	}
-	
-	public void setParametro(String nombre, TypeIF tipo)
-	{
-		this.parametros.put(nombre, tipo);
 	}
 
 }

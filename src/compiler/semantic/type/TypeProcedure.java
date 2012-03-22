@@ -1,7 +1,10 @@
 package compiler.semantic.type;
 
+import java.util.HashMap;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 /**
  * Class for TypeProcedure.
@@ -13,7 +16,9 @@ import es.uned.lsi.compiler.semantic.type.TypeBase;
 public class TypeProcedure
     extends TypeBase
 {   
-   /**
+   protected HashMap<String, TypeIF> parametros;
+
+/**
      * Constructor for TypeProcedure.
      * @param scope The declaration scope.
      */
@@ -42,4 +47,22 @@ public class TypeProcedure
         // TODO: Student work
         return 1;
     }
+
+	/**
+	 * @return the parametros
+	 */
+	public HashMap<String, TypeIF> getParametros() {
+		return parametros;
+	}
+
+	/**
+	 * @param parametros the parametros to set
+	 */
+	public void setParametros(HashMap<String, TypeIF> parametros) {
+		this.parametros = parametros;
+	}
+
+	public void setParametro(String nombre, TypeIF tipo) {
+		this.parametros.put(nombre, tipo);
+	}
 }
