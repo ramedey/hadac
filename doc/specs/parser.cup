@@ -379,7 +379,16 @@ expresion_logica ::= expresion IGUAL expresion
 acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro 
                   | IDENTIFICADOR PUNTO IDENTIFICADOR;
 
-llamada_subprograma ::= IDENTIFICADOR ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS;
+llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
+                        {:
+                            ScopeIF scope = scopeManager.getCurrentScope();
+                            SymbolTableIF symbolTable = scope.getSymbolTable ();
+                            TypeTableIF typeTable = scope.getTypeTable ();
+                            if (!(symbolTable.containsSymbol(id.getLexema())) && !(typeTable.containsType(id.getLexema()))) { 
+                                //comprobar los parametros si coinciden en numero y tipo
+                                
+                            }
+                        :};
 
 parametros_actuales ::= expresion COMA parametros_actuales 
                       | expresion 
@@ -391,9 +400,9 @@ elemento ::= IDENTIFICADOR resto
            | FALSE 
            | CONSTANTE_NUMERICA:id
                 {:
-                    Expresion exp = new Expresion(new TypeSimple(scopeManager.getCurrentScope(), "ENTERO"));
+                    Expresion exp = new Expresion(new TypeSimpleInteger(scopeManager.getCurrentScope()));
 
-                    Value resultado=new Value(Integer.parseInt(id.getLexema()));
+                    Value resultado = new Value(Integer.parseInt(id.getLexema()));
                     exp.setResultado(resultado);
                     RESULT=exp;
                 :};
