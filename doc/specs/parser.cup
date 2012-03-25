@@ -196,28 +196,29 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             // Al ser una constante booleana, su tipo es booleano
                             TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
                             
-                            // Añadir el tipo a la tabla de tipos
-                            TypeTableIF typeTable = scope.getTypeTable();
-                            if(!typeTable.containsType(tipo))
+                            try{
+                                Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
+                            }catch(Exception ex)
                             {
-                                typeTable.addType(tipo);
+                                semanticErrorManager.semanticFatalError(ex.getMessage());
                             }
-                            
-                            // Añadir los identificadores a la tabla de símbolos
-                            List<Token> identificadores = lista.getListaIdentificadores();
-                            SymbolTableIF symbolTable = scope.getSymbolTable();
-                            for(int i = 0; i < identificadores.size(); i++)
-                            {
-                                if(!symbolTable.containsSymbol(identificadores.get(i).getLexema()))
-                                {
-                                    symbolTable.addSymbol(new SymbolBooleanConstant(scope, 
-                                                                identificadores.get(i).getLexema(), 
-                                                                tipo,
-                                                                Util.convertirStringABoolean(constante.getLexema())));
-                                }
-                            }
+                                                        
                         :}
-                      | lista_identificadores DECLARACION CONSTANT ASIGNACION FALSE PUNTOYCOMA declaraciones;
+                      | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA declaraciones
+                        {:
+                             // Ámbito actual
+                            ScopeIF scope = scopeManager.getCurrentScope();
+                            
+                            // Al ser una constante booleana, su tipo es booleano
+                            TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
+                            
+                            try{
+                                Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
+                            }catch(Exception ex)
+                            {
+                                semanticErrorManager.semanticFatalError(ex.getMessage());
+                            }
+                        :};
 
 dec_tipo ::= lista_identificadores:lista DECLARACION tipo_simple:tSimple
                 {:

@@ -1,6 +1,9 @@
 package compiler.semantic.util;
 
+import java.util.List;
+
 import compiler.lexical.Token;
+import compiler.semantic.symbol.SymbolBooleanConstant;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -30,6 +33,29 @@ public class Util {
            symbolTable.addSymbol(new SymbolVariable(scope, id, tipo));
         }
 		
+	}
+	
+	public static void agregarConstanteBooleanaATablasSimbolosYTipos(ScopeIF scope, List<Token> identificadores, TypeIF tipo, Token constante) throws Exception
+	{
+        // Añadir el tipo a la tabla de tipos
+        TypeTableIF typeTable = scope.getTypeTable();
+        if(!typeTable.containsType(tipo))
+        {
+            typeTable.addType(tipo);
+        }
+        
+        // Añadir los identificadores a la tabla de símbolos
+        SymbolTableIF symbolTable = scope.getSymbolTable();
+        for(int i = 0; i < identificadores.size(); i++)
+        {
+            if(!symbolTable.containsSymbol(identificadores.get(i).getLexema()))
+            {
+                symbolTable.addSymbol(new SymbolBooleanConstant(scope, 
+                                            identificadores.get(i).getLexema(), 
+                                            tipo,
+                                            Util.convertirStringABoolean(constante.getLexema())));
+            }
+        }
 	}
 	
 	
