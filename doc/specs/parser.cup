@@ -318,7 +318,10 @@ parametros_formales ::= parametro_formal:parametro PUNTOYCOMA parametros_formale
                       | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de parametros formales."); :};
                         
                        
-parametro_formal ::= lista_identificadores DECLARACION INTEGER 
+parametro_formal ::= lista_identificadores:lista DECLARACION INTEGER 
+                        {:
+                            RESULT = new ParametroFormal(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()));                            
+                        :}
                    | lista_identificadores:lista DECLARACION BOOLEAN 
                         {:
                             RESULT = new ParametroFormal(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()));                            
