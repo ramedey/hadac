@@ -5,8 +5,28 @@ import java.util.List;
 public class ListaSentencias extends NonTerminal {
 
 	private List<NonTerminal> lista;
-	boolean tieneSentenciaReturn = false;
+	/**
+	 * Indice de la primera sentencia return en la lista de sentencias
+	 */
+	int indiceSentenciaReturn = -1;
 	
+	/**
+	 * @return the tieneSentenciaReturn
+	 */
+	public boolean tieneSentenciaReturn() {
+		return indiceSentenciaReturn != -1;
+	}
+
+	/**
+	 * Obtiene la sentencia return de la lista de sentencias
+	 * @return La sentencia return o null si no tiene ninguna sentencia return
+	 */
+	public SentenciaReturn getSentenciaReturn()
+	{
+		if(this.tieneSentenciaReturn())
+			return (SentenciaReturn) lista.get(indiceSentenciaReturn);
+		return null;
+	}
 	public ListaSentencias()
 	{
 		super();
@@ -23,7 +43,7 @@ public class ListaSentencias extends NonTerminal {
 	/**
 	 * Agrega una sentencia o expresion a la lista. Si es una sentencia
 	 * se comprueba si es una sentencia return para actualizar la variable
-	 * "tieneSentenciaReturn"
+	 * "indiceSentenciaReturn"
 	 * @param noterminal
 	 * @throws Exception
 	 */
@@ -36,9 +56,11 @@ public class ListaSentencias extends NonTerminal {
 		{
 			Sentencia sent = (Sentencia)noterminal;
 			
-			if(sent.isSentenciaReturn())
+			// Si es una sentencia Return y no hay otra sentencia return previa,
+			// se almacena su indice en la lista de sentencias.
+			if(sent instanceof SentenciaReturn && !this.tieneSentenciaReturn())
 			{
-				this.tieneSentenciaReturn = true;
+				this.indiceSentenciaReturn = lista.size() - 1;
 			}
 		}
 		
