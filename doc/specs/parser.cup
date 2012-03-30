@@ -302,10 +302,19 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     
                     //Registrar las declaraciones en el ambito actual
                     
-                    //Comprobar que en el cuerpo existe la sentencia "return".
+                    //Comprobar que en el cuerpo existe la sentencia "return"
+                    // y que su tipo coincide con el tipo de retorno declarado
+                    // en la cabecera de la función.
                     if(listaSentencias.tieneSentenciaReturn())
                     {
                         SentenciaReturn sent = listaSentencias.getSentenciaReturn();
+                        
+                        if(sent.getTipoDevolucion() != function.getTipoRetorno())
+                        {
+                            semanticErrorManager.semanticFatalError("El tipo de retorno no coincide con el tipo de la sentencia Return");
+                        }
+                    }else{
+                        semanticErrorManager.semanticFatalError("La función declarada no tiene sentencia Return");
                     }
                 :};
 

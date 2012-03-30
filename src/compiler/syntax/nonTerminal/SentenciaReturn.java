@@ -15,7 +15,7 @@ public class SentenciaReturn extends Sentencia {
 		expresion = exp;
 	}
 	
-	TypeIF getTipoDevolucion()
+	public TypeIF getTipoDevolucion()
 	{
 		if(expresion != null)
 			return expresion.getTipoInstruccion();
