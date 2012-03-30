@@ -383,6 +383,9 @@ expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
                 semanticErrorManager.semanticFatalError("Los tipos no coinciden");
             }
             
+            // Realizar la suma de expresiones.
+            exp.setValue(e1.getValue() + e1.getValue());
+            
             RESULT = exp;
         :};
 
