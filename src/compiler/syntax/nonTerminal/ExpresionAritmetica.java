@@ -1,5 +1,8 @@
 package compiler.syntax.nonTerminal;
 
+import compiler.semantic.type.TypeSimpleInteger;
+import es.uned.lsi.compiler.semantic.ScopeIF;
+
 public class ExpresionAritmetica extends Expresion {
 
 	// valor entero del contexto de la expresión
@@ -8,7 +11,7 @@ public class ExpresionAritmetica extends Expresion {
 	/**
 	 * @return the value
 	 */
-	public int getValue() {
+	public Object getValue() {
 		return value;
 	}
 
@@ -19,12 +22,20 @@ public class ExpresionAritmetica extends Expresion {
 		this.value = value;
 	}
 
-	public ExpresionAritmetica(){
-		super();
+	public ExpresionAritmetica(int value, ScopeIF scope) {
+		this.value = value;
+		this.setTipoInstruccion(new TypeSimpleInteger(scope));
+	}
+
+	public ExpresionAritmetica(Expresion e1, Expresion e2) throws Exception
+	{
+		super(e1, e2);		
 	}
 	
-	public ExpresionAritmetica(int value){
-		super();
-		this.value = value;
-	}
+	@Override
+	public void doOperation(Expresion e1, Expresion e2) {
+		value = Integer.parseInt(e1.getValue().toString()) + Integer.parseInt(e2.getValue().toString());
+	}	
+
+	
 }

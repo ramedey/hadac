@@ -1,64 +1,43 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.List;
-
-import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
-public class Expresion extends NonTerminal {
-
-    private TypeIF tipoInstruccion;
-    private List codigoIntermedio;
-    private OperandIF resultado;
+public abstract class Expresion extends NonTerminal {
     
-    public Expresion(){}
-    
-    public Expresion(TypeIF tipoInstruccion)
-    {
-    	this.tipoInstruccion = tipoInstruccion; 
-    }
-    
-    public Expresion(Expresion expresion)
-    {
-    	this.tipoInstruccion = expresion.getTipoInstruccion(); 
-    	this.resultado = expresion.getResultado();
-    }
-    
-	/**
+	private TypeIF tipoInstruccion;
+	
+    /**
 	 * @return the tipoInstruccion
 	 */
 	public TypeIF getTipoInstruccion() {
 		return tipoInstruccion;
 	}
+
 	/**
 	 * @param tipoInstruccion the tipoInstruccion to set
 	 */
 	public void setTipoInstruccion(TypeIF tipoInstruccion) {
 		this.tipoInstruccion = tipoInstruccion;
 	}
-	/**
-	 * @return the codigoIntermedio
-	 */
-	public List getCodigoIntermedio() {
-		return codigoIntermedio;
+	
+	public Expresion(){}
+	
+	public Expresion(Expresion e1, Expresion e2) throws Exception{
+		if(e1 == null)
+			throw new Exception("La primera expresión es nula");
+		if(e2 == null)
+			throw new Exception("La segunda expresión es nula");
+		
+		if(!e1.getTipoInstruccion().equals(e2.getTipoInstruccion()))
+        {
+			throw new Exception("Los tipos no coinciden");
+        }
+		
+		// Realizar la suma de expresiones.
+        this.doOperation(e1, e2);
 	}
-	/**
-	 * @param codigoIntermedio the codigoIntermedio to set
-	 */
-	public void setCodigoIntermedio(List codigoIntermedio) {
-		this.codigoIntermedio = codigoIntermedio;
-	}
-	/**
-	 * @return the resultado
-	 */
-	public OperandIF getResultado() {
-		return resultado;
-	}
-	/**
-	 * @param resultado the resultado to set
-	 */
-	public void setResultado(OperandIF resultado) {
-		this.resultado = resultado;
-	}
-    
+	
+	public abstract Object getValue();
+	
+	public abstract void doOperation(Expresion e1, Expresion e2);
 }

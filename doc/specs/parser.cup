@@ -368,30 +368,27 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
                    | sentencia expresion PUNTOYCOMA lista_sentencias 
                    | ;
 
-expresion ::= expresion_aritmetica:expa {: Expresion exp = new Expresion(expa); RESULT = exp; :}
+expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
             | expresion_logica 
             | elemento 
             | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
 expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
-        {:
-            ExpresionAritmetica exp = new ExpresionAritmetica();
-            
-            if(!e1.getTipoInstruccion().equals(e2.getTipoInstruccion()))
-            {
-                semanticErrorManager.semanticFatalError("Los tipos no coinciden");
+        {:        
+            try{
+                RESULT = new ExpresionAritmetica(e1, e2);
+            }catch(Exception ex){
+                semanticErrorManager.semanticFatalError(ex.getMessage());
             }
-            
-            // Realizar la suma de expresiones.
-            exp.setValue(e1.getValue() + e1.getValue());
-            
-            RESULT = exp;
         :};
 
-expresion_logica ::= expresion IGUAL expresion 
-                   | expresion OR expresion 
-                   | expresion MAYORQUE expresion;
+expresion_logica ::= expresion:e1 IGUAL expresion:e2 
+                     {:
+                        
+                     :}
+                   | expresion:e1 OR expresion:e2 
+                   | expresion:e1 MAYORQUE expresion:e2;
 
 acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro 
                   | IDENTIFICADOR PUNTO IDENTIFICADOR;
@@ -417,11 +414,8 @@ elemento ::= IDENTIFICADOR resto
            | FALSE 
            | CONSTANTE_NUMERICA:id
                 {:
-                    Expresion exp = new Expresion(new TypeSimpleInteger(scopeManager.getCurrentScope()));
-
-                    Value resultado = new Value(Integer.parseInt(id.getLexema()));
-                    exp.setResultado(resultado);
-                    RESULT=exp;
+                    ExpresionAritmetica expa = new ExpresionAritmetica(Integer.parseInt(id.getLexema()), scopeManager.getCurrentScope());
+                    RESULT=expa;
                 :};
 
 resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS 
