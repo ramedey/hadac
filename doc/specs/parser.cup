@@ -385,10 +385,28 @@ expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
 
 expresion_logica ::= expresion:e1 IGUAL expresion:e2 
                      {:
-                        
+                         try{
+                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
+                         }catch(Exception ex){
+                                semanticErrorManager.semanticFatalError(ex.getMessage());
+                         }
                      :}
-                   | expresion:e1 OR expresion:e2 
-                   | expresion:e1 MAYORQUE expresion:e2;
+                   | expresion:e1 OR expresion:e2
+                     {:
+                         try{
+                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
+                         }catch(Exception ex){
+                                semanticErrorManager.semanticFatalError(ex.getMessage());
+                         }
+                     :} 
+                   | expresion:e1 MAYORQUE expresion:e2
+                     {:
+                         try{
+                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
+                         }catch(Exception ex){
+                                semanticErrorManager.semanticFatalError(ex.getMessage());
+                         }
+                     :};
 
 acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro 
                   | IDENTIFICADOR PUNTO IDENTIFICADOR;

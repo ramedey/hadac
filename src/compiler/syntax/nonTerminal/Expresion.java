@@ -33,11 +33,11 @@ public abstract class Expresion extends NonTerminal {
 			throw new Exception("Los tipos no coinciden");
         }
 		
-		// Realizar la suma de expresiones.
+		// Realizar la operación de expresiones.
         this.doOperation(e1, e2);
 	}
 	
 	public abstract Object getValue();
 	
-	public abstract void doOperation(Expresion e1, Expresion e2);
+	public abstract void doOperation(Expresion e1, Expresion e2) throws Exception;
 }
