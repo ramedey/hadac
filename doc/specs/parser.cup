@@ -408,8 +408,18 @@ expresion_logica ::= expresion:e1 IGUAL expresion:e2
                          }
                      :};
 
-acceso_registro ::= IDENTIFICADOR PUNTO acceso_registro 
-                  | IDENTIFICADOR PUNTO IDENTIFICADOR;
+acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro 
+                    {:
+                        // Comprobar que existe el identificador en el ambito actual
+                        ScopeIF scope = scopeManager.getCurrentScope();
+                        Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
+                    :}
+                  | IDENTIFICADOR:id1 PUNTO IDENTIFICADOR:id2
+                    {:
+                        // Comprobar que existe el identificador en el ambito actual
+                        ScopeIF scope = scopeManager.getCurrentScope();
+                        Util.comprobarExisteSimboloEnAmbito(id1.getLexema(), scope);
+                    :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
