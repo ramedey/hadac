@@ -249,7 +249,15 @@ tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones
                     TypeSimpleInteger tipoSimpleInteger = new TypeSimpleInteger(scopeManager.getCurrentScope());
                     RESULT = new TipoSimple(tipoSimpleInteger); 
                 :}
-              | IDENTIFICADOR PUNTOYCOMA declaraciones 
+              | IDENTIFICADOR:id PUNTOYCOMA declaraciones
+                {:
+                    //Si no es ni entero ni booleano, solo puede ser un tipo registro.
+                    // Comprobar si el tipo está registrado en el ámbito actual
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
+                    //AQUI TENGO UN PROBLEMA CON LA GRAMÁTICA!
+                    //RESULT = scope.getSymbolTable().getSymbol(id.getLexema());
+                :} 
               | BOOLEAN:id PUNTOYCOMA declaraciones                
                 {: 
                     TypeSimpleBoolean tipoSimpleBoolean = new TypeSimpleBoolean(scopeManager.getCurrentScope());
