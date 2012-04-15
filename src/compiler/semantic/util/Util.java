@@ -8,6 +8,7 @@ import compiler.semantic.symbol.SymbolBooleanConstant;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.ScopeManagerIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolTableIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
@@ -93,4 +94,31 @@ public class Util {
 //			CompilerContext.getSemanticErrorManager().semanticFatalError("El símbolo " + textoSimbolo + " no existe en el ámbito actual");
 //		}
 	}
+	
+	/**
+	 * Busca un tipo en las tablas de tipos. En la actual y las de ámbitos de niveles superiores.
+	 * @param scopeManager
+	 * @param typeTable
+	 * @param name
+	 * @return
+	 */
+    public static TypeIF buscarTipoPreviamenteDeclarado(ScopeManagerIF scopeManager, String name){
+        
+        boolean encontrado=false;
+        ScopeIF scope = scopeManager.getCurrentScope();
+        TypeIF tipo=null;
+        while(scope != null){
+            if (encontrado) 
+            {
+            	break;
+            }
+            else {
+                tipo= scope.getTypeTable().getType(name);
+                if (tipo != null) {encontrado=true;}
+            }
+        	scope = scope.getParentScope();
+            
+        }
+       return tipo;         
+    }
 }

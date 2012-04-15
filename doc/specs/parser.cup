@@ -97,9 +97,9 @@ terminal Token TYPE;
 non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones;
-non terminal            dec_const_simbolica, dec_tipo, dec_subprograma;
+non terminal            dec_const_simbolica, dec_variable, dec_tipo_registro, dec_subprograma;
 non terminal ListaIdentificadores lista_identificadores;
-non terminal TipoSimple tipo_simple, tipo_retorno;
+non terminal TipoSimple tipo_retorno;
 non terminal            tipo_registro;
 non terminal Expresion  expresion, expresion_logica, elemento;
 non terminal ExpresionAritmetica expresion_aritmetica;
@@ -155,7 +155,8 @@ axiom ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS declar
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 declaraciones ::= dec_const_simbolica 
-                | dec_tipo 
+                | dec_variable
+                | dec_tipo_registro
                 | dec_subprograma  
                 | error declaraciones{: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
                 |;
@@ -222,47 +223,9 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                         :};
 
-dec_tipo ::= lista_identificadores:lista DECLARACION tipo_simple:tSimple
-                {:
-                    // Consultar en el ámbito actual si está el tipo resgitrado.
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                    TypeTableIF typeTable = scope.getTypeTable();
-                    if(!typeTable.containsType(tSimple.getTipo()))
-                    {
-                        typeTable.addType(tSimple.getTipo());
-                    }
-                    List<Token> identificadores = lista.getListaIdentificadores();
-                    // Agregar los identificadores a la tabla de símbolos
-                    SymbolTableIF symbolTable = scope.getSymbolTable();
-                    for(int i = 0; i < identificadores.size(); i++)
-                    {
-                       if(!symbolTable.containsSymbol(identificadores.get(i).getLexema()))
-                       {
-                           symbolTable.addSymbol(new SymbolVariable(scope, identificadores.get(i), tSimple.getTipo()));
-                       }
-                    }
-                :} 
-           | tipo_registro;
-
-tipo_simple ::= INTEGER:id PUNTOYCOMA declaraciones 
-                {: 
-                    TypeSimpleInteger tipoSimpleInteger = new TypeSimpleInteger(scopeManager.getCurrentScope());
-                    RESULT = new TipoSimple(tipoSimpleInteger); 
-                :}
-              | IDENTIFICADOR:id PUNTOYCOMA declaraciones
-                {:
-                    //Si no es ni entero ni booleano, solo puede ser un tipo registro.
-                    // Comprobar si el tipo está registrado en el ámbito actual
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                    Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
-                    //AQUI TENGO UN PROBLEMA CON LA GRAMÁTICA!
-                    //RESULT = scope.getSymbolTable().getSymbol(id.getLexema());
-                :} 
-              | BOOLEAN:id PUNTOYCOMA declaraciones                
-                {: 
-                    TypeSimpleBoolean tipoSimpleBoolean = new TypeSimpleBoolean(scopeManager.getCurrentScope());
-                    RESULT = new TipoSimple(tipoSimpleBoolean);
-                :};
+dec_variable ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA declaraciones |
+             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA declaraciones |
+             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA declaraciones;
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
@@ -278,7 +241,7 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                                 RESULT = resultado;
                             :};
 
-tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_tipo END RECORD PUNTOYCOMA declaraciones 
+dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variable END RECORD PUNTOYCOMA declaraciones 
                     {:
                         // Consultar en el ámbito actual si está el tipo resgitrado.
                         ScopeIF scope = scopeManager.getCurrentScope();
@@ -356,7 +319,7 @@ tipo_retorno ::= INTEGER {: RESULT = new TipoSimple(new TypeSimpleInteger(scopeM
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica 
-                            | dec_tipo 
+                            | dec_variable
                             | dec_subprograma 
                             |;
 
