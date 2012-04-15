@@ -3,6 +3,7 @@ package compiler.syntax.nonTerminal;
 import java.util.ArrayList;
 import java.util.List;
 
+import compiler.CompilerContext;
 import compiler.lexical.Token;
 
 /**
@@ -34,9 +35,18 @@ public class ListaIdentificadores extends NonTerminal {
 		super();
 	}
 	
+	/**
+	 * Añade un token a la lista de identificadores comprobando que no haya repeticiones
+	 * @param token
+	 */
 	public void addIdentificador(Token token)
 	{
-		//TODO: comprobar que no se inserte dos veces el mism símbolo		
+		//TODO: comprobar que no se inserte dos veces el mism símbolo	
+		if(contiene(token))
+		{
+			CompilerContext.getSemanticErrorManager().semanticFatalError("El símbolo " + token.getLexema() + " está repetido");
+		}
+		
 		listaIdentificadores.add(token);		
 	}
 	

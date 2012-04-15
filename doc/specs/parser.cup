@@ -97,7 +97,8 @@ terminal Token TYPE;
 non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones;
-non terminal            dec_const_simbolica, dec_variable, dec_tipo_registro, dec_subprograma;
+non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
+non terminal DecVariable dec_variable;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TipoSimple tipo_retorno;
 non terminal            tipo_registro;
@@ -223,9 +224,31 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                         :};
 
-dec_variable ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA declaraciones |
-             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA declaraciones |
-             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA declaraciones;
+dec_variable ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA declaraciones
+                {:
+                    //registrar identificadores y devolver objeto Decvariable
+                    RESULT = new DecVariable(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()),
+                    scopeManager.getCurrentScope());
+                :} |
+             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA declaraciones
+                {:
+                    //registrar identificadores y devolver objeto Decvariable
+                    TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
+                    
+                    // El tipo record debe estár declarado y ser visible en el ámbito actual
+                    if(tipo == null)
+                    {
+                        semanticErrorManager.semanticFatalError("El tipo " + id.getLexema() + "No está declarado o no es visible en este ámbito");
+                    }
+                    
+                    RESULT = new DecVariable(lista, tipo, scopeManager.getCurrentScope());
+                :} |
+             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA declaraciones
+                {:
+                    //registrar identificadores y devolver objeto Decvariable
+                    RESULT = new DecVariable(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()),
+                    scopeManager.getCurrentScope());
+                :} ;
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
