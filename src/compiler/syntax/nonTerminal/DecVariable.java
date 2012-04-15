@@ -14,6 +14,13 @@ public class DecVariable extends NonTerminal {
 	TypeIF tipo;
 	List<SymbolVariable> listaVariables;
 	
+	/**
+	 * @return the listaVariables
+	 */
+	public List<SymbolVariable> getListaVariables() {
+		return listaVariables;
+	}
+
 	public DecVariable()
 	{
 		super();

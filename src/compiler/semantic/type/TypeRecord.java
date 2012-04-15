@@ -2,6 +2,10 @@ package compiler.semantic.type;
 
 import java.util.HashMap;
 
+import compiler.semantic.symbol.SymbolVariable;
+import compiler.syntax.nonTerminal.DecVariable;
+import compiler.syntax.nonTerminal.DecVariables;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeBase;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
@@ -50,6 +54,26 @@ public class TypeRecord
         super (record.getScope (), record.getName ());
         campos = new HashMap<String, TypeIF>(record.campos);
     } 
+    
+    /**
+     * Constructor que crea un objeto TypeRecord con la lista de campos.
+     * @param scope
+     * @param name
+     * @param declaraciones
+     */
+    public TypeRecord(ScopeIF scope, String name, DecVariables declaraciones)
+    {
+    	super (scope, name);
+        campos = new HashMap<String, TypeIF>();
+        
+        for(DecVariable declaracion : declaraciones.getDeclaraciones())
+        {
+        	for(SymbolVariable symbol : declaracion.getListaVariables())
+        	{
+        		campos.put(symbol.getName(), symbol.getType());
+        	}        	
+        }
+    }
     
     /**
      * Returns the size of the type.

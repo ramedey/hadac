@@ -98,10 +98,9 @@ non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones;
 non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
-non terminal DecVariable dec_variable;
+non terminal DecVariables dec_variables;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TipoSimple tipo_retorno;
-non terminal            tipo_registro;
 non terminal Expresion  expresion, expresion_logica, elemento;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
@@ -155,14 +154,14 @@ axiom ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS declar
         :}
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
-declaraciones ::= dec_const_simbolica 
-                | dec_variable
-                | dec_tipo_registro
-                | dec_subprograma  
+declaraciones ::= dec_const_simbolica declaraciones
+                | dec_variables declaraciones
+                | dec_tipo_registro declaraciones
+                | dec_subprograma declaraciones
                 | error declaraciones{: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
                 |;
 
-dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA declaraciones
+dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
                             // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
@@ -192,7 +191,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                     
                         :} 
-                      | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION TRUE:constante PUNTOYCOMA declaraciones
+                      | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION TRUE:constante PUNTOYCOMA 
                         {:
                              // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
@@ -208,7 +207,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                                                         
                         :}
-                      | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA declaraciones
+                      | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA 
                         {:
                              // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
@@ -224,13 +223,13 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                         :};
 
-dec_variable ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA declaraciones
+dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA dec_variables
                 {:
                     //registrar identificadores y devolver objeto Decvariable
-                    RESULT = new DecVariable(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()),
-                    scopeManager.getCurrentScope());
+                    RESULT = new DecVariables(new DecVariable(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()),
+                    scopeManager.getCurrentScope()));
                 :} |
-             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA declaraciones
+             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA dec_variables
                 {:
                     //registrar identificadores y devolver objeto Decvariable
                     TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
@@ -241,13 +240,13 @@ dec_variable ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA d
                         semanticErrorManager.semanticFatalError("El tipo " + id.getLexema() + "No está declarado o no es visible en este ámbito");
                     }
                     
-                    RESULT = new DecVariable(lista, tipo, scopeManager.getCurrentScope());
+                    RESULT = new DecVariables(new DecVariable(lista, tipo, scopeManager.getCurrentScope()));
                 :} |
-             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA declaraciones
+             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA dec_variables
                 {:
                     //registrar identificadores y devolver objeto Decvariable
-                    RESULT = new DecVariable(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()),
-                    scopeManager.getCurrentScope());
+                    RESULT = new DecVariables(new DecVariable(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()),
+                    scopeManager.getCurrentScope()));
                 :} ;
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
@@ -264,12 +263,12 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                                 RESULT = resultado;
                             :};
 
-dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variable END RECORD PUNTOYCOMA declaraciones 
+dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variables:declaraciones END RECORD PUNTOYCOMA 
                     {:
                         // Consultar en el ámbito actual si está el tipo resgitrado.
                         ScopeIF scope = scopeManager.getCurrentScope();
                         TypeTableIF typeTable = scope.getTypeTable();
-                        TypeRecord tipoRecord = new TypeRecord(scope, id.getLexema());
+                        TypeRecord tipoRecord = new TypeRecord(scope, id.getLexema(), declaraciones);
                         if(!typeTable.containsType(tipo.getLexema()))
                         {
                             typeTable.addType(tipoRecord);
@@ -281,8 +280,8 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variable END RECO
                         }
                     :};
 
-dec_subprograma ::= funcion declaraciones 
-                  | procedimiento declaraciones;
+dec_subprograma ::= funcion  
+                  | procedimiento;
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
@@ -342,7 +341,7 @@ tipo_retorno ::= INTEGER {: RESULT = new TipoSimple(new TypeSimpleInteger(scopeM
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica 
-                            | dec_variable
+                            | dec_variables
                             | dec_subprograma 
                             |;
 
