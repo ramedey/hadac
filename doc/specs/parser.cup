@@ -340,9 +340,9 @@ tipo_retorno ::= INTEGER {: RESULT = new TipoSimple(new TypeSimpleInteger(scopeM
                | BOOLEAN {: RESULT = new TipoSimple(new TypeSimpleBoolean(scopeManager.getCurrentScope()));:}
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
-declaraciones_subprograma ::= dec_const_simbolica 
-                            | dec_variables
-                            | dec_subprograma 
+declaraciones_subprograma ::= dec_const_simbolica declaraciones_subprograma
+                            | dec_variables declaraciones_subprograma
+                            | dec_subprograma declaraciones_subprograma
                             |;
 
 procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
