@@ -418,14 +418,17 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                         {:
                             ScopeIF scope = scopeManager.getCurrentScope();
                             SymbolTableIF symbolTable = scope.getSymbolTable ();
-                            TypeTableIF typeTable = scope.getTypeTable ();
-                            if (!(symbolTable.containsSymbol(id.getLexema())) && !(typeTable.containsType(id.getLexema()))) { 
-                                //comprobar los parametros si coinciden en numero y tipo
+                            
+                            if (!symbolTable.containsSymbol(id.getLexema())) { 
+                                //comprobar los parametros si coinciden en orden, numero y tipo
                                 
                             }
                         :};
 
-parametros_actuales ::= expresion COMA parametros_actuales 
+parametros_actuales ::= expresion:exp COMA parametros_actuales:par 
+                        {:
+                            
+                        :}
                       | expresion 
                       |;
 
