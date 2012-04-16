@@ -109,7 +109,7 @@ non terminal            acceso_registro, llamada_subprograma, parametros_actuale
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia;
 non terminal            sentencia_asignacion, sentencia_if, sentencia_for, parametro;
-non terminal            sentencia_put_line, resto;
+non terminal            sentencia_put_line;
 // ...
 
 
@@ -362,6 +362,7 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
 expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
             | expresion_logica 
             | elemento 
+            | llamada_subprograma
             | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
@@ -430,8 +431,7 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
                       | expresion 
                       |;
 
-elemento ::= IDENTIFICADOR resto 
-           | acceso_registro 
+elemento ::= acceso_registro 
            | TRUE 
            | FALSE 
            | CONSTANTE_NUMERICA:id
@@ -439,9 +439,6 @@ elemento ::= IDENTIFICADOR resto
                     ExpresionAritmetica expa = new ExpresionAritmetica(Integer.parseInt(id.getLexema()), scopeManager.getCurrentScope());
                     RESULT=expa;
                 :};
-
-resto ::= ABRE_PARENTESIS parametros_actuales CIERRA_PARENTESIS 
-        | ;
 
 sentencia ::= sentencia_asignacion 
             | sentencia_if 
