@@ -362,7 +362,13 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
 expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
             | expresion_logica 
             | elemento 
-            | llamada_subprograma
+            | llamada_subprograma:llamada 
+            {: 
+                //Comprobar que no se está llamando a un procedimiento
+                if(llamada instanceof Sentencia){
+                    semanticErrorManager.semanticFatalError("La función debe devolver una valor");
+                }    
+            :}
             | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
@@ -415,12 +421,16 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
-                            ScopeIF scope = scopeManager.getCurrentScope();
-                            SymbolTableIF symbolTable = scope.getSymbolTable ();
+                            //Comprobar si elsubprograma es visible desde el ámbito actual
                             
-                            if (!symbolTable.containsSymbol(id.getLexema())) { 
-                                //comprobar los parametros si coinciden en orden, numero y tipo
+                            TypeIF tipo = buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
+                                                       
+                            //comprobar los parametros si coinciden en orden, numero y tipo
+                            if (tipo != null) { 
                                 
+                                
+                            }else{
+                                semanticErrorManager.semanticFatalError("El procedimiento o funcion " + id.getLexema() + " no existe");
                             }
                         :};
 
