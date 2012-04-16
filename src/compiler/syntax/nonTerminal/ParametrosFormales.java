@@ -24,13 +24,11 @@ public class ParametrosFormales extends NonTerminal {
 		this.parametros = parametros;
 	}
 
-	public void addParametro(ParametroFormal p)
-	{
-		ListaIdentificadores lista = p.listaIdentificadores;
-		
+	public void addParametros(ListaIdentificadores lista, TypeIF tipo)
+	{	
 		for(Token t : lista.getListaIdentificadores())
 		{
-			parametros.put(t.getLexema(), p.tipo);			
+			parametros.put(t.getLexema(), tipo);			
 		}
 	}
 }

@@ -100,11 +100,10 @@ non terminal            declaraciones;
 non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
 non terminal DecVariables dec_variables;
 non terminal ListaIdentificadores lista_identificadores;
-non terminal TipoSimple tipo_retorno;
+non terminal TypeSimple tipo_retorno, tipo_parametro;
 non terminal Expresion  expresion, expresion_logica, elemento;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
-non terminal ParametroFormal parametro_formal;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
 non terminal            acceso_registro, llamada_subprograma, parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -288,7 +287,7 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     // registrar la funcion en el ambito actual
                     ScopeIF scope = scopeManager.getCurrentScope();
                     TypeFunction function = new TypeFunction(scope, id.getLexema());
-                    function.setTipoRetorno(tipoRetorno.getTipo());
+                    function.setTipoRetorno(tipoRetorno);
                     Util.actualizarTablasSimbolosYTipos(scope, id, function);
                     ScopeIF newScope = scopeManager.openScope(id.getLexema());
                     function.setParametros(parametros.getParametros());
@@ -312,32 +311,32 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                 :};
 
 
-parametros_formales ::= parametro_formal:parametro PUNTOYCOMA parametros_formales:parametros
+parametros_formales ::= lista_identificadores:lista DECLARACION tipo_parametro:tipo PUNTOYCOMA parametros_formales:parametros
                         {:
-                            parametros.addParametro(parametro);
+                            parametros.addParametros(lista, tipo);
                         :}
-                      | parametro_formal:parametro 
+                      | lista_identificadores:lista DECLARACION tipo_parametro:tipo 
                         {:
                             ParametrosFormales parametros = new ParametrosFormales();
-                            parametros.addParametro(parametro);
+                            parametros.addParametros(lista, tipo);
                             RESULT = parametros;
                         :}
                       | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de parametros formales."); :};
                         
                        
-parametro_formal ::= lista_identificadores:lista DECLARACION INTEGER 
+tipo_parametro ::= INTEGER 
                         {:
-                            RESULT = new ParametroFormal(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()));                            
+                            RESULT = new TypeSimpleInteger(scopeManager.getCurrentScope());                            
                         :}
-                   | lista_identificadores:lista DECLARACION BOOLEAN 
+                   | BOOLEAN 
                         {:
-                            RESULT = new ParametroFormal(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()));                            
+                            new TypeSimpleBoolean(scopeManager.getCurrentScope());                            
                         :}
                    |;
                         
 
-tipo_retorno ::= INTEGER {: RESULT = new TipoSimple(new TypeSimpleInteger(scopeManager.getCurrentScope()));:}
-               | BOOLEAN {: RESULT = new TipoSimple(new TypeSimpleBoolean(scopeManager.getCurrentScope()));:}
+tipo_retorno ::= INTEGER {: RESULT = new TypeSimpleInteger(scopeManager.getCurrentScope());:}
+               | BOOLEAN {: RESULT = new TypeSimpleBoolean(scopeManager.getCurrentScope());:}
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica declaraciones_subprograma
