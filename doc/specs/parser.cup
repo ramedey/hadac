@@ -423,7 +423,7 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                         {:
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
-                            TypeIF tipo = buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
+                            TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                                                        
                             //comprobar los parametros si coinciden en orden, numero y tipo
                             if (tipo != null) { 
