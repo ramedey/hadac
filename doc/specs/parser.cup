@@ -321,7 +321,7 @@ parametros_formales ::= lista_identificadores:lista DECLARACION tipo_parametro:t
                             parametros.addParametros(lista, tipo);
                             RESULT = parametros;
                         :}
-                      | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de parametros formales."); :};
+                      | ;
                         
                        
 tipo_parametro ::= INTEGER 
@@ -331,8 +331,7 @@ tipo_parametro ::= INTEGER
                    | BOOLEAN 
                         {:
                             new TypeSimpleBoolean(scopeManager.getCurrentScope());                            
-                        :}
-                   |;
+                        :};
                         
 
 tipo_retorno ::= INTEGER {: RESULT = new TypeSimpleInteger(scopeManager.getCurrentScope());:}
