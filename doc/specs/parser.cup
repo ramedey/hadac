@@ -469,6 +469,11 @@ sentencia ::= sentencia_asignacion
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
 sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion 
+                         {:
+                         // Comprobar que el identificador es visible desde el ámbito actual
+                         //Comprobar que le tipo de la expresión es compatible con el del
+                         // símbolo que recibe el valor en la asignación.
+                         :}
                        | acceso_registro ASIGNACION expresion;
 
 sentencia_if ::= IF expresion THEN lista_sentencias END IF 
