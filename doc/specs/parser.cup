@@ -32,6 +32,14 @@ action code {:
 	SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
 	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
 	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
+	
+	public void aserto(boolean esCierto, String mensajeError){
+	
+	   if(!esCierto)
+	   {
+	       semanticErrorManager.semanticFatalError(mensajeError);
+	   }
+	}
 
 :}	
 
@@ -105,7 +113,8 @@ non terminal Expresion  expresion, expresion_logica, elemento;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
-non terminal            acceso_registro, llamada_subprograma, parametros_actuales;
+non terminal            acceso_registro, llamada_subprograma;
+non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia;
 non terminal            sentencia_asignacion, sentencia_if, sentencia_for, parametro;
@@ -424,21 +433,22 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
+                            
+                            aserto(tipo != null, "El procedimiento o funcion " + id.getLexema() + " no existe");
                                                        
                             //comprobar los parametros si coinciden en orden, numero y tipo
-                            if (tipo != null) { 
-                                
-                                
-                            }else{
-                                semanticErrorManager.semanticFatalError("El procedimiento o funcion " + id.getLexema() + " no existe");
-                            }
+                            TypeProcedure tipoSubprograma = (TypeProcedure)tipo;                              
+                            aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");                                                                
                         :};
 
 parametros_actuales ::= expresion:exp COMA parametros_actuales:par 
                         {:
-                            
+                            RESULT = new ParametrosActuales(exp, par);
                         :}
-                      | expresion 
+                      | expresion:exp
+                        {:
+                            RESULT = new ParametrosActuales(exp);
+                        :}
                       |;
 
 elemento ::= acceso_registro 
