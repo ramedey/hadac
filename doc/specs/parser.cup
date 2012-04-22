@@ -109,11 +109,12 @@ non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
 non terminal DecVariables dec_variables;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TypeSimple tipo_retorno, tipo_parametro;
-non terminal Expresion  expresion, expresion_logica, elemento;
+non terminal Expresion  expresion, expresion_logica;
+non terminal Elemento   elemento, acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal            funcion, procedimiento, declaraciones_subprograma;
-non terminal            acceso_registro, llamada_subprograma;
+non terminal            llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia;
@@ -370,14 +371,7 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
 
 expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
             | expresion_logica 
-            | elemento 
-            | llamada_subprograma:llamada 
-            {: 
-                //Comprobar que no se está llamando a un procedimiento
-                if(llamada instanceof Sentencia){
-                    semanticErrorManager.semanticFatalError("La función debe devolver una valor");
-                }    
-            :}
+            | elemento             
             | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
@@ -456,9 +450,16 @@ elemento ::= acceso_registro
            | FALSE 
            | CONSTANTE_NUMERICA:id
                 {:
-                    ExpresionAritmetica expa = new ExpresionAritmetica(Integer.parseInt(id.getLexema()), scopeManager.getCurrentScope());
-                    RESULT=expa;
-                :};
+                    Elemento elto = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
+                    RESULT=elto;
+                :}
+           | llamada_subprograma:llamada 
+            {: 
+                //Comprobar que no se está llamando a un procedimiento
+                if(llamada instanceof Sentencia){
+                    semanticErrorManager.semanticFatalError("La función debe devolver una valor");
+                }    
+            :};
 
 sentencia ::= sentencia_asignacion 
             | sentencia_if 
@@ -468,13 +469,34 @@ sentencia ::= sentencia_asignacion
             | RETURN expresion 
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
-sentencia_asignacion ::= IDENTIFICADOR ASIGNACION expresion 
+sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          {:
                          // Comprobar que el identificador es visible desde el ámbito actual
+                         SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
+                         
+                         
                          //Comprobar que le tipo de la expresión es compatible con el del
                          // símbolo que recibe el valor en la asignación.
+                         
+                         SymbolVariable variable = (SymbolVariable) simbolo;
+                         
+                         aserto(variable.getType().equals(exp.getTipoInstruccion()), "Los tipos de la expresión y de la variable asignada no coinciden");
+                         
+                         
                          :}
-                       | acceso_registro ASIGNACION expresion;
+                       | acceso_registro:reg ASIGNACION expresion:exp
+                       {:
+                            //Comprobar que el tipo registro existe y es visisble desde el ámbito actual
+                            
+                            //Comprobar que el tipo de la expresion coincide con el del campo del registro.
+                            
+                            TypeBase tipo = (TypeBase)reg.getTipoInstruccion();
+                            aserto(tipo.equals(exp.getTipoInstruccion()), "Los tipos de la expresión y de la variable asignada no coinciden");
+                            
+                            //Realiza la asignacion
+                            
+                            reg.setResultado(exp.getValue());
+                       :};
 
 sentencia_if ::= IF expresion THEN lista_sentencias END IF 
                | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF;

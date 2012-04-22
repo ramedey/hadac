@@ -3,7 +3,7 @@ package compiler.syntax.nonTerminal;
 import compiler.semantic.type.TypeSimpleInteger;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
-public class ExpresionAritmetica extends Expresion {
+public class ExpresionAritmetica extends ExpresionOperacion {
 
 	// valor entero del contexto de la expresión
 	private int value;
@@ -33,7 +33,7 @@ public class ExpresionAritmetica extends Expresion {
 	}
 	
 	@Override
-	public void doOperation(Expresion e1, Expresion e2) {
+	public void doOperation(Expresion e1, Expresion e2) throws Exception{
 		value = Integer.parseInt(e1.getValue().toString()) + Integer.parseInt(e2.getValue().toString());
 	}	
 

@@ -4,7 +4,7 @@ import compiler.semantic.type.TypeSimpleBoolean;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
-public class ExpresionLogica extends Expresion {
+public class ExpresionLogica extends ExpresionOperacion {
 
 	private boolean value;
 	private Operation operacion;
