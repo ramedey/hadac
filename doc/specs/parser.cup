@@ -167,7 +167,6 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
         lista_sentencias 
         {: syntaxErrorManager.syntaxInfo("Termina cuerpo programa");:}
         END IDENTIFICADOR PUNTOYCOMA
-        
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 declaraciones ::= dec_const_simbolica declaraciones
@@ -175,7 +174,7 @@ declaraciones ::= dec_const_simbolica declaraciones
                 | dec_tipo_registro declaraciones
                 | dec_subprograma declaraciones
                 | error declaraciones {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
-                | {: syntaxErrorManager.syntaxInfo("Fin declaracion de constante"); :};
+                | {: syntaxErrorManager.syntaxInfo("Fin declaraciones"); :};
 
 dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
@@ -240,7 +239,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             }
                         :};
 
-dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA dec_variables
+dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
                 {:
                 syntaxErrorManager.syntaxInfo("Declaracion de variables");
                     // comprobar si ya hay una variable con el mismo nombre en el ambito actual
@@ -249,7 +248,7 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
                     RESULT = new DecVariables(new DecVariable(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()),
                     scopeManager.getCurrentScope()));
                 :} |
-             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA dec_variables
+             lista_identificadores:lista DECLARACION IDENTIFICADOR:id PUNTOYCOMA 
                 {:
                     //registrar identificadores y devolver objeto Decvariable
                     TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
@@ -262,12 +261,12 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
                     
                     RESULT = new DecVariables(new DecVariable(lista, tipo, scopeManager.getCurrentScope()));
                 :} |
-             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA dec_variables
+             lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA 
                 {:
                     //registrar identificadores y devolver objeto Decvariable
                     RESULT = new DecVariables(new DecVariable(lista, new TypeSimpleBoolean(scopeManager.getCurrentScope()),
                     scopeManager.getCurrentScope()));
-                :} ;
+                :};
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
