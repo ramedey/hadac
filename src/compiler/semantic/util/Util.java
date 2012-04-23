@@ -76,18 +76,31 @@ public class Util {
 	
 	/**
 	 * Comprueba si se ha registrado la tabla de símbolos del ámbito
-	 * pasado como parámetro el símbolo pasado como parámetro.
+	 * pasado como parámetro (y superiores) el símbolo pasado como parámetro.
 	 * @param textoSimbolo Cadena de caracteres con el nombre del símbolo
 	 * @param scope Ámbito donde se comprueba la existencia del símbolo.
 	 */
-	public static void comprobarExisteSimboloEnAmbito(String textoSimbolo, ScopeIF scope)
+	public static SymbolIF comprobarExisteSimboloEnAmbito(String textoSimbolo, ScopeIF scope)
 	{
 		if(!scope.getSymbolTable().containsSymbol(textoSimbolo))
 		{
-			CompilerContext.getSemanticErrorManager().semanticFatalError("El símbolo " + textoSimbolo + " no existe en el ámbito actual");
+			ScopeIF parentScope = scope.getParentScope();
+			boolean encontrado = false;
+			while(parentScope != null && encontrado == false)
+			{
+				if(parentScope.getSymbolTable().containsSymbol(textoSimbolo))
+				{
+					encontrado = true;
+				}
+				parentScope = parentScope.getParentScope();
+			}
+			if(!encontrado)
+			{
+				CompilerContext.getSemanticErrorManager().semanticFatalError("El simbolo " + textoSimbolo + " no existe. Ambito " + scope.getName());
+			}
 		}
 		
-//		SymbolIF simbolo = scope.getSymbolTable().getSymbol(textoSimbolo);
+		return scope.getSymbolTable().getSymbol(textoSimbolo);
 //		
 //		if(!scope.getTypeTable().containsType(simbolo.getType()))
 //		{
