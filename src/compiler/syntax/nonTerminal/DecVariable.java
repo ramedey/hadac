@@ -3,6 +3,7 @@ package compiler.syntax.nonTerminal;
 import java.util.ArrayList;
 import java.util.List;
 
+import compiler.CompilerContext;
 import compiler.lexical.Token;
 import compiler.semantic.symbol.SymbolVariable;
 
@@ -29,6 +30,8 @@ public class DecVariable extends NonTerminal {
 	
 	/**
 	 * Construye un objeto DecVariable a partir de una lista de tokens.
+	 * Comprueba si hay en el mismo ambito otros identificadores con el mismo nombre.
+	 * Registra cada símbolo en el ámbito actual.
 	 * @param lista Lista de tokens, se supone que no hay tokens repetidos, ya que la 
 	 * clase ListaIdentificadores no lo permite.
 	 * @param tipo
@@ -37,9 +40,19 @@ public class DecVariable extends NonTerminal {
 	public DecVariable(ListaIdentificadores lista, TypeIF tipo, ScopeIF scope)
 	{
 		this.tipo = tipo; 
+		listaVariables = new ArrayList<SymbolVariable>();
 		for(Token token : lista.getListaIdentificadores())
 		{
-			listaVariables.add(new SymbolVariable(scope, token, tipo));
+			if(!this.existeIdentificadorEnAmbito(scope, token.getLexema()))
+			{
+				//Registra cada símbolo en el ámbito pasado como parámetro
+				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrado simbolo " + token.getLexema() + " en ambito " + scope.getName());
+				scope.getSymbolTable().addSymbol(new SymbolVariable(scope, token, tipo));
+				listaVariables.add(new SymbolVariable(scope, token, tipo));
+				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrado simbolo");
+			}else{
+				CompilerContext.getSemanticErrorManager().semanticError("El identificador " + token.getLexema() + " ya existe.");
+			}
 		}
 	}
 	
@@ -62,4 +75,8 @@ public class DecVariable extends NonTerminal {
 		listaVariables.add(variable);
 	}
 	
+	public boolean existeIdentificadorEnAmbito(ScopeIF scope, String simbolo)
+	{
+		return scope.getSymbolTable().containsSymbol(simbolo);
+	}
 }
