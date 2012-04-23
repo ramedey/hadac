@@ -498,8 +498,18 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             reg.setResultado(exp.getValue());
                        :};
 
-sentencia_if ::= IF expresion THEN lista_sentencias END IF 
-               | IF expresion THEN lista_sentencias ELSE lista_sentencias END IF;
+sentencia_if ::= IF expresion:exp THEN lista_sentencias END IF 
+                {:
+                    //Comprobar que la expresion sea logica
+                    
+                    aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
+                :}
+               | IF expresion:exp THEN lista_sentencias ELSE lista_sentencias END IF
+                {:
+                    //Comprobar que la expresion sea logica
+                    
+                    aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
+                :};
 
 sentencia_for ::= FOR expresion IN expresion PUNTOPUNTO expresion LOOP lista_sentencias END LOOP;
 
