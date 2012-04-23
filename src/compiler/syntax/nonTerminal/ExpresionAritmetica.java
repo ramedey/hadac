@@ -33,7 +33,7 @@ public class ExpresionAritmetica extends ExpresionOperacion {
 	}
 	
 	@Override
-	public void doOperation(Expresion e1, Expresion e2) throws Exception{
+	public void doOperation(Expresion e1, Expresion e2){
 		value = Integer.parseInt(e1.getValue().toString()) + Integer.parseInt(e2.getValue().toString());
 	}	
 

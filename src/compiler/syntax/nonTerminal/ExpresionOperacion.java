@@ -24,6 +24,6 @@ public abstract class ExpresionOperacion extends Expresion {
         this.doOperation(e1, e2);
 	}
 	
-	public abstract void doOperation(Expresion e1, Expresion e2) throws Exception;
+	public abstract void doOperation(Expresion e1, Expresion e2);
 
 }

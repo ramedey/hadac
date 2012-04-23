@@ -215,13 +215,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             // Al ser una constante booleana, su tipo es booleano
                             TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
                             
-                            try{
-                                Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
-                            }catch(Exception ex)
-                            {
-                                semanticErrorManager.semanticFatalError(ex.getMessage());
-                            }
-                                                        
+                            Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
                         :}
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA 
                         {:
@@ -231,12 +225,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             // Al ser una constante booleana, su tipo es booleano
                             TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
                             
-                            try{
-                                Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
-                            }catch(Exception ex)
-                            {
-                                semanticErrorManager.semanticFatalError(ex.getMessage());
-                            }
+                            Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
                         :};
 
 dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
@@ -381,36 +370,20 @@ expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
 
 expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
         {:        
-            try{
-                RESULT = new ExpresionAritmetica(e1, e2);
-            }catch(Exception ex){
-                semanticErrorManager.semanticFatalError(ex.getMessage());
-            }
+            RESULT = new ExpresionAritmetica(e1, e2);            
         :};
 
 expresion_logica ::= expresion:e1 IGUAL expresion:e2 
                      {:
-                         try{
-                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
-                         }catch(Exception ex){
-                                semanticErrorManager.semanticFatalError(ex.getMessage());
-                         }
+                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
                      :}
                    | expresion:e1 OR expresion:e2
                      {:
-                         try{
-                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
-                         }catch(Exception ex){
-                                semanticErrorManager.semanticFatalError(ex.getMessage());
-                         }
+                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
                      :} 
                    | expresion:e1 MAYORQUE expresion:e2
                      {:
-                         try{
-                                RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
-                         }catch(Exception ex){
-                                semanticErrorManager.semanticFatalError(ex.getMessage());
-                         }
+                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
                      :};
 
 acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro 
