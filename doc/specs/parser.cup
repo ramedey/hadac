@@ -118,7 +118,8 @@ non terminal            llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia;
-non terminal            sentencia_asignacion, sentencia_if, sentencia_for, parametro;
+non terminal            sentencia_asignacion, sentencia_if, sentencia_for;
+non terminal String     parametro_cadena;
 non terminal            sentencia_put_line;
 // ...
 
@@ -511,9 +512,43 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias END IF
                     aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
                 :};
 
-sentencia_for ::= FOR expresion IN expresion PUNTOPUNTO expresion LOOP lista_sentencias END LOOP;
+sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP
+                  {:
+                     // se abre un nuevo ámbito
+                    ScopeIF newScope = scopeManager.openScope();
+                    
+                  
+                     //Comprobar que la condicion del bucle es un entero.
+                    aserto(exp.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    
+                    // comprobar que las expresiones que indican el número de iteraciones también son enteros
+                    aserto(exp2.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp3.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    
+                    
+                    
+                  :}
+                  | FOR sentencia_asignacion:sent IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP
+                  {:
+                    // se abre un nuevo ámbito
+                    ScopeIF newScope = scopeManager.openScope();
+                    
+                    // comprobar que las expresiones que indican el número de iteraciones también son enteros
+                    aserto(exp2.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp3.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    
+                  
+                  :};
 
-sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro CIERRA_PARENTESIS;
+sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro_cadena CIERRA_PARENTESIS;
 
-parametro ::= expresion 
-            | CONSTANTE_CADENA;
+parametro_cadena ::= expresion:exp
+            {:
+                //La expresión tiene que se cadena de caracteres
+                aserto(exp.getValue() instanceof String, "Se esperaba cadena de caracteres");
+                RESULT = (String)exp.getValue();
+            :}
+            | CONSTANTE_CADENA:cad
+            {:
+                RESULT = cad.getLexema();
+            :};
