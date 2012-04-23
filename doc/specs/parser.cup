@@ -155,12 +155,15 @@ program ::=
    :};
 
 
-axiom ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
-        {:
-            //Crear el ámbito global del programa asociado al nombre del procedimiento.
-            String name = id.getLexema();
-            scopeManager.openScope(name);
-        :}
+axiom ::= PROCEDURE IDENTIFICADOR:id 
+            {:
+                //Crear el ámbito global del programa asociado al nombre del procedimiento.
+                String name = id.getLexema();
+                scopeManager.openScope(name);
+                syntaxErrorManager.syntaxInfo("Ambito global " + name);
+            :}
+        ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+        
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
 declaraciones ::= dec_const_simbolica declaraciones
@@ -172,6 +175,7 @@ declaraciones ::= dec_const_simbolica declaraciones
 
 dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
+                            syntaxErrorManager.syntaxInfo("Declaracion de constante");
                             // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
                             
@@ -474,6 +478,7 @@ sentencia ::= sentencia_asignacion
 
 sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          {:
+                         syntaxErrorManager.syntaxInfo("Entencia de asignacion a " + id.getLexema());
                          // Comprobar que el identificador es visible desde el ámbito actual
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
