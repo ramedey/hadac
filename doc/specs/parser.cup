@@ -370,9 +370,9 @@ lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias
                    | ;
 
 expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
-            | expresion_logica 
-            | elemento             
-            | ABRE_PARENTESIS expresion CIERRA_PARENTESIS 
+            | expresion_logica:expl {: RESULT = expl; :}
+            | elemento:elto {: RESULT = elto; :}             
+            | ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS {: RESULT = exp; :}
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
 expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
@@ -413,13 +413,15 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro
                     {:
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
-                        Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
+                        SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
+                        RESULT = new Elemento(variable);
                     :}
                   | IDENTIFICADOR:id1 PUNTO IDENTIFICADOR:id2
                     {:
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
-                        Util.comprobarExisteSimboloEnAmbito(id1.getLexema(), scope);
+                        SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id1.getLexema(), scope);
+                        RESULT = new Elemento(variable);
                     :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
@@ -445,13 +447,14 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
                         :}
                       |;
 
-elemento ::= acceso_registro 
-           | TRUE 
-           | FALSE 
+elemento ::= acceso_registro:reg {: RESULT = reg; :}
+           | TRUE:id 
+           {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
+           | FALSE:id
+           {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | CONSTANTE_NUMERICA:id
                 {:
-                    Elemento elto = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
-                    RESULT=elto;
+                    RESULT = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
                 :}
            | llamada_subprograma:llamada 
             {: 
@@ -482,6 +485,8 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          
                          aserto(variable.getType().equals(exp.getTipoInstruccion()), "Los tipos de la expresión y de la variable asignada no coinciden");
                          
+                         //Realizo la asignacion
+                         variable.setValor(exp.getValue());
                          
                          :}
                        | acceso_registro:reg ASIGNACION expresion:exp
@@ -540,5 +545,8 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                   :};
 
 sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion CIERRA_PARENTESIS
+                       {:
+                        //Tras la impresión en pantalla se debe generar un salto de línea.
+                       :}
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS;
 

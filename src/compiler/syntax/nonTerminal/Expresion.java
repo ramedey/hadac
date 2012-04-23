@@ -20,7 +20,11 @@ public abstract class Expresion extends NonTerminal {
 		this.tipoInstruccion = tipoInstruccion;
 	}
 	
-	public Expresion(){}	
+	public Expresion(){}
+	
+	public Expresion(TypeIF tipoInstruccion) {
+		this.tipoInstruccion = tipoInstruccion;
+	}
 	
 	/**
 	 * Obtiene el valor resultado de la expresion
