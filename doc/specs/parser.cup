@@ -119,7 +119,6 @@ non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia;
 non terminal            sentencia_asignacion, sentencia_if, sentencia_for;
-non terminal String     parametro_cadena;
 non terminal            sentencia_put_line;
 // ...
 
@@ -540,15 +539,6 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                   
                   :};
 
-sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS parametro_cadena CIERRA_PARENTESIS;
+sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion CIERRA_PARENTESIS
+                       | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS;
 
-parametro_cadena ::= expresion:exp
-            {:
-                //La expresión tiene que se cadena de caracteres
-                aserto(exp.getValue() instanceof String, "Se esperaba cadena de caracteres");
-                RESULT = (String)exp.getValue();
-            :}
-            | CONSTANTE_CADENA:cad
-            {:
-                RESULT = cad.getLexema();
-            :};
