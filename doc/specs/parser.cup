@@ -254,11 +254,8 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
                     TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                     
                     // El tipo record debe estár declarado y ser visible en el ámbito actual
-                    if(tipo == null)
-                    {
-                        semanticErrorManager.semanticFatalError("El tipo " + id.getLexema() + "No está declarado o no es visible en este ámbito");
-                    }
-                    
+                    aserto(tipo == null, "El tipo " + id.getLexema() + "No está declarado o no es visible en este ámbito");
+                                        
                     RESULT = new DecVariables(new DecVariable(lista, tipo, scopeManager.getCurrentScope()));
                 :} |
              lista_identificadores:lista DECLARACION BOOLEAN:id PUNTOYCOMA 
@@ -271,8 +268,7 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
-                                if(lista.contiene(id))
-                                    semanticErrorManager.semanticFatalError("El identificador ya está declarado en el ámbito actual.");
+                                aserto(lista.contiene(id), "El identificador ya está declarado en el ámbito actual.");
                                 lista.addIdentificador(id);
                             :} 
                         | IDENTIFICADOR:id
@@ -317,19 +313,15 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     //Registrar las declaraciones en el ambito actual
                     
                     //Comprobar que en el cuerpo existe la sentencia "return"
-                    // y que su tipo coincide con el tipo de retorno declarado
+                    
+                    aserto(!listaSentencias.tieneSentenciaReturn(), "La función declarada no tiene sentencia Return");
+                    
+                    SentenciaReturn sent = listaSentencias.getSentenciaReturn();
+                    
+                    // Comprobar que su tipo coincide con el tipo de retorno declarado
                     // en la cabecera de la función.
-                    if(listaSentencias.tieneSentenciaReturn())
-                    {
-                        SentenciaReturn sent = listaSentencias.getSentenciaReturn();
-                        
-                        if(sent.getTipoDevolucion() != function.getTipoRetorno())
-                        {
-                            semanticErrorManager.semanticFatalError("El tipo de retorno no coincide con el tipo de la sentencia Return");
-                        }
-                    }else{
-                        semanticErrorManager.semanticFatalError("La función declarada no tiene sentencia Return");
-                    }
+                    aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
+                    
                 :};
 
 
@@ -471,9 +463,8 @@ elemento ::= acceso_registro:reg {: RESULT = reg; :}
            | llamada_subprograma:llamada 
             {: 
                 //Comprobar que no se está llamando a un procedimiento
-                if(llamada instanceof Sentencia){
-                    semanticErrorManager.semanticFatalError("La función debe devolver una valor");
-                }    
+                aserto(llamada instanceof Sentencia,"La función debe devolver una valor");
+                
             :};
 
 sentencia ::= sentencia_asignacion 
