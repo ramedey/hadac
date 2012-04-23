@@ -144,8 +144,8 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
-  		 List intermediateCode = ax.getIntermediateCode ();
-  		 finalCodeFactory.create (intermediateCode);
+  		// List intermediateCode = ax.getIntermediateCode ();
+  		// finalCodeFactory.create (intermediateCode);
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.
@@ -162,7 +162,11 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
                 scopeManager.openScope(name);
                 syntaxErrorManager.syntaxInfo("Ambito global " + name);
             :}
-        ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+        ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN
+        {: syntaxErrorManager.syntaxInfo("Comienza cuerpo programa");:} 
+        lista_sentencias 
+        {: syntaxErrorManager.syntaxInfo("Termina cuerpo programa");:}
+        END IDENTIFICADOR PUNTOYCOMA
         
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
@@ -170,8 +174,8 @@ declaraciones ::= dec_const_simbolica declaraciones
                 | dec_variables declaraciones
                 | dec_tipo_registro declaraciones
                 | dec_subprograma declaraciones
-                | error declaraciones{: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
-                |;
+                | error declaraciones {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
+                | {: syntaxErrorManager.syntaxInfo("Fin declaracion de constante"); :};
 
 dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
@@ -202,7 +206,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                                                                 Integer.parseInt(numero.getLexema())));
                                 }
                             }
-                    
+                             
                         :} 
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION TRUE:constante PUNTOYCOMA 
                         {:
@@ -238,6 +242,9 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
 
 dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA dec_variables
                 {:
+                syntaxErrorManager.syntaxInfo("Declaracion de variables");
+                    // comprobar si ya hay una variable con el mismo nombre en el ambito actual
+                    // El objeto DecVariable hace la comprobación.
                     //registrar identificadores y devolver objeto Decvariable
                     RESULT = new DecVariables(new DecVariable(lista, new TypeSimpleInteger(scopeManager.getCurrentScope()),
                     scopeManager.getCurrentScope()));
@@ -271,9 +278,11 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             :} 
                         | IDENTIFICADOR:id
                             {:
+                                syntaxErrorManager.syntaxInfo("Un solo identificador, " + id.getLexema());
                                 ListaIdentificadores resultado = new ListaIdentificadores();
                                 resultado.addIdentificador(id);
                                 RESULT = resultado;
+                                syntaxErrorManager.syntaxInfo("Fin lista_identificadores, " + id.getLexema());
                             :};
 
 dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variables:declaraciones END RECORD PUNTOYCOMA 
@@ -369,7 +378,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                         //Registrar las declaraciones en el ambito actual
                     :};
 
-lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias 
+lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias {: syntaxErrorManager.syntaxInfo("Lista de sentencias"); :}
                    | sentencia expresion PUNTOYCOMA lista_sentencias 
                    | ;
 
@@ -478,7 +487,7 @@ sentencia ::= sentencia_asignacion
 
 sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          {:
-                         syntaxErrorManager.syntaxInfo("Entencia de asignacion a " + id.getLexema());
+                         syntaxErrorManager.syntaxInfo("Sentencia de asignacion ");
                          // Comprobar que el identificador es visible desde el ámbito actual
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
@@ -496,6 +505,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          :}
                        | acceso_registro:reg ASIGNACION expresion:exp
                        {:
+                            syntaxErrorManager.syntaxInfo("Asignacion a campo de registro");
                             //Comprobar que el tipo registro existe y es visisble desde el ámbito actual
                             
                             //Comprobar que el tipo de la expresion coincide con el del campo del registro.
