@@ -438,6 +438,14 @@ elemento ::= acceso_registro:reg {: RESULT = reg; :}
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof Sentencia,"La función debe devolver una valor");
                 
+            :}
+            | IDENTIFICADOR:id
+            {:
+                // Comprobar que el identificador es visible desde el ámbito actual
+                SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
+                
+                RESULT = new Elemento(simbolo);
+                
             :};
 
 sentencia ::= sentencia_asignacion 
@@ -461,7 +469,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          // símbolo que recibe el valor en la asignación.
                          
                          SymbolVariable variable = (SymbolVariable) simbolo;
-                         //syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
+                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
                          aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + variable.getType() + ") no coinciden");
                          
                          //Realizo la asignacion
