@@ -454,13 +454,15 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          // Comprobar que el identificador es visible desde el ámbito actual
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
+                         //Comprobar que el simbolo es una variable
+                         aserto(simbolo instanceof SymbolVariable, "El identificador a asignar debe ser una variable");
                          
                          //Comprobar que le tipo de la expresión es compatible con el del
                          // símbolo que recibe el valor en la asignación.
                          
                          SymbolVariable variable = (SymbolVariable) simbolo;
-                         
-                         aserto(variable.getType().equals(exp.getTipoInstruccion()), "Los tipos de la expresión y de la variable asignada no coinciden");
+                         //syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
+                         aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + variable.getType() + ") no coinciden");
                          
                          //Realizo la asignacion
                          variable.setValor(exp.getValue());
