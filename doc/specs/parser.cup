@@ -230,7 +230,7 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
 
 dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
                 {:
-                syntaxErrorManager.syntaxInfo("Declaracion de variables");
+                //syntaxErrorManager.syntaxInfo("Declaracion de variables");
                     // comprobar si ya hay una variable con el mismo nombre en el ambito actual
                     // El objeto DecVariable hace la comprobación.
                     //registrar identificadores y devolver objeto Decvariable
@@ -256,6 +256,7 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
+                            syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
                                 aserto(lista.contiene(id), "El identificador ya está declarado en el ámbito actual.");
                                 lista.addIdentificador(id);
@@ -289,40 +290,60 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variables:declara
 dec_subprograma ::= funcion  
                   | procedimiento;
 
-funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
+funcion ::= FUNCTION IDENTIFICADOR:id 
                 {:
+                    syntaxErrorManager.syntaxInfo("Declaracion de funcion " + id.getLexema());
                     // registrar la funcion en el ambito actual
                     ScopeIF scope = scopeManager.getCurrentScope();
                     TypeFunction function = new TypeFunction(scope, id.getLexema());
-                    function.setTipoRetorno(tipoRetorno);
                     Util.actualizarTablasSimbolosYTipos(scope, id, function);
                     ScopeIF newScope = scopeManager.openScope(id.getLexema());
-                    function.setParametros(parametros.getParametros());
+                    
                     
                     //Registrar las declaraciones en el ambito actual
+                :}
+                ABRE_PARENTESIS parametros_formales:parametros 
+                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin parametros ");:}
+                CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno 
+                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin tipo retorno ");:}
+                IS declaraciones_subprograma 
+                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin declaraciones subprograma ");:}
+                BEGIN lista_sentencias:listaSentencias 
+                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin lista sentencias ");:}
+                END IDENTIFICADOR PUNTOYCOMA
+                {:
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TypeFunction function = new TypeFunction(scope, id.getLexema());
+                    function.setTipoRetorno(tipoRetorno);
+                    function.setParametros(parametros.getParametros());
+                    
+                    //Registrar e el ambito las declaraciones
                     
                     //Comprobar que en el cuerpo existe la sentencia "return"
-                    
-                    aserto(!listaSentencias.tieneSentenciaReturn(), "La función declarada no tiene sentencia Return");
+                    syntaxErrorManager.syntaxInfo("Declaracion de funcion (2) " + listaSentencias);
+                    aserto(listaSentencias != null, "La función declarada no tiene sentencia Return");
+                    aserto(listaSentencias.tieneSentenciaReturn(), "La funcion declarada no tiene sentencia Return");
                     
                     SentenciaReturn sent = listaSentencias.getSentenciaReturn();
-                    
+                    aserto(sent != null, "La funcion declarada no tiene sentencia Return");
                     // Comprobar que su tipo coincide con el tipo de retorno declarado
                     // en la cabecera de la función.
                     aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
-                    
                 :};
 
 
 parametros_formales ::= lista_identificadores:lista DECLARACION tipo_parametro:tipo PUNTOYCOMA parametros_formales:parametros
                         {:
+                        syntaxErrorManager.syntaxInfo("Declaracion de parametros formales");
                             parametros.addParametros(lista, tipo);
+                            RESULT = parametros;
                         :}
                       | lista_identificadores:lista DECLARACION tipo_parametro:tipo 
                         {:
-                            ParametrosFormales parametros = new ParametrosFormales();
-                            parametros.addParametros(lista, tipo);
+                            syntaxErrorManager.syntaxInfo("Declaracion de parametro formal");
+                            ParametrosFormales parametros = new ParametrosFormales(lista, tipo);
                             RESULT = parametros;
+                            syntaxErrorManager.syntaxInfo("Fin Declaracion de parametro formal");
                         :}
                       | ;
                         
@@ -333,7 +354,7 @@ tipo_parametro ::= INTEGER
                         :}
                    | BOOLEAN 
                         {:
-                            new TypeSimpleBoolean(scopeManager.getCurrentScope());                            
+                            RESULT = new TypeSimpleBoolean(scopeManager.getCurrentScope());                            
                         :};
                         
 
@@ -358,8 +379,39 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                         //Registrar las declaraciones en el ambito actual
                     :};
 
-lista_sentencias ::= sentencia PUNTOYCOMA lista_sentencias {: syntaxErrorManager.syntaxInfo("Lista de sentencias"); :}
-                   | sentencia expresion PUNTOYCOMA lista_sentencias 
+lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
+                    {: 
+                    
+                        syntaxErrorManager.syntaxInfo("Lista de sentenciass. lista es " + lista + ". Sentencia es " + sent); 
+                        //Agregar la sentencia a la lista de sentencias
+                        
+                        if(lista == null){
+                            lista = new ListaSentencias();
+                        }
+                            
+                        if(sent != null){
+                            lista.agregarSentenciaOExpresion(sent);
+                        }
+                        RESULT = lista;
+                    
+                    :}
+                   | sentencia:sent expresion:exp PUNTOYCOMA lista_sentencias:lista 
+                    {: 
+                    
+                        syntaxErrorManager.syntaxInfo("Lista de sentencias. lista es " + lista + ". Sentencia es " + sent); 
+                        //Agregar la sentencia a la lista de sentencias
+                        if(lista == null){
+                            lista = new ListaSentencias();
+                        }
+                        if(sent != null){
+                            lista.agregarSentenciaOExpresion(sent);
+                        }
+                        if(exp != null){
+                            lista.agregarSentenciaOExpresion(exp);
+                        }
+                        RESULT = lista;
+                    
+                    :}
                    | ;
 
 expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
@@ -370,6 +422,7 @@ expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
 
 expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
         {:        
+            syntaxErrorManager.syntaxInfo("Expresion aritmetica");
             RESULT = new ExpresionAritmetica(e1, e2);            
         :};
 
@@ -403,6 +456,7 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
+                        syntaxErrorManager.syntaxInfo("Llamada a subprograma");
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
@@ -431,19 +485,21 @@ elemento ::= acceso_registro:reg {: RESULT = reg; :}
            {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | CONSTANTE_NUMERICA:id
                 {:
+                syntaxErrorManager.syntaxInfo("Cte numerica");
                     RESULT = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
                 :}
            | llamada_subprograma:llamada 
             {: 
+                syntaxErrorManager.syntaxInfo("Llamada subprograma ");
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof Sentencia,"La función debe devolver una valor");
                 
             :}
             | IDENTIFICADOR:id
             {:
+                 
                 // Comprobar que el identificador es visible desde el ámbito actual
                 SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
-                
                 RESULT = new Elemento(simbolo);
                 
             :};
@@ -453,7 +509,7 @@ sentencia ::= sentencia_asignacion
             | sentencia_for 
             | llamada_subprograma 
             | sentencia_put_line 
-            | RETURN expresion 
+            | RETURN expresion:exp {: RESULT = new SentenciaReturn(exp);:}
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
 sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
@@ -463,7 +519,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
                          //Comprobar que el simbolo es una variable
-                         aserto(simbolo instanceof SymbolVariable, "El identificador a asignar debe ser una variable");
+                         aserto(simbolo instanceof SymbolVariable, "El identificador a asignar debe ser una variable: " + simbolo);
                          
                          //Comprobar que le tipo de la expresión es compatible con el del
                          // símbolo que recibe el valor en la asignación.

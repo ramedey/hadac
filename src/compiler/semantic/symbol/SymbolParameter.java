@@ -15,6 +15,7 @@ public class SymbolParameter
     extends SymbolBase
 {  
    
+	private Object value;
     /**
      * Constructor for SymbolParameter.
      * @param scope The declaration scope.
@@ -26,5 +27,11 @@ public class SymbolParameter
                            TypeIF type)
     {
         super (scope, name, type);
-    } 
+    }
+	public void setValue(Object value) {
+		this.value = value;
+	}
+	public Object getValue() {
+		return value;
+	} 
 }

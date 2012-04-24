@@ -3,6 +3,7 @@ package compiler.syntax.nonTerminal;
 import compiler.CompilerContext;
 import compiler.semantic.symbol.SymbolBooleanConstant;
 import compiler.semantic.symbol.SymbolIntegerConstant;
+import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
@@ -48,6 +49,8 @@ public class Elemento extends Expresion {
         	resultado = ((SymbolBooleanConstant)simbolo).getValue();
         }else if(simbolo instanceof SymbolIntegerConstant){
         	resultado = ((SymbolIntegerConstant)simbolo).getValue();
+        }else if(simbolo instanceof SymbolParameter){
+        	resultado = ((SymbolParameter)simbolo).getValue();
         }else{
         	CompilerContext.getSemanticErrorManager().semanticFatalError("El identificador debe ser una variable o constante");
         }

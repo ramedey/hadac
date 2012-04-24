@@ -1,5 +1,6 @@
 package compiler.syntax.nonTerminal;
 
+import compiler.CompilerContext;
 import compiler.semantic.type.TypeSimpleInteger;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
@@ -30,6 +31,7 @@ public class ExpresionAritmetica extends ExpresionOperacion {
 	public ExpresionAritmetica(Expresion e1, Expresion e2) throws Exception
 	{
 		super(e1, e2);		
+		CompilerContext.getSyntaxErrorManager().syntaxInfo("Expresion aritmetica creada");
 	}
 	
 	@Override

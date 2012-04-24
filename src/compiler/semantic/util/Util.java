@@ -62,7 +62,7 @@ public class Util {
 	}
 	
 	
-	public static boolean convertirStringABoolean(String cadena) throws Exception
+	public static boolean convertirStringABoolean(String cadena)
 	{
 		if(cadena.toLowerCase() == "true")
 		{
@@ -71,7 +71,8 @@ public class Util {
 		{
 			return false;
 		}
-		throw new Exception("La cadena de entrada no se puede convertir: " + cadena);
+		CompilerContext.getSemanticErrorManager().semanticFatalError("La cadena de entrada no se puede convertir: " + cadena);
+		return false;
 	}
 	
 	/**
@@ -85,19 +86,16 @@ public class Util {
 		if(!scope.getSymbolTable().containsSymbol(textoSimbolo))
 		{
 			ScopeIF parentScope = scope.getParentScope();
-			boolean encontrado = false;
-			while(parentScope != null && encontrado == false)
+			while(parentScope != null)
 			{
 				if(parentScope.getSymbolTable().containsSymbol(textoSimbolo))
 				{
-					encontrado = true;
+					return parentScope.getSymbolTable().getSymbol(textoSimbolo);
 				}
 				parentScope = parentScope.getParentScope();
 			}
-			if(!encontrado)
-			{
-				CompilerContext.getSemanticErrorManager().semanticFatalError("El simbolo " + textoSimbolo + " no existe. Ambito " + scope.getName());
-			}
+			CompilerContext.getSemanticErrorManager().semanticFatalError("El simbolo " + textoSimbolo + " no existe. Ambito " + scope.getName());
+			
 		}
 		
 		return scope.getSymbolTable().getSymbol(textoSimbolo);
