@@ -22,7 +22,7 @@ public abstract class ExpresionOperacion extends Expresion {
         {
 			CompilerContext.getSemanticErrorManager().semanticFatalError("Los tipos no coinciden: " + e1.getTipoInstruccion() + " distinto de " + e2.getTipoInstruccion());
         }
-		
+		this.setTipoInstruccion(e1.getTipoInstruccion());
 		// Realizar la operación de expresiones.
         //this.doOperation(e1, e2);
 	}
