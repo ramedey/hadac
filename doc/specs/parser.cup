@@ -113,7 +113,8 @@ non terminal Expresion  expresion, expresion_logica;
 non terminal Elemento   elemento, acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
-non terminal            funcion, procedimiento, declaraciones_subprograma;
+non terminal SymbolFunction funcion;
+non terminal  procedimiento, declaraciones_subprograma;
 non terminal            llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -290,33 +291,23 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variables:declara
 dec_subprograma ::= funcion  
                   | procedimiento;
 
-funcion ::= FUNCTION IDENTIFICADOR:id 
+funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
                     syntaxErrorManager.syntaxInfo("Declaracion de funcion " + id.getLexema());
                     // registrar la funcion en el ambito actual
                     ScopeIF scope = scopeManager.getCurrentScope();
-                    TypeFunction function = new TypeFunction(scope, id.getLexema());
-                    Util.actualizarTablasSimbolosYTipos(scope, id, function);
                     ScopeIF newScope = scopeManager.openScope(id.getLexema());
                     
                     
                     //Registrar las declaraciones en el ambito actual
-                :}
-                ABRE_PARENTESIS parametros_formales:parametros 
-                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin parametros ");:}
-                CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno 
-                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin tipo retorno ");:}
-                IS declaraciones_subprograma 
-                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin declaraciones subprograma ");:}
-                BEGIN lista_sentencias:listaSentencias 
-                {:syntaxErrorManager.syntaxInfo("Declaracion de funcion: fin lista sentencias ");:}
-                END IDENTIFICADOR PUNTOYCOMA
-                {:
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                    TypeFunction function = new TypeFunction(scope, id.getLexema());
+                   
+                    TypeFunction function = new TypeFunction(scope, id.getLexema(), parametros.getParametros());
                     function.setTipoRetorno(tipoRetorno);
-                    function.setParametros(parametros.getParametros());
-                    
+                    TypeTableIF typeTable = scope.getTypeTable();
+                    if(!typeTable.containsType(function))
+                    {
+                        typeTable.addType(function);
+                    }
                     //Registrar e el ambito las declaraciones
                     
                     //Comprobar que en el cuerpo existe la sentencia "return"
@@ -329,6 +320,8 @@ funcion ::= FUNCTION IDENTIFICADOR:id
                     // Comprobar que su tipo coincide con el tipo de retorno declarado
                     // en la cabecera de la función.
                     aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
+                    
+                   
                 :};
 
 
@@ -371,10 +364,10 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                     {:
                          // registrar la funcion en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
-                        TypeProcedure procedure = new TypeProcedure(scope, id.getLexema());
+                        TypeProcedure procedure = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
                         Util.actualizarTablasSimbolosYTipos(scope, id, procedure);
                         ScopeIF newScope = scopeManager.openScope(id.getLexema());
-                        procedure.setParametros(parametros.getParametros());
+                        //procedure.setParametros(parametros.getParametros());
                     
                         //Registrar las declaraciones en el ambito actual
                     :};
@@ -456,7 +449,7 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
-                        syntaxErrorManager.syntaxInfo("Llamada a subprograma");
+                        syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
@@ -465,7 +458,14 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                                                        
                             //comprobar los parametros si coinciden en orden, numero y tipo
                             TypeProcedure tipoSubprograma = (TypeProcedure)tipo;                              
-                            aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");                                                                
+                            aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");
+                            if(tipoSubprograma instanceof TypeFunction)
+                            {
+                                RESULT = new SymbolFunction(scopeManager.getCurrentScope(), id.getLexema(), tipo);
+                            }else{
+                                RESULT = new SymbolProcedure(scopeManager.getCurrentScope(), id.getLexema(), tipo);
+                            }
+                                                                                             
                         :};
 
 parametros_actuales ::= expresion:exp COMA parametros_actuales:par 
@@ -490,10 +490,10 @@ elemento ::= acceso_registro:reg {: RESULT = reg; :}
                 :}
            | llamada_subprograma:llamada 
             {: 
-                syntaxErrorManager.syntaxInfo("Llamada subprograma ");
+                syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof SymbolFunction));
                 //Comprobar que no se está llamando a un procedimiento
-                aserto(llamada instanceof Sentencia,"La función debe devolver una valor");
-                
+                aserto(llamada instanceof SymbolFunction,"La función debe devolver una valor");
+                RESULT = new Elemento((SymbolIF)llamada);
             :}
             | IDENTIFICADOR:id
             {:
@@ -525,9 +525,21 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          // símbolo que recibe el valor en la asignación.
                          
                          SymbolVariable variable = (SymbolVariable) simbolo;
-                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
-                         aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + variable.getType() + ") no coinciden");
+                         syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
+                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
+                         //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
+                         // tipos con el tipo de retorno de la funcion.
+                         if(exp.getTipoInstruccion() instanceof TypeFunction)
+                         {
+                            aserto(variable.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
+                            "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
+                            variable.getType() + ") no coinciden");
+                         }else{
+                            aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), 
+                            "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
+                            variable.getType() + ") no coinciden");
+                         }
                          //Realizo la asignacion
                          variable.setValor(exp.getValue());
                          
@@ -591,6 +603,7 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
 sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion CIERRA_PARENTESIS
                        {:
                         //Tras la impresión en pantalla se debe generar un salto de línea.
+                        //Se permite una sentencia put_line sin argumentos.
                        :}
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS;
 

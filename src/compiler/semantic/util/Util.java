@@ -64,10 +64,10 @@ public class Util {
 	
 	public static boolean convertirStringABoolean(String cadena)
 	{
-		if(cadena.toLowerCase() == "true")
+		if(cadena.toLowerCase().equals("true"))
 		{
 			return true;
-		}else if(cadena.toLowerCase() == "false")
+		}else if(cadena.toLowerCase().equals("false"))
 		{
 			return false;
 		}

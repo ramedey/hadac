@@ -23,7 +23,7 @@ begin
   f := 4;
   d := suma (f,e);
   Put_line("resultado:");
-  Put_line(d);   -- Debe mostar un 5 
+  --Put_line(d);   -- Debe mostar un 5 
 
 end testB;
 

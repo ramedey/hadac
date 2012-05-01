@@ -37,6 +37,11 @@ public class TypeFunction
         parametros = new HashMap<String, TypeIF>();
     }
     
+    public TypeFunction (ScopeIF scope, String name, HashMap<String, TypeIF> parametros)
+    {
+        super (scope, name, parametros);
+    }
+    
     /**
      * Returns the size of the type.
      * @return the size of the type.

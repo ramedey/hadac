@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import compiler.CompilerContext;
 import compiler.syntax.nonTerminal.Expresion;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -42,6 +43,17 @@ public class TypeProcedure
     }
     
     /**
+     * Constructor for TypeProcedure.
+     * @param scope The declaration scope
+     * @param name The name of the procedure.
+     */
+    public TypeProcedure (ScopeIF scope, String name, HashMap<String, TypeIF> parametros)
+    {
+        super (scope, name);
+        setParametros(parametros);
+    }
+    
+    /**
      * Returns the size of the type.
      * @return the size of the type.
      */
@@ -63,7 +75,12 @@ public class TypeProcedure
 	 * @param parametros the parametros to set
 	 */
 	public void setParametros(HashMap<String, TypeIF> parametros) {
-		this.parametros = parametros;
+		CompilerContext.getSemanticErrorManager().semanticDebug("Numero de parametros: " + parametros.size());
+		this.parametros = new HashMap<String, TypeIF>(parametros);
+//		for(String key : parametros.keySet())
+//		{
+//			this.parametros.put(key, parametros.get(key));
+//		}
 	}
 
 	public void setParametro(String nombre, TypeIF tipo) {
@@ -80,6 +97,7 @@ public class TypeProcedure
 	{
 		if(parametrosActuales.size() != parametros.size())
 		{
+			CompilerContext.getSemanticErrorManager().semanticDebug("No coincide el numero de parametros: " + parametrosActuales.size() + " y " + parametros.size());
 			return false;
 		}
 		
@@ -87,7 +105,8 @@ public class TypeProcedure
 		
 		for(int i = 0; i < parametrosActuales.size(); i++)
 		{
-			if(!parametrosActuales.get(i).getTipoInstruccion().equals(tipos.get(i)))
+			CompilerContext.getSemanticErrorManager().semanticDebug("Comparando " + parametrosActuales.get(i).getTipoInstruccion() + " y " + tipos.get(i));
+			if(!parametrosActuales.get(i).getTipoInstruccion().getName().equals(tipos.get(i).getName()))
 			{
 				return false;
 			}
