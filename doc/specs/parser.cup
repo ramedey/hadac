@@ -257,10 +257,11 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
-                            syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
+                                syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
-                                aserto(lista.contiene(id), "El identificador ya está declarado en el ámbito actual.");
+                                aserto(!lista.contiene(id), "El identificador " + id.getLexema() + " ya está declarado en el ámbito actual. linea " + id.getLine());
                                 lista.addIdentificador(id);
+                                RESULT = lista;
                             :} 
                         | IDENTIFICADOR:id
                             {:
