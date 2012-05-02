@@ -40,6 +40,14 @@ action code {:
 	       semanticErrorManager.semanticFatalError(mensajeError);
 	   }
 	}
+	
+	   public void aserto(boolean esCierto, String mensajeError, int linea){
+    
+       if(!esCierto)
+       {
+           semanticErrorManager.semanticFatalError(mensajeError + ". Linea " + linea);
+       }
+    }
 
 :}	
 
@@ -106,11 +114,12 @@ non terminal  			program;
 non terminal Axiom		axiom;
 non terminal            declaraciones;
 non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
-non terminal DecVariables dec_variables;
+non terminal DecVariables dec_variables, dec_campos_registro;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TypeSimple tipo_retorno, tipo_parametro;
 non terminal Expresion  expresion, expresion_logica;
-non terminal Elemento   elemento, acceso_registro;
+non terminal Elemento   elemento;
+non terminal SymbolVariable acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal SymbolFunction funcion;
@@ -179,7 +188,7 @@ declaraciones ::= dec_const_simbolica declaraciones
 
 dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
-                            syntaxErrorManager.syntaxInfo("Declaracion de constante");
+                            semanticErrorManager.semanticInfo("Declaracion de constantes numericas en linea " + numero.getLine());
                             // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
                             
@@ -210,6 +219,8 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                         :} 
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION TRUE:constante PUNTOYCOMA 
                         {:
+                        semanticErrorManager.semanticInfo("Declaracion de constantes con valor true en linea " + constante.getLine());
+                            
                              // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
                             
@@ -220,6 +231,8 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                         :}
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA 
                         {:
+                            semanticErrorManager.semanticInfo("Declaracion de constantes con valor false en linea " + constante.getLine());
+                            
                              // Ámbito actual
                             ScopeIF scope = scopeManager.getCurrentScope();
                             
@@ -229,9 +242,22 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
                         :};
 
+dec_campos_registro ::= dec_variables:dec dec_campos_registro:dec_reg 
+                        {:
+                            for(DecVariable decVar : dec.getDeclaraciones())
+                            {
+                                dec_reg.addDeclaracion(decVar);
+                            }
+                            RESULT = dec_reg;
+                        :}
+                        | dec_variables:dec
+                        {:
+                            RESULT = dec;
+                        :};
+
 dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA 
                 {:
-                //syntaxErrorManager.syntaxInfo("Declaracion de variables");
+                    syntaxErrorManager.syntaxInfo("Declaracion de variables de tipo entero. Linea " + id.getLine());
                     // comprobar si ya hay una variable con el mismo nombre en el ambito actual
                     // El objeto DecVariable hace la comprobación.
                     //registrar identificadores y devolver objeto Decvariable
@@ -244,7 +270,7 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
                     TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                     
                     // El tipo record debe estár declarado y ser visible en el ámbito actual
-                    aserto(tipo == null, "El tipo " + id.getLexema() + "No está declarado o no es visible en este ámbito");
+                    aserto(tipo != null, "El tipo " + id.getLexema() + " no esta declarado o no es visible en este ambito", id.getLine());
                                         
                     RESULT = new DecVariables(new DecVariable(lista, tipo, scopeManager.getCurrentScope()));
                 :} |
@@ -257,7 +283,7 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
-                                syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
+                                //syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
                                 aserto(!lista.contiene(id), "El identificador " + id.getLexema() + " ya está declarado en el ámbito actual. linea " + id.getLine());
                                 lista.addIdentificador(id);
@@ -265,44 +291,60 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             :} 
                         | IDENTIFICADOR:id
                             {:
-                                syntaxErrorManager.syntaxInfo("Un solo identificador, " + id.getLexema());
+                                //syntaxErrorManager.syntaxInfo("Un solo identificador, " + id.getLexema());
                                 ListaIdentificadores resultado = new ListaIdentificadores();
                                 resultado.addIdentificador(id);
                                 RESULT = resultado;
-                                syntaxErrorManager.syntaxInfo("Fin lista_identificadores, " + id.getLexema());
+                                //syntaxErrorManager.syntaxInfo("Fin lista_identificadores, " + id.getLexema());
                             :};
 
-dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD:tipo dec_variables:declaraciones END RECORD PUNTOYCOMA 
+dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD
+{:
+                        syntaxErrorManager.syntaxInfo("Declaracion de registro " + id.getLexema() + ". Linea " + id.getLine());
+                    :}
+ dec_campos_registro:declaraciones END RECORD PUNTOYCOMA 
                     {:
+                        syntaxErrorManager.syntaxInfo("Declaracion de registro " + id.getLexema() + ". Linea " + id.getLine());
+                    
                         // Consultar en el ámbito actual si está el tipo resgitrado.
                         ScopeIF scope = scopeManager.getCurrentScope();
                         TypeTableIF typeTable = scope.getTypeTable();
                         TypeRecord tipoRecord = new TypeRecord(scope, id.getLexema(), declaraciones);
-                        if(!typeTable.containsType(tipo.getLexema()))
-                        {
-                            typeTable.addType(tipoRecord);
-                        }
-                        SymbolTableIF symbolTable = scope.getSymbolTable();
-                        if(!symbolTable.containsSymbol(id.getLexema()))
-                        {
-                           symbolTable.addSymbol(new SymbolVariable(scope, id, tipoRecord));
-                        }
+                        aserto(!typeTable.containsType(id.getLexema()), "El tipo ya esta declarado. Linea " + id.getLine());
+                        semanticErrorManager.semanticInfo("Agergo el tipo " + id.getLexema() + " a la tabla de tipos del ambito " + scope);
+                        typeTable.addType(tipoRecord);
+                        
+                        //SymbolTableIF symbolTable = scope.getSymbolTable();
+                        //if(!symbolTable.containsSymbol(id.getLexema()))
+                        //{
+                        //   symbolTable.addSymbol(new SymbolVariable(scope, id, tipoRecord));
+                        //}
                     :};
 
 dec_subprograma ::= funcion  
                   | procedimiento;
 
-funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
+funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno
+            {:
+                syntaxErrorManager.syntaxInfo("Linea " + id.getLine() + ". Declaracion de funcion " + id.getLexema());
+                   //Abrir ambito de la funcion
+                    scopeManager.openScope(id.getLexema());
+            :} 
+            IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
-                    syntaxErrorManager.syntaxInfo("Declaracion de funcion " + id.getLexema());
-                    // registrar la funcion en el ambito actual
+                     // registrar la funcion en el ambito actual
                     ScopeIF scope = scopeManager.getCurrentScope();
-                    ScopeIF newScope = scopeManager.openScope(id.getLexema());
-                    
-                    
+                                        
                     //Registrar las declaraciones en el ambito actual
-                   
-                    TypeFunction function = new TypeFunction(scope, id.getLexema(), parametros.getParametros());
+                    
+                    TypeFunction function;
+                    
+                    if(parametros != null)
+                    {
+                        function = new TypeFunction(scope, id.getLexema(), parametros.getParametros());
+                    }else{
+                        function = new TypeFunction(scope, id.getLexema());
+                    }
                     function.setTipoRetorno(tipoRetorno);
                     TypeTableIF typeTable = scope.getTypeTable();
                     if(!typeTable.containsType(function))
@@ -312,7 +354,7 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     //Registrar e el ambito las declaraciones
                     
                     //Comprobar que en el cuerpo existe la sentencia "return"
-                    syntaxErrorManager.syntaxInfo("Declaracion de funcion (2) " + listaSentencias);
+                    syntaxErrorManager.syntaxInfo("Declaracion de funcion  " + id.getLexema() + " , listaSentencias: " + listaSentencias);
                     aserto(listaSentencias != null, "La función declarada no tiene sentencia Return");
                     aserto(listaSentencias.tieneSentenciaReturn(), "La funcion declarada no tiene sentencia Return");
                     
@@ -322,6 +364,7 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     // en la cabecera de la función.
                     aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
                     
+                    scopeManager.closeScope();
                    
                 :};
 
@@ -433,24 +476,34 @@ expresion_logica ::= expresion:e1 IGUAL expresion:e2
                          RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
                      :};
 
-acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro 
+acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
                     {:
+                        semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + id.getLexema());
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
                         SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
-                        RESULT = new Elemento(variable);
+                        
+                        SymbolVariableRecord accesoRegistro = (SymbolVariableRecord)acreg;
+                        semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + variable.getType());
+                        //El tipo en este caso debe ser TypeRecord
+                        aserto(variable.getType() instanceof TypeRecord, "La variable " + variable.getName() + "no no es de tipo registro.", id.getLine());
+                        //RESULT = new SymbolVariableRecord(variable, accesoRegistro.getCampoReferenciado().getName());
+                        RESULT = accesoRegistro;
                     :}
                   | IDENTIFICADOR:id1 PUNTO IDENTIFICADOR:id2
                     {:
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
                         SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id1.getLexema(), scope);
-                        RESULT = new Elemento(variable);
+                        aserto(variable.getType() != null, "El tipo es nuloooooooooooooooooooooooooo " + variable);
+                        
+                        // Crear objeto SymbolVariableRecord indicando el campo del registro que se esta referenciando.
+                        RESULT = new SymbolVariableRecord(variable, id2.getLexema());
                     :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
-                        syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
+                            syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
@@ -479,7 +532,7 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
                         :}
                       |;
 
-elemento ::= acceso_registro:reg {: RESULT = reg; :}
+elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
            | TRUE:id 
            {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | FALSE:id
@@ -515,7 +568,7 @@ sentencia ::= sentencia_asignacion
 
 sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          {:
-                         syntaxErrorManager.syntaxInfo("Sentencia de asignacion ");
+                         syntaxErrorManager.syntaxInfo("Sentencia de asignacion en linea " + id.getLine());
                          // Comprobar que el identificador es visible desde el ámbito actual
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
@@ -528,13 +581,13 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          SymbolVariable variable = (SymbolVariable) simbolo;
                          syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
-                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " " + exp.getValue() + "Tipos " + variable.getType() + " = " + exp.getTipoInstruccion());
+                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " valor: " + exp.getValue() + ".\nTipos " + variable.getType() + " == " + exp.getTipoInstruccion());
                          //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
                          // tipos con el tipo de retorno de la funcion.
                          if(exp.getTipoInstruccion() instanceof TypeFunction)
                          {
                             aserto(variable.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
-                            "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
+                            "Los tipos de la funcion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
                             variable.getType() + ") no coinciden");
                          }else{
                             aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), 
@@ -545,19 +598,23 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          variable.setValor(exp.getValue());
                          
                          :}
-                       | acceso_registro:reg ASIGNACION expresion:exp
+                       | acceso_registro:reg ASIGNACION:id expresion:exp
                        {:
-                            syntaxErrorManager.syntaxInfo("Asignacion a campo de registro");
+                            syntaxErrorManager.syntaxInfo("Asignacion a campo de registro en linea " + id.getLine());
                             //Comprobar que el tipo registro existe y es visisble desde el ámbito actual
+                            syntaxErrorManager.syntaxInfo("Tipo del registrooo " + reg.getType());
+                            SymbolVariableRecord accesoRegistro = (SymbolVariableRecord) reg;
                             
                             //Comprobar que el tipo de la expresion coincide con el del campo del registro.
                             
-                            TypeBase tipo = (TypeBase)reg.getTipoInstruccion();
-                            aserto(tipo.equals(exp.getTipoInstruccion()), "Los tipos de la expresión y de la variable asignada no coinciden");
+                            TypeBase tipo = (TypeBase)accesoRegistro.getTipoDeCampoReferenciado();
+                            semanticErrorManager.semanticInfo("Tipo del campo: " + tipo);
+                            
+                            aserto(tipo.getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion y de la variable asignada no coinciden");
                             
                             //Realiza la asignacion
                             
-                            reg.setResultado(exp.getValue());
+                            
                        :};
 
 sentencia_if ::= IF expresion:exp THEN lista_sentencias END IF 

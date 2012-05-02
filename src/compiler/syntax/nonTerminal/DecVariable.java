@@ -46,10 +46,10 @@ public class DecVariable extends NonTerminal {
 			if(!this.existeIdentificadorEnAmbito(scope, token.getLexema()))
 			{
 				//Registra cada símbolo en el ámbito pasado como parámetro
-				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrado simbolo " + token.getLexema() + " en ambito " + scope.getName());
+				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrando simbolo " + token.getLexema() + " en ambito " + scope.getName());
 				scope.getSymbolTable().addSymbol(new SymbolVariable(scope, token, tipo));
 				listaVariables.add(new SymbolVariable(scope, token, tipo));
-				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrado simbolo");
+				CompilerContext.getSyntaxErrorManager().syntaxInfo("Fin Registro simbolo");
 			}else{
 				CompilerContext.getSemanticErrorManager().semanticError("El identificador " + token.getLexema() + " ya existe.");
 			}

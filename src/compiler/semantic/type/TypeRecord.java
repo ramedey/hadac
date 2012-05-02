@@ -25,6 +25,13 @@ public class TypeRecord
 	 */
 	HashMap<String, TypeIF> campos;
     /**
+	 * @return the campos
+	 */
+	public HashMap<String, TypeIF> getCampos() {
+		return campos;
+	}
+
+	/**
      * Constructor for TypeRecord.
      * @param scope The declaration scope.
      */
