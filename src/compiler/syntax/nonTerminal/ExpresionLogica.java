@@ -30,6 +30,7 @@ public class ExpresionLogica extends ExpresionOperacion {
 	public ExpresionLogica(Expresion e1, Expresion e2, Operation operation) throws Exception
 	{
 		super(e1, e2);
+		this.setTipoInstruccion(new TypeSimpleBoolean());
 		this.setOperacion(operation);
 	}
 
