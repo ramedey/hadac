@@ -326,35 +326,42 @@ dec_subprograma ::= funcion
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno
             {:
-                syntaxErrorManager.syntaxInfo("Linea " + id.getLine() + ". Declaracion de funcion " + id.getLexema());
+                   semanticErrorManager.semanticInfo("Linea " + id.getLine() + ". Declaracion de funcion " + id.getLexema());
+                   
+                    // registrar la funcion en el ambito actual
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    
+                    //Actualizar tablas de tipos y simbolos
+                    
+                    TypeFunction function = new TypeFunction(scope, id.getLexema());
+                    
+                    function.setTipoRetorno(tipoRetorno);
+                    TypeTableIF typeTable = scope.getTypeTable();
+                    aserto(!typeTable.containsType(function), "El tipo " + id.getLexema() + " ya existe en el ambito actual.");
+                    
+                    typeTable.addType(function);
+                    semanticErrorManager.semanticInfo("Funcion " + id.getLexema() + ". Linea " + id.getLine() + ". Agregando tipo al ambito " + scope);
+                    SymbolTableIF symbolTable = scope.getSymbolTable();
+                    
+                    SymbolFunction simbolo = new SymbolFunction(scope, id.getLexema(), function);
+                     aserto(!symbolTable.containsSymbol(simbolo), "La funcion " + id.getLexema() + " ya existe en el ambito actual.");
+                    
+                    symbolTable.addSymbol(simbolo);
+                    
                    //Abrir ambito de la funcion
                     scopeManager.openScope(id.getLexema());
             :} 
             IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
-                     // registrar la funcion en el ambito actual
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                                        
-                    //Registrar las declaraciones en el ambito actual
                     
-                    TypeFunction function;
-                    
+                    TypeFunction function = (TypeFunction)scopeManager.searchType(id.getLexema());
+                        
                     if(parametros != null)
                     {
-                        function = new TypeFunction(scope, id.getLexema(), parametros.getParametros());
-                    }else{
-                        function = new TypeFunction(scope, id.getLexema());
+                        function.setParametros(parametros.getParametros());
                     }
-                    function.setTipoRetorno(tipoRetorno);
-                    TypeTableIF typeTable = scope.getTypeTable();
-                    if(!typeTable.containsType(function))
-                    {
-                        typeTable.addType(function);
-                    }
-                    //Registrar e el ambito las declaraciones
                     
                     //Comprobar que en el cuerpo existe la sentencia "return"
-                    syntaxErrorManager.syntaxInfo("Declaracion de funcion  " + id.getLexema() + " , listaSentencias: " + listaSentencias);
                     aserto(listaSentencias != null, "La función declarada no tiene sentencia Return");
                     aserto(listaSentencias.tieneSentenciaReturn(), "La funcion declarada no tiene sentencia Return");
                     
@@ -503,15 +510,19 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
+                            String nombreFuncion = id.getLexema();
+                            
                             syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
                             //Comprobar si elsubprograma es visible desde el ámbito actual
                             
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                             
-                            aserto(tipo != null, "El procedimiento o funcion " + id.getLexema() + " no existe");
+                            aserto(scopeManager.containsSymbol(nombreFuncion), "El procedimiento o funcion " + nombreFuncion + " no existe. Ambito " + scopeManager.getCurrentScope());
+                            
+                            SymbolIF s = scopeManager.searchSymbol(nombreFuncion);
                                                        
                             //comprobar los parametros si coinciden en orden, numero y tipo
-                            TypeProcedure tipoSubprograma = (TypeProcedure)tipo;                              
+                            TypeProcedure tipoSubprograma = (TypeProcedure)s.getType();                              
                             aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");
                             if(tipoSubprograma instanceof TypeFunction)
                             {
