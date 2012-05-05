@@ -1,12 +1,20 @@
 package compiler.syntax.nonTerminal;
 
-import compiler.CompilerContext;
+import java.util.List;
 
+import compiler.CompilerContext;
+import compiler.intermediate.Temporal;
+
+import es.uned.lsi.compiler.intermediate.QuadrupleIF;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public abstract class Expresion extends NonTerminal {
     
 	private TypeIF tipoInstruccion;
+	
+	private TemporalIF temporal;
+    private List<QuadrupleIF> code;
 	
     /**
 	 * @return the tipoInstruccion
@@ -37,4 +45,21 @@ public abstract class Expresion extends NonTerminal {
 	 * @return
 	 */
 	public abstract Object getValue();
+
+	public void setTemporal(TemporalIF temp) {
+		this.temporal = temp;
+	}
+
+	public TemporalIF getTemporal() {
+		return temporal;
+	}
+
+	public void setCode(List<QuadrupleIF> code) {
+		this.code = code;
+	}
+
+	public List<QuadrupleIF> getCode() {
+		return code;
+	}
+
 }

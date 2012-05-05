@@ -467,7 +467,21 @@ expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
 expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
         {:        
             syntaxErrorManager.syntaxInfo("Expresion aritmetica en linea: " + plus.getLine());
-            RESULT = new ExpresionAritmetica(e1, e2);            
+            
+            ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
+            
+            ScopeIF scope = scopeManager.getCurrentScope();
+            TemporalFactory tF = new TemporalFactory (scope);
+            IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+            TemporalIF temp1 = e1.getTemporal ();
+            TemporalIF temp2 = e2.getTemporal ();
+            TemporalIF temp = tF.create ();
+            cb.addQuadruples (e1.getCode ());
+            cb.addQuadruples (e2.getCode ());
+            cb.addQuadruple ("ADD", temp, temp1, temp2);
+            e.setTemporal (temp);
+            e.setCode (cb.create());
+            RESULT = e;        
         :};
 
 expresion_logica ::= expresion:e1 IGUAL expresion:e2 
