@@ -550,7 +550,7 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
            {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | CONSTANTE_NUMERICA:id
                 {:
-                syntaxErrorManager.syntaxInfo("Cte numerica");
+                syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
                     RESULT = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
                 :}
            | llamada_subprograma:llamada 
@@ -573,7 +573,7 @@ sentencia ::= sentencia_asignacion
             | sentencia_if 
             | sentencia_for 
             | llamada_subprograma 
-            | sentencia_put_line 
+            | sentencia_put_line {: semanticErrorManager.semanticInfo("Finalizada sentencia put_line");:}
             | RETURN expresion:exp {: RESULT = new SentenciaReturn(exp);:}
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
@@ -648,11 +648,11 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                     
                   
                      //Comprobar que la condicion del bucle es un entero.
-                    aserto(exp.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle.");
                     
                     // comprobar que las expresiones que indican el número de iteraciones también son enteros
-                    aserto(exp2.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
-                    aserto(exp3.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp2.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp3.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     
                     
                     
@@ -674,5 +674,8 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion CIERRA_PARENTESIS
                         //Tras la impresión en pantalla se debe generar un salto de línea.
                         //Se permite una sentencia put_line sin argumentos.
                        :}
-                       | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS;
+                       | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS
+                       {:
+                            semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + cad.getLexema());
+                       :};
 
