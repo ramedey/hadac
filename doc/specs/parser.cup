@@ -464,9 +464,9 @@ expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
             | ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS {: RESULT = exp; :}
             | error PUNTOYCOMA {: syntaxErrorManager.syntaxDebug ("Error en expresion."); :};
 
-expresion_aritmetica ::= expresion:e1 PLUS expresion:e2
+expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
         {:        
-            syntaxErrorManager.syntaxInfo("Expresion aritmetica");
+            syntaxErrorManager.syntaxInfo("Expresion aritmetica en linea: " + plus.getLine());
             RESULT = new ExpresionAritmetica(e1, e2);            
         :};
 
