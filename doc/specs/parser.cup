@@ -127,9 +127,7 @@ non terminal  procedimiento, declaraciones_subprograma;
 non terminal            llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
-non terminal Sentencia sentencia;
-non terminal            sentencia_asignacion, sentencia_if, sentencia_for;
-non terminal            sentencia_put_line;
+non terminal Sentencia sentencia, sentencia_put_line, sentencia_asignacion, sentencia_if, sentencia_for;
 // ...
 
 
@@ -622,6 +620,26 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          //Realizo la asignacion
                          variable.setValor(exp.getValue());
                          
+                        /* Sentencia sent = new Sentencia();
+
+                        ScopeIF scope = scopeManager.getCurrentScope();
+                        TemporalFactoryIF tF = new TemporalFactory (scope);
+                        TemporalIF eTemp = exp.getTemporal ();
+                        TemporalIF rTemp = r.getTemporal ();
+                        TemporalIF rTempI = r.getTemporalIndex ();
+                        TemporalIF rTempO = r.getTemporalOffset ();
+                        TemporalIF temp = tF.create ();
+                        IntermediateCodeBuilder cb = new …Builder (scope);
+                        cb.addQuadruples (e.getCode ());
+                        cb.addQuadruples (r.getCode ());
+                        cb.addQuadruple (“MUL”, temp, rTempI, rSize);
+                        cb.addQuadruple (“ADD”, temp, temp, rTemp);
+                        cb.addQuadruple (“ADD”, temp, temp, rTempO);
+                        cb.addQuadruple (“STP”, temp, eTemp);
+                        sent.setCode (cb.create()); 
+                        RESULT = sent;*/
+                         
+                         
                          :}
                        | acceso_registro:reg ASIGNACION:id expresion:exp
                        {:
@@ -683,13 +701,24 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                   
                   :};
 
-sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion CIERRA_PARENTESIS
+sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                        {:
                         //Tras la impresión en pantalla se debe generar un salto de línea.
                         //Se permite una sentencia put_line sin argumentos.
+                            Sentencia sent = new Sentencia();
+                            semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp.getValue());
+                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
+                            cb.addQuadruple("ESCRIBE", exp.getValue());
+                            sent.setIntermediateCode(cb.create());
+                            RESULT = sent;
                        :}
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS
                        {:
+                            Sentencia sent = new Sentencia();
                             semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + cad.getLexema());
+                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
+                            cb.addQuadruple("ESCRIBE", cad.getLexema());
+                            sent.setIntermediateCode(cb.create());
+                            RESULT = sent;
                        :};
 

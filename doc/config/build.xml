@@ -8,7 +8,7 @@
 		se quiera compilar
 	-->
 	
-	<property name="test-file-name" value="test02_sinerrores.ha"/>
+	<property name="test-file-name" value="testCaseB03.ha"/>
 	
 	<property name="lib" location="lib"/>
 	<property name="test" location="doc/test"/>
