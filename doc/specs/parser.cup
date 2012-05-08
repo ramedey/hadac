@@ -479,20 +479,30 @@ expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
             cb.addQuadruple ("ADD", temp, temp1, temp2);
             e.setTemporal (temp);
             e.setCode (cb.create());
+            semanticErrorManager.semanticDebug(e.getCode());
             RESULT = e;        
         :};
 
 expresion_logica ::= expresion:e1 IGUAL expresion:e2 
                      {:
-                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
+                        ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
+                        e.generarCodigoIntermedio();
+                        semanticErrorManager.semanticDebug(e.getCode());
+                        RESULT = e;
                      :}
                    | expresion:e1 OR expresion:e2
                      {:
-                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
+                        ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
+                        e.generarCodigoIntermedio();
+                        semanticErrorManager.semanticDebug(e.getCode());
+                        RESULT = e;
                      :} 
                    | expresion:e1 MAYORQUE expresion:e2
                      {:
-                         RESULT = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
+                        ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
+                        e.generarCodigoIntermedio();
+                        semanticErrorManager.semanticDebug(e.getCode());
+                        RESULT = e;
                      :};
 
 acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg

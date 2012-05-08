@@ -7,6 +7,8 @@ import compiler.semantic.symbol.SymbolIntegerConstant;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolVariable;
 
+import es.uned.lsi.compiler.intermediate.TemporalFactory;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -63,6 +65,12 @@ public class Elemento extends Expresion {
 	public Object getValue() {
 		
 		return resultado;
+	}
+
+	@Override
+	public void generarCodigoIntermedio() {
+		TemporalFactory tF = new TemporalFactory (CompilerContext.getScopeManager().getCurrentScope());
+		TemporalIF temp = tF.create ();
 	}
 
 	

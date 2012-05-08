@@ -62,4 +62,5 @@ public abstract class Expresion extends NonTerminal {
 		return code;
 	}
 
+	public abstract void generarCodigoIntermedio();
 }

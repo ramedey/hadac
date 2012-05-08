@@ -63,4 +63,18 @@ public class ExpresionLogica extends ExpresionOperacion {
 			CompilerContext.getSemanticErrorManager().semanticFatalError("Operacion lógica no definida");
 		}		
 	}
+
+	@Override
+	public String getCodigoOperacion() {
+		switch(operacion){
+		case Eq:
+			return "EQ";
+		case Gt:
+			return "GT";
+		case Or:
+			return "OR";
+		default:
+			return null;
+		}		
+	}
 }
