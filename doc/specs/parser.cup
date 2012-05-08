@@ -468,18 +468,7 @@ expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
             
             ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
             
-            ScopeIF scope = scopeManager.getCurrentScope();
-            TemporalFactory tF = new TemporalFactory (scope);
-            IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-            TemporalIF temp1 = e1.getTemporal ();
-            TemporalIF temp2 = e2.getTemporal ();
-            TemporalIF temp = tF.create ();
-            cb.addQuadruples (e1.getCode ());
-            cb.addQuadruples (e2.getCode ());
-            cb.addQuadruple ("ADD", temp, temp1, temp2);
-            e.setTemporal (temp);
-            e.setCode (cb.create());
-            semanticErrorManager.semanticDebug(e.getCode());
+            e.generarCodigoIntermedio();
             RESULT = e;        
         :};
 
@@ -487,21 +476,21 @@ expresion_logica ::= expresion:e1 IGUAL expresion:e2
                      {:
                         ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Eq);
                         e.generarCodigoIntermedio();
-                        semanticErrorManager.semanticDebug(e.getCode());
+                        semanticErrorManager.semanticDebug(e.getIntermediateCode());
                         RESULT = e;
                      :}
                    | expresion:e1 OR expresion:e2
                      {:
                         ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Or);
                         e.generarCodigoIntermedio();
-                        semanticErrorManager.semanticDebug(e.getCode());
+                        semanticErrorManager.semanticDebug(e.getIntermediateCode());
                         RESULT = e;
                      :} 
                    | expresion:e1 MAYORQUE expresion:e2
                      {:
                         ExpresionLogica e = new ExpresionLogica(e1, e2, ExpresionLogica.Operation.Gt);
                         e.generarCodigoIntermedio();
-                        semanticErrorManager.semanticDebug(e.getCode());
+                        semanticErrorManager.semanticDebug(e.getIntermediateCode());
                         RESULT = e;
                      :};
 
@@ -592,7 +581,7 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
             :};
 
 sentencia ::= sentencia_asignacion 
-            | sentencia_if 
+            | sentencia_if:sentIf {: RESULT = sentIf;:}
             | sentencia_for 
             | llamada_subprograma 
             | sentencia_put_line {: semanticErrorManager.semanticInfo("Finalizada sentencia put_line");:}
@@ -639,13 +628,13 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                         TemporalIF rTempI = r.getTemporalIndex ();
                         TemporalIF rTempO = r.getTemporalOffset ();
                         TemporalIF temp = tF.create ();
-                        IntermediateCodeBuilder cb = new …Builder (scope);
+                        IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
                         cb.addQuadruples (e.getCode ());
                         cb.addQuadruples (r.getCode ());
-                        cb.addQuadruple (“MUL”, temp, rTempI, rSize);
-                        cb.addQuadruple (“ADD”, temp, temp, rTemp);
-                        cb.addQuadruple (“ADD”, temp, temp, rTempO);
-                        cb.addQuadruple (“STP”, temp, eTemp);
+                        cb.addQuadruple ("MUL", temp, rTempI, rSize);
+                        cb.addQuadruple ("ADD", temp, temp, rTemp);
+                        cb.addQuadruple ("ADD", temp, temp, rTempO);
+                        cb.addQuadruple ("STP", temp, eTemp);
                         sent.setCode (cb.create()); 
                         RESULT = sent;*/
                          
@@ -670,17 +659,48 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             
                        :};
 
-sentencia_if ::= IF expresion:exp THEN lista_sentencias END IF 
+sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF 
                 {:
                     //Comprobar que la expresion sea logica
                     
                     aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
+                    Sentencia sIF = new Sentencia();                    
+                    ScopeIF scope = scopeManager.getCurrentScope ();
+                    LabelFactoryIF lF = new LabelFactory ();
+                    LabelIF l1 = lF.create ();
+                    TemporalIF eTemp = exp.getTemporal ();
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    cb.addQuadruples (exp.getIntermediateCode());
+                    cb.addQuadruple ("BRT", eTemp, l1);
+                    cb.addQuadruples (lista.getIntermediateCode());
+                    cb.addQuadruple ("INL", l1);
+                    sIF.setIntermediateCode(cb.create ());
+                    semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
+                    RESULT = sIF;
                 :}
-               | IF expresion:exp THEN lista_sentencias ELSE lista_sentencias END IF
+               | IF expresion:exp THEN lista_sentencias:lista1 ELSE lista_sentencias:lista2 END IF
                 {:
                     //Comprobar que la expresion sea logica
                     
                     aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
+                    
+                    Sentencia sIF = new Sentencia();                    
+                    ScopeIF scope = scopeManager.getCurrentScope ();
+                    LabelFactoryIF lF = new LabelFactory ();
+                    LabelIF l1 = lF.create ();
+                    LabelIF l2 = lF.create ();
+                    TemporalIF eTemp = exp.getTemporal ();
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    cb.addQuadruples (exp.getIntermediateCode());
+                    cb.addQuadruple ("BRT", eTemp, l1);
+                    cb.addQuadruples (lista1.getIntermediateCode());
+                    cb.addQuadruple ("BR", l2);
+                    cb.addQuadruple ("INL", l1);
+                    cb.addQuadruples (lista2.getIntermediateCode());
+                    cb.addQuadruple ("INL", l2);
+                    sIF.setIntermediateCode(cb.create ());
+                    semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
+                    RESULT = sIF;
                 :};
 
 sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP

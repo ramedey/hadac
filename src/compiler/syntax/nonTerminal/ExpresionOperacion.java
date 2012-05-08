@@ -45,11 +45,11 @@ public abstract class ExpresionOperacion extends Expresion {
         TemporalIF temp1 = e1.getTemporal ();
         TemporalIF temp2 = e2.getTemporal ();
         TemporalIF temp = tF.create ();
-        cb.addQuadruples (e1.getCode ());
-        cb.addQuadruples (e2.getCode ());
+        cb.addQuadruples (e1.getIntermediateCode());
+        cb.addQuadruples (e2.getIntermediateCode());
         cb.addQuadruple (getCodigoOperacion(), temp, temp1, temp2);
         this.setTemporal (temp);
-        this.setCode (cb.create());
+        this.setIntermediateCode(cb.create());
 	}
 	
 	public abstract void doOperation(Expresion e1, Expresion e2);

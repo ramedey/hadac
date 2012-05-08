@@ -14,7 +14,6 @@ public abstract class Expresion extends NonTerminal {
 	private TypeIF tipoInstruccion;
 	
 	private TemporalIF temporal;
-    private List<QuadrupleIF> code;
 	
     /**
 	 * @return the tipoInstruccion
@@ -52,14 +51,6 @@ public abstract class Expresion extends NonTerminal {
 
 	public TemporalIF getTemporal() {
 		return temporal;
-	}
-
-	public void setCode(List<QuadrupleIF> code) {
-		this.code = code;
-	}
-
-	public List<QuadrupleIF> getCode() {
-		return code;
 	}
 
 	public abstract void generarCodigoIntermedio();
