@@ -53,7 +53,7 @@ public class ListaSentencias extends NonTerminal {
 	 */
 	public void agregarSentenciaOExpresion(NonTerminal noterminal) throws Exception
 	{
-		CompilerContext.getSyntaxErrorManager().syntaxInfo("ListaSentencias, agregando sentencias a la lista. " + lista + noterminal);
+		//CompilerContext.getSyntaxErrorManager().syntaxInfo("ListaSentencias, agregando sentencias a la lista. " + lista + noterminal);
 		if(noterminal instanceof Expresion)
 		{
 			lista.add(noterminal);

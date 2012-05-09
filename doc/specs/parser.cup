@@ -424,7 +424,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
 lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
                     {: 
                     
-                        syntaxErrorManager.syntaxInfo("Lista de sentenciass. lista es " + lista + ". Sentencia es " + sent); 
+                        //syntaxErrorManager.syntaxInfo("Lista de sentenciass. lista es " + lista + ". Sentencia es " + sent); 
                         //Agregar la sentencia a la lista de sentencias
                         
                         if(lista == null){
@@ -440,7 +440,7 @@ lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
                    | sentencia:sent expresion:exp PUNTOYCOMA lista_sentencias:lista 
                     {: 
                     
-                        syntaxErrorManager.syntaxInfo("Lista de sentencias. lista es " + lista + ". Sentencia es " + sent); 
+                        //syntaxErrorManager.syntaxInfo("Lista de sentencias. lista es " + lista + ". Sentencia es " + sent); 
                         //Agregar la sentencia a la lista de sentencias
                         if(lista == null){
                             lista = new ListaSentencias();
@@ -464,7 +464,7 @@ expresion ::= expresion_aritmetica:expa {: RESULT = expa; :}
 
 expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
         {:        
-            syntaxErrorManager.syntaxInfo("Expresion aritmetica en linea: " + plus.getLine());
+            //syntaxErrorManager.syntaxInfo("Expresion aritmetica en linea: " + plus.getLine());
             
             ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
             
@@ -513,7 +513,7 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
                         SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id1.getLexema(), scope);
-                        aserto(variable.getType() != null, "El tipo es nuloooooooooooooooooooooooooo " + variable);
+                        aserto(variable.getType() != null, "El tipo es nulo " + variable);
                         
                         // Crear objeto SymbolVariableRecord indicando el campo del registro que se esta referenciando.
                         RESULT = new SymbolVariableRecord(variable, id2.getLexema());
@@ -561,7 +561,7 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
            {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | CONSTANTE_NUMERICA:id
                 {:
-                syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
+                //syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
                     RESULT = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
                 :}
            | llamada_subprograma:llamada 
@@ -580,11 +580,11 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
                 
             :};
 
-sentencia ::= sentencia_asignacion 
-            | sentencia_if:sentIf {: RESULT = sentIf;:}
-            | sentencia_for 
+sentencia ::= sentencia_asignacion:sAsig {: RESULT = sAsig;:}
+            | sentencia_if:sIF {: RESULT = sIF;:}
+            | sentencia_for:sFor {: RESULT = sFor;:}
             | llamada_subprograma 
-            | sentencia_put_line {: semanticErrorManager.semanticInfo("Finalizada sentencia put_line");:}
+            | sentencia_put_line:sPut {: RESULT = sPut;:}
             | RETURN expresion:exp {: RESULT = new SentenciaReturn(exp);:}
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
@@ -600,43 +600,37 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          //Comprobar que le tipo de la expresión es compatible con el del
                          // símbolo que recibe el valor en la asignación.
                          
-                         SymbolVariable variable = (SymbolVariable) simbolo;
+                         SymbolVariable symbolVariable = (SymbolVariable) simbolo;
                          syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
-                         syntaxErrorManager.syntaxInfo("Variables: " + variable.getName() + " valor: " + exp.getValue() + ".\nTipos " + variable.getType() + " == " + exp.getTipoInstruccion());
+                         syntaxErrorManager.syntaxInfo("Variables: " + symbolVariable.getName() + " valor: " + exp.getValue() + ".\nTipos " + symbolVariable.getType() + " == " + exp.getTipoInstruccion());
                          //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
                          // tipos con el tipo de retorno de la funcion.
                          if(exp.getTipoInstruccion() instanceof TypeFunction)
                          {
-                            aserto(variable.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
+                            aserto(symbolVariable.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
                             "Los tipos de la funcion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
-                            variable.getType() + ") no coinciden");
+                            symbolVariable.getType() + ") no coinciden");
                          }else{
-                            aserto(variable.getType().getName().equals(exp.getTipoInstruccion().getName()), 
+                            aserto(symbolVariable.getType().getName().equals(exp.getTipoInstruccion().getName()), 
                             "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
-                            variable.getType() + ") no coinciden");
+                            symbolVariable.getType() + ") no coinciden");
                          }
                          //Realizo la asignacion
-                         variable.setValor(exp.getValue());
+                         //symbolVariable.setValor(exp.getValue());
                          
-                        /* Sentencia sent = new Sentencia();
+                        Sentencia sent = new Sentencia();
 
                         ScopeIF scope = scopeManager.getCurrentScope();
-                        TemporalFactoryIF tF = new TemporalFactory (scope);
-                        TemporalIF eTemp = exp.getTemporal ();
-                        TemporalIF rTemp = r.getTemporal ();
-                        TemporalIF rTempI = r.getTemporalIndex ();
-                        TemporalIF rTempO = r.getTemporalOffset ();
-                        TemporalIF temp = tF.create ();
+                        TemporalFactoryIF tF = new TemporalFactory(scope);
+                        TemporalIF eTemp = exp.getTemporal();
+                        TemporalIF temp = tF.create();
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
-                        cb.addQuadruples (e.getCode ());
-                        cb.addQuadruples (r.getCode ());
-                        cb.addQuadruple ("MUL", temp, rTempI, rSize);
-                        cb.addQuadruple ("ADD", temp, temp, rTemp);
-                        cb.addQuadruple ("ADD", temp, temp, rTempO);
-                        cb.addQuadruple ("STP", temp, eTemp);
-                        sent.setCode (cb.create()); 
-                        RESULT = sent;*/
+                        cb.addQuadruples(exp.getIntermediateCode());
+                        cb.addQuadruple("MV", temp, eTemp);
+                        sent.setIntermediateCode(cb.create()); 
+                        semanticErrorManager.semanticDebug(sent.getIntermediateCode());
+                        RESULT = sent;
                          
                          
                          :}
@@ -703,7 +697,7 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                     RESULT = sIF;
                 :};
 
-sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP
+sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias:lista END LOOP
                   {:
                      // se abre un nuevo ámbito
                     ScopeIF newScope = scopeManager.openScope();
@@ -716,7 +710,22 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                     aserto(exp2.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     aserto(exp3.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     
-                    
+                    Sentencia sFor = new Sentencia();
+                    ScopeIF scope = scopeManager.getCurrentScope ();
+                    LabelFactoryIF lF = new LabelFactory();
+                    LabelIF l1 = lF.create ();
+                    LabelIF l2 = lF.create ();
+                    TemporalIF eTemp = exp3.getTemporal ();
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    cb.addQuadruples (exp2.getIntermediateCode());
+                    cb.addQuadruple ("INL", l1);
+                    cb.addQuadruples (exp3.getIntermediateCode());
+                    cb.addQuadruple ("BRF", eTemp, l2);
+                    cb.addQuadruples (lista.getIntermediateCode());
+                    cb.addQuadruple ("BR", l1);
+                    cb.addQuadruple ("INL", l2);
+                    sFor.setIntermediateCode(cb.create ());
+                    RESULT = sFor;
                     
                   :}
                   | FOR sentencia_asignacion:sent IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP
