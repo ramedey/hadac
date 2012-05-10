@@ -469,6 +469,7 @@ expresion_aritmetica ::= expresion:e1 PLUS:plus expresion:e2
             ExpresionAritmetica e = new ExpresionAritmetica(e1, e2);
             
             e.generarCodigoIntermedio();
+            semanticErrorManager.semanticDebug(e.getIntermediateCode());
             RESULT = e;        
         :};
 
@@ -561,8 +562,17 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
            {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
            | CONSTANTE_NUMERICA:id
                 {:
-                //syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
-                    RESULT = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
+                    //syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
+                    Elemento e = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TemporalFactory tF = new TemporalFactory (scope);
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    TemporalIF temp = tF.create ();
+                    cb.addQuadruple ("MV", temp, new Value(e.getResultado()));
+                    e.setTemporal(temp);
+                    e.setIntermediateCode(cb.create());
+                    semanticErrorManager.semanticDebug(e.getIntermediateCode());
+                    RESULT = e;
                 :}
            | llamada_subprograma:llamada 
             {: 
