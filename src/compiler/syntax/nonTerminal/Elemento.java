@@ -1,14 +1,17 @@
 package compiler.syntax.nonTerminal;
 
 import compiler.CompilerContext;
+import compiler.intermediate.Value;
 import compiler.semantic.symbol.SymbolBooleanConstant;
 import compiler.semantic.symbol.SymbolFunction;
 import compiler.semantic.symbol.SymbolIntegerConstant;
 import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolVariable;
 
+import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.TemporalFactory;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
+import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -69,8 +72,14 @@ public class Elemento extends Expresion {
 
 	@Override
 	public void generarCodigoIntermedio() {
-		TemporalFactory tF = new TemporalFactory (CompilerContext.getScopeManager().getCurrentScope());
-		TemporalIF temp = tF.create ();
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+        TemporalFactory tF = new TemporalFactory (scope);
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        TemporalIF temp = tF.create ();
+        cb.addQuadruple ("MV", temp, new Value(this.getResultado()));
+        this.setTemporal(temp);
+        this.setIntermediateCode(cb.create());
+        CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
 	}
 
 	

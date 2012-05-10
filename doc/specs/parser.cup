@@ -557,21 +557,22 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
 
 elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
            | TRUE:id 
-           {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
+                {: 
+                    Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope()));
+                    e.generarCodigoIntermedio();
+                    RESULT = e; 
+                :}
            | FALSE:id
-           {: RESULT = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); :}
+                {: 
+                    Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); 
+                    e.generarCodigoIntermedio();
+                    RESULT = e;
+                :}
            | CONSTANTE_NUMERICA:id
                 {:
                     //syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
                     Elemento e = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                    TemporalFactory tF = new TemporalFactory (scope);
-                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-                    TemporalIF temp = tF.create ();
-                    cb.addQuadruple ("MV", temp, new Value(e.getResultado()));
-                    e.setTemporal(temp);
-                    e.setIntermediateCode(cb.create());
-                    semanticErrorManager.semanticDebug(e.getIntermediateCode());
+                    e.generarCodigoIntermedio();
                     RESULT = e;
                 :}
            | llamada_subprograma:llamada 
