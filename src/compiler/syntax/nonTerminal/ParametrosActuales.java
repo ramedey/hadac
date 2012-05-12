@@ -6,6 +6,7 @@ import java.util.List;
 import compiler.CompilerContext;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
 public class ParametrosActuales extends NonTerminal {
@@ -26,8 +27,14 @@ public class ParametrosActuales extends NonTerminal {
 		parametros.add(exp);		
 	}
 	
+	/**
+	 * 
+	 * @param exp
+	 * @param par
+	 */
 	public ParametrosActuales(Expresion exp, ParametrosActuales par)
 	{
+		
 		super();
 		parametros = new ArrayList<Expresion>();
 		
@@ -46,6 +53,7 @@ public class ParametrosActuales extends NonTerminal {
 		return parametros;
 	}
 	
+	
 	public void generarCodigoIntermedio()
 	{
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
@@ -53,10 +61,26 @@ public class ParametrosActuales extends NonTerminal {
 		
 		for(Expresion parametro : parametros)
 		{
-			cb.addQuadruples(parametro.getIntermediateCode());
-			cb.addQuadruple ("PARAM", parametro.getTemporal ());
+			if(!parametroPreviamenteGenerado(parametro))
+			{
+				cb.addQuadruples(parametro.getIntermediateCode());
+				cb.addQuadruple ("PARAM", parametro.getTemporal ());
+			}
 		}
 		this.setIntermediateCode(cb.create());
 	}
 	
+	//TODO: controlar que no se genere codigo intermedio dos veces para los parametros
+	// que provienen de la otra clase (parametro par);
+	private boolean parametroPreviamenteGenerado(Expresion parametro)
+	{
+		for(QuadrupleIF quadruple : parametro.getIntermediateCode())
+		{
+			if(quadruple.getOperation().equals("PARAM"))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
