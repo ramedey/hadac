@@ -66,8 +66,9 @@ public class ListaSentencias extends NonTerminal {
 			if(sent instanceof SentenciaReturn && !this.tieneSentenciaReturn())
 			{
 				this.indiceSentenciaReturn = lista.size() - 1;
+				CompilerContext.getSyntaxErrorManager().syntaxInfo("indice de la sent return " + indiceSentenciaReturn);
 			}
-			CompilerContext.getSyntaxErrorManager().syntaxInfo("indice de la sent return " + indiceSentenciaReturn);
+			
 		}else{
 		
 			CompilerContext.getSemanticErrorManager().semanticFatalError("Una lista de sentencias solo puede contener sentencias o expresiones: " + noterminal.toString());

@@ -547,11 +547,15 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
 
 parametros_actuales ::= expresion:exp COMA parametros_actuales:par 
                         {:
-                            RESULT = new ParametrosActuales(exp, par);
+                            ParametrosActuales params = new ParametrosActuales(exp, par);
+                            params.generarCodigoIntermedio();
+                            RESULT = params;
                         :}
                       | expresion:exp
                         {:
-                            RESULT = new ParametrosActuales(exp);
+                            ParametrosActuales params = new ParametrosActuales(exp);
+                            params.generarCodigoIntermedio();
+                            RESULT = params;
                         :}
                       |;
 
@@ -640,7 +644,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                         cb.addQuadruples(exp.getIntermediateCode());
                         cb.addQuadruple("MV", temp, eTemp);
                         sent.setIntermediateCode(cb.create()); 
-                        semanticErrorManager.semanticDebug(sent.getIntermediateCode());
+                        semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                         RESULT = sent;
                          
                          
@@ -760,6 +764,7 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
                             cb.addQuadruple("ESCRIBE", exp.getValue());
                             sent.setIntermediateCode(cb.create());
+                            semanticErrorManager.semanticDebug(sent.getIntermediateCode());
                             RESULT = sent;
                        :}
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS

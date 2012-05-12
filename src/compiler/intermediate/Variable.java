@@ -12,6 +12,7 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
+    private Object value;
         
     /**
      * Constructor for Variable.
@@ -112,4 +113,12 @@ public class Variable
     {    
         return name;
     }
+
+	public void setValue(Object value) {
+		this.value = value;
+	}
+
+	public Object getValue() {
+		return value;
+	}
 }
