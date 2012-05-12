@@ -152,8 +152,10 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
-  		// List intermediateCode = ax.getIntermediateCode ();
-  		// finalCodeFactory.create (intermediateCode);
+  		 List intermediateCode = ax.getIntermediateCode ();
+  		 semanticErrorManager.semanticDebug("Codigo final" + intermediateCode);
+  		 finalCodeFactory.setEnvironment(CompilerContext.getExecutionEnvironment());
+  		 finalCodeFactory.create (intermediateCode);
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.
@@ -172,8 +174,13 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
             :}
         ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN
         {: syntaxErrorManager.syntaxInfo("Comienza cuerpo programa");:} 
-        lista_sentencias 
-        {: syntaxErrorManager.syntaxInfo("Termina cuerpo programa");:}
+        lista_sentencias:lista
+        {:         
+            syntaxErrorManager.syntaxInfo("Termina cuerpo programa");
+            Axiom ax = new Axiom();
+            ax.setIntermediateCode(lista.getIntermediateCode());
+            RESULT = ax;
+        :}
         END IDENTIFICADOR PUNTOYCOMA
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
@@ -434,6 +441,7 @@ lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
                         if(sent != null){
                             lista.agregarSentenciaOExpresion(sent);
                         }
+                        lista.generarCodigoIntermedio();
                         RESULT = lista;
                     
                     :}
@@ -451,6 +459,8 @@ lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
                         if(exp != null){
                             lista.agregarSentenciaOExpresion(exp);
                         }
+                        lista.generarCodigoIntermedio();
+                        
                         RESULT = lista;
                     
                     :}

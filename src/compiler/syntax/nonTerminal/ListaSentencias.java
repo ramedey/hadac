@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import compiler.CompilerContext;
+import compiler.intermediate.Value;
+import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
+import es.uned.lsi.compiler.intermediate.TemporalFactory;
+import es.uned.lsi.compiler.intermediate.TemporalIF;
+import es.uned.lsi.compiler.semantic.ScopeIF;
 
 public class ListaSentencias extends NonTerminal {
 
@@ -73,5 +78,20 @@ public class ListaSentencias extends NonTerminal {
 		
 			CompilerContext.getSemanticErrorManager().semanticFatalError("Una lista de sentencias solo puede contener sentencias o expresiones: " + noterminal.toString());
 		}
+	}
+	
+	public void generarCodigoIntermedio()
+	{
+		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
+
+        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+        
+        for(NonTerminal noterminal : lista)
+        {
+        	cb.addQuadruples(noterminal.getIntermediateCode());
+        }
+        
+        this.setIntermediateCode(cb.create());
+        //CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
 	}
 }
