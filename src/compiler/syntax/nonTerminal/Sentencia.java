@@ -8,5 +8,9 @@ public class Sentencia extends NonTerminal {
 		super();
 	}
 
-	
+	public Sentencia(LlamadaProcedimiento proc)
+	{
+		super();
+		this.setIntermediateCode(proc.getIntermediateCode());
+	}
 }

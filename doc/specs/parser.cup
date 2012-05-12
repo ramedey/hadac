@@ -124,7 +124,7 @@ non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal SymbolFunction funcion;
 non terminal  procedimiento, declaraciones_subprograma;
-non terminal            llamada_subprograma;
+non terminal LlamadaProcedimiento llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
 non terminal Sentencia sentencia, sentencia_put_line, sentencia_asignacion, sentencia_if, sentencia_for;
@@ -538,9 +538,13 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                             aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");
                             if(tipoSubprograma instanceof TypeFunction)
                             {
-                                RESULT = new SymbolFunction(scopeManager.getCurrentScope(), id.getLexema(), tipo);
+                                LlamadaFuncion funcion = new LlamadaFuncion(s, parametros);
+                                funcion.generarCodigoIntermedio();
+                                RESULT = funcion;
                             }else{
-                                RESULT = new SymbolProcedure(scopeManager.getCurrentScope(), id.getLexema(), tipo);
+                                LlamadaProcedimiento procedimiento = new LlamadaProcedimiento(s, parametros);
+                                procedimiento.generarCodigoIntermedio();
+                                RESULT = procedimiento;
                             }
                                                                                              
                         :};
@@ -581,10 +585,10 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
                 :}
            | llamada_subprograma:llamada 
             {: 
-                syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof SymbolFunction));
+                syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
-                aserto(llamada instanceof SymbolFunction,"La función debe devolver una valor");
-                RESULT = new Elemento((SymbolIF)llamada);
+                aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
+                RESULT = new Elemento(llamada.getSimbolo());
             :}
             | IDENTIFICADOR:id
             {:
@@ -598,9 +602,14 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
 sentencia ::= sentencia_asignacion:sAsig {: RESULT = sAsig;:}
             | sentencia_if:sIF {: RESULT = sIF;:}
             | sentencia_for:sFor {: RESULT = sFor;:}
-            | llamada_subprograma 
+            | llamada_subprograma:sub {: RESULT = new Sentencia(sub); :} 
             | sentencia_put_line:sPut {: RESULT = sPut;:}
-            | RETURN expresion:exp {: RESULT = new SentenciaReturn(exp);:}
+            | RETURN expresion:exp 
+            {: 
+                SentenciaReturn sent = new SentenciaReturn(exp);
+                sent.generarCodigoIntermedio();
+                RESULT = sent;
+            :}
             | error {: syntaxErrorManager.syntaxDebug ("Error en sentencia."); :};
 
 sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
