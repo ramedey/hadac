@@ -638,6 +638,7 @@ elemento ::= acceso_registro:reg
             :}
             | IDENTIFICADOR:id
             {:
+                //Puede ser una variable o una constante. En ambos casos se utiliza Variable para generar el CI
                 Elemento e = new Elemento();
                 String name = id.getLexema();
                 
@@ -655,6 +656,7 @@ elemento ::= acceso_registro:reg
                 e.setTemporal(temp);
                 cb.addQuadruple ("MVA", temp, var);
                 e.setIntermediateCode(cb.create());
+                semanticErrorManager.semanticDebug(e.getIntermediateCode());
                 RESULT = e;
                 
             :};
@@ -840,6 +842,7 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                             Sentencia sent = new Sentencia();
                             semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp);
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
+                            cb.addQuadruples (exp.getIntermediateCode());
                             cb.addQuadruple("ESCRIBE", exp.getTemporal());
                             sent.setIntermediateCode(cb.create());
                             semanticErrorManager.semanticDebug(sent.getIntermediateCode());
