@@ -643,11 +643,11 @@ elemento ::= acceso_registro:reg
                 
                 semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                 // Comprobar que el identificador es visible desde el ámbito actual
-                SymbolVariable sV = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
+                SymbolIF symbol = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                 
-                e.setTipoInstruccion(sV.getType());
+                e.setTipoInstruccion(symbol.getType());
                 
-                Variable var = new Variable (name, sV.getScope ());
+                Variable var = new Variable (name, symbol.getScope ());
                 ScopeIF scope = scopeManager.getCurrentScope();
                 TemporalFactory tF = new TemporalFactory (scope);
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
