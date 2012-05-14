@@ -323,12 +323,17 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declar
 dec_subprograma ::= funcion  
                   | procedimiento;
 
-funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno
+funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS 
+            {:
+                //Abrir ambito de la funcion
+                    scopeManager.openScope(id.getLexema());
+            :}
+            parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno
             {:
                    semanticErrorManager.semanticInfo("Linea " + id.getLine() + ". Declaracion de funcion " + id.getLexema());
                    
                     // registrar la funcion en el ambito actual
-                    ScopeIF scope = scopeManager.getCurrentScope();
+                    ScopeIF scope = scopeManager.getCurrentScope().getParentScope();
                     
                     //Actualizar tablas de tipos y simbolos
                     
@@ -345,10 +350,8 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parame
                     SymbolFunction simbolo = new SymbolFunction(scope, id.getLexema(), function);
                      aserto(!symbolTable.containsSymbol(simbolo), "La funcion " + id.getLexema() + " ya existe en el ambito actual.");
                     
-                    symbolTable.addSymbol(simbolo);
-                    
-                   //Abrir ambito de la funcion
-                    scopeManager.openScope(id.getLexema());
+                    symbolTable.addSymbol(simbolo);                    
+                   
             :} 
             IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
@@ -410,15 +413,19 @@ declaraciones_subprograma ::= dec_const_simbolica declaraciones_subprograma
                             | dec_subprograma declaraciones_subprograma
                             |;
 
-procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS 
+                    {:
+                        //Abrir ambito de la funcion
+                        scopeManager.openScope(id.getLexema());
+                    :}
+                  parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
                     {:
                          // registrar la funcion en el ambito actual
-                        ScopeIF scope = scopeManager.getCurrentScope();
+                        ScopeIF scope = scopeManager.getCurrentScope().getParentScope();
                         TypeProcedure procedure = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
                         Util.actualizarTablasSimbolosYTipos(scope, id, procedure);
                         ScopeIF newScope = scopeManager.openScope(id.getLexema());
-                        //procedure.setParametros(parametros.getParametros());
-                    
+                                           
                         //Registrar las declaraciones en el ambito actual
                     :};
 
