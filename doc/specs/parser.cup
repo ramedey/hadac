@@ -177,14 +177,15 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
             Axiom ax = new Axiom();
             syntaxErrorManager.syntaxInfo("Sentencias: " + lista);
             
-            if(decl != null)
-            {
-                ax.setIntermediateCode(decl.getIntermediateCode());
-            }
             if(lista != null)
             {
-                ax.getIntermediateCode().addAll(0, lista.getIntermediateCode());
+                ax.getIntermediateCode().addAll(lista.getIntermediateCode());
             }
+            if(decl != null)
+            {
+                ax.getIntermediateCode().addAll(decl.getIntermediateCode());
+            }
+            
             RESULT = ax;
         :}
         END IDENTIFICADOR PUNTOYCOMA
