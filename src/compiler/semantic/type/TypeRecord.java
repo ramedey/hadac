@@ -1,6 +1,8 @@
 package compiler.semantic.type;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import compiler.semantic.symbol.SymbolVariable;
 import compiler.syntax.nonTerminal.DecVariable;
@@ -101,6 +103,21 @@ public class TypeRecord
     public boolean containsCampo(String nombre)
     {
     	return campos.containsKey(nombre);
+    }
+    
+    public int getOffset(String nombre)
+    {
+    	Iterator<Entry<String, TypeIF>> it = campos.entrySet().iterator();
+    	int i = 0;
+    	while (it.hasNext()) {
+    		Entry<String, TypeIF> entry = it.next();
+    		if(entry.getKey().equals(nombre))
+    		{
+    			return i;
+    		}
+    		i++;    		
+    	}
+    	return -1;
     }
     
 }

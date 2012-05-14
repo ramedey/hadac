@@ -1,6 +1,5 @@
 package compiler.syntax.nonTerminal;
 
-import compiler.CompilerContext;
 import compiler.semantic.type.TypeSimpleBoolean;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -34,7 +33,7 @@ public class ExpresionLogica extends ExpresionOperacion {
 		this.setOperacion(operation);
 	}
 
-	@Override
+
 	public Object getValue() {
 		return value;
 	}
@@ -45,23 +44,6 @@ public class ExpresionLogica extends ExpresionOperacion {
 
 	public Operation getOperacion() {
 		return operacion;
-	}
-
-	@Override
-	public void doOperation(Expresion e1, Expresion e2) {
-		switch(operacion){
-		case Eq:
-			this.value = Boolean.parseBoolean(e1.getValue().toString()) == Boolean.parseBoolean(e2.getValue().toString());
-			break;
-		case Gt:
-			this.value = Integer.parseInt(e1.getValue().toString()) > Integer.parseInt(e2.getValue().toString());
-			break;
-		case Or:
-			this.value = Boolean.parseBoolean(e1.getValue().toString()) || Boolean.parseBoolean(e2.getValue().toString());
-			break;
-		default:
-			CompilerContext.getSemanticErrorManager().semanticFatalError("Operacion lógica no definida");
-		}		
 	}
 
 	@Override

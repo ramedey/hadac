@@ -570,28 +570,59 @@ elemento ::= acceso_registro:reg
                 {: 
                     semanticErrorManager.semanticDebug("Acceso a registro: " + reg.getCampoReferenciado().getName() + "(" + reg.getCampoReferenciado().getValor() + ")");
                     Elemento e = new Elemento(reg); 
-                    e.generarCodigoIntermedio();
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TemporalFactory tF = new TemporalFactory (scope);
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    TemporalIF temp = tF.create ();
+                   
+                    TypeRecord rType = (TypeRecord)e.getTipoInstruccion();
+                    int idOffset = rType.getOffset (reg.getCampoReferenciado().getName());
+                    cb.addQuadruple ("MV", temp, idOffset);
+                    e.setTemporal(temp);
+                    e.setIntermediateCode(cb.create());
+        
                     RESULT = e;
                 :}
            | TRUE:id 
                 {: 
                     semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
-                    Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope()));
-                    e.generarCodigoIntermedio();
+                    boolean verdadero = Util.convertirStringABoolean(id.getLexema());
+                    Elemento e = new Elemento(new TypeSimpleBoolean(scopeManager.getCurrentScope()));
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TemporalFactory tF = new TemporalFactory (scope);
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    TemporalIF temp = tF.create ();
+                    cb.addQuadruple ("MV", temp, new Value(verdadero));
+                    e.setTemporal(temp);
+                    e.setIntermediateCode(cb.create());
                     RESULT = e; 
                 :}
            | FALSE:id
                 {: 
                     semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
-                    Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); 
-                    e.generarCodigoIntermedio();
+                    boolean falso = Util.convertirStringABoolean(id.getLexema());
+                    Elemento e = new Elemento(new TypeSimpleBoolean(scopeManager.getCurrentScope())); 
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TemporalFactory tF = new TemporalFactory (scope);
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    TemporalIF temp = tF.create ();
+                    cb.addQuadruple ("MV", temp, new Value(falso));
+                    e.setTemporal(temp);
+                    e.setIntermediateCode(cb.create());
                     RESULT = e;
                 :}
            | CONSTANTE_NUMERICA:id
                 {:
                     semanticErrorManager.semanticDebug("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
-                    Elemento e = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
-                    e.generarCodigoIntermedio();
+                    int numero = Integer.parseInt(id.getLexema());
+                    Elemento e = new Elemento(new TypeSimpleInteger(scopeManager.getCurrentScope()));
+                    ScopeIF scope = scopeManager.getCurrentScope();
+                    TemporalFactory tF = new TemporalFactory (scope);
+                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                    TemporalIF temp = tF.create ();
+                    cb.addQuadruple ("MV", temp, new Value(numero));
+                    e.setTemporal(temp);
+                    e.setIntermediateCode(cb.create());
                     RESULT = e;
                 :}
            | llamada_subprograma:llamada 
@@ -603,11 +634,23 @@ elemento ::= acceso_registro:reg
             :}
             | IDENTIFICADOR:id
             {:
+                Elemento e = new Elemento();
+                String name = id.getLexema();
+                
                 semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                 // Comprobar que el identificador es visible desde el ámbito actual
-                SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
-                Elemento e = new Elemento(simbolo);
-                e.generarCodigoIntermedio();
+                SymbolVariable sV = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
+                
+                e.setTipoInstruccion(sV.getType());
+                
+                Variable var = new Variable (name, sV.getScope ());
+                ScopeIF scope = scopeManager.getCurrentScope();
+                TemporalFactory tF = new TemporalFactory (scope);
+                IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                TemporalIF temp = tF.create ();
+                e.setTemporal(temp);
+                cb.addQuadruple ("MVA", temp, var);
+                e.setIntermediateCode(cb.create());
                 RESULT = e;
                 
             :};
@@ -640,7 +683,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          SymbolVariable symbolVariable = (SymbolVariable) simbolo;
                          syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
-                         syntaxErrorManager.syntaxInfo("Variables: " + symbolVariable.getName() + " valor: " + exp.getValue() + ".\nTipos " + symbolVariable.getType() + " == " + exp.getTipoInstruccion());
+                         syntaxErrorManager.syntaxInfo("Variables: " + symbolVariable.getName() + ".\nTipos " + symbolVariable.getType() + " == " + exp.getTipoInstruccion());
                          //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
                          // tipos con el tipo de retorno de la funcion.
                          if(exp.getTipoInstruccion() instanceof TypeFunction)
@@ -653,9 +696,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
                             symbolVariable.getType() + ") no coinciden");
                          }
-                         //Realizo la asignacion
-                         symbolVariable.setValor(exp.getValue());
-                         
+                                                  
                         Sentencia sent = new Sentencia();
                         syntaxErrorManager.syntaxInfo("generando codigo intermedio... ");
                         ScopeIF scope = scopeManager.getCurrentScope();
@@ -679,7 +720,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             //Comprobar que el tipo de la expresion coincide con el del campo del registro.
                             
                             TypeBase tipo = (TypeBase)accesoRegistro.getTipoDeCampoReferenciado();
-                            semanticErrorManager.semanticInfo("Tipo del campo: " + tipo);
+                            //semanticErrorManager.semanticInfo("Tipo del campo: " + tipo);
                             
                             aserto(tipo.getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion y de la variable asignada no coinciden");
                             
@@ -696,10 +737,6 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             sent.setIntermediateCode(cb.create()); 
                             semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                             
-                            
-                            //Realiza la asignacion
-                            semanticErrorManager.semanticDebug(accesoRegistro.getCampoReferenciado().getName() + " := " + exp.getValue());
-                            accesoRegistro.setValorCampoReferenciado(exp.getValue());
                             
                             RESULT = sent;
                             
@@ -786,8 +823,8 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                     ScopeIF newScope = scopeManager.openScope();
                     
                     // comprobar que las expresiones que indican el número de iteraciones también son enteros
-                    aserto(exp2.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
-                    aserto(exp3.getValue() instanceof Integer, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp2.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
+                    aserto(exp3.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     
                   
                   :};
@@ -797,9 +834,9 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                         //Tras la impresión en pantalla se debe generar un salto de línea.
                         //Se permite una sentencia put_line sin argumentos.
                             Sentencia sent = new Sentencia();
-                            semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp.getValue());
+                            semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp);
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
-                            cb.addQuadruple("ESCRIBE", exp.getValue());
+                            cb.addQuadruple("ESCRIBE", exp.getTemporal());
                             sent.setIntermediateCode(cb.create());
                             semanticErrorManager.semanticDebug(sent.getIntermediateCode());
                             RESULT = sent;

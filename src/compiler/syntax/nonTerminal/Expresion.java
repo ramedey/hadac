@@ -39,12 +39,6 @@ public abstract class Expresion extends NonTerminal {
 		this.tipoInstruccion = tipoInstruccion;
 	}
 	
-	/**
-	 * Obtiene el valor resultado de la expresion
-	 * @return
-	 */
-	public abstract Object getValue();
-
 	public void setTemporal(TemporalIF temp) {
 		this.temporal = temp;
 	}

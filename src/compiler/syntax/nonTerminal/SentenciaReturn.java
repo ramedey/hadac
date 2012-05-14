@@ -35,7 +35,7 @@ public class SentenciaReturn extends Sentencia {
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         TemporalIF temp = tF.create ();
-        cb.addQuadruple ("RET", temp, new Value(expresion.getValue()));
+        cb.addQuadruple ("RET", temp, expresion.getTemporal());
         expresion.setTemporal(temp);
         this.setIntermediateCode(cb.create());
         CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());

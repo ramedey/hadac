@@ -18,6 +18,20 @@ public class AccesoRegistro extends NonTerminal {
 	 */
 	private SymbolVariable campoReferenciado;
 	private SymbolVariable variableRegistro;
+	/**
+	 * @return the variableRegistro
+	 */
+	public SymbolVariable getVariableRegistro() {
+		return variableRegistro;
+	}
+
+	/**
+	 * @param variableRegistro the variableRegistro to set
+	 */
+	public void setVariableRegistro(SymbolVariable variableRegistro) {
+		this.variableRegistro = variableRegistro;
+	}
+
 	private TemporalIF temporal;
 	
 	public AccesoRegistro(SymbolVariable variable , String nombreCampo)

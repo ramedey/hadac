@@ -17,7 +17,7 @@ public class SymbolVariable
     extends SymbolBase
 {  
     private Object valor;
-    
+    private int address;
     
     /**
      * Constructor for SymbolVariable.
@@ -49,6 +49,20 @@ public class SymbolVariable
 
 	public Object getValor() {
 		return valor;
+	}
+
+	/**
+	 * @return the address
+	 */
+	public int getAddress() {
+		return address;
+	}
+
+	/**
+	 * @param address the address to set
+	 */
+	public void setAddress(int address) {
+		this.address = address;
 	}
     
 }
