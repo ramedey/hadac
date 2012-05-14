@@ -421,29 +421,30 @@ declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprogra
                             | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
                             | {: RESULT = new Declaraciones();:};
 
-procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS 
+procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros
                     {:
                         //Abrir ambito de la funcion
                         scopeManager.openScope(id.getLexema());
                         syntaxErrorManager.syntaxInfo("Declaracion de procedimiento " + id.getLexema());
-                    :}
-                  parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma:decl BEGIN lista_sentencias:lista END IDENTIFICADOR PUNTOYCOMA
-                    {:
-                         // registrar la funcion en el ambito actual
+                        
+                         // registrar el procedimiento en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope().getParentScope();
                         TypeProcedure tipo = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
                        
                         TypeTableIF typeTable = scope.getTypeTable();
-                        aserto(!typeTable.containsType(tipo), "E tipo ya esta registrado en el ambito: " + scope);
+                        aserto(!typeTable.containsType(tipo), "El tipo ya esta registrado en el ambito: " + scope);
                        
                         typeTable.addType(tipo);
-                        
+                    :}
+                    CIERRA_PARENTESIS IS declaraciones_subprograma:decl BEGIN lista_sentencias:lista END IDENTIFICADOR PUNTOYCOMA
+                    {:
+                                                
                         Declaraciones proc = new Declaraciones(decl);
                         proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
                         
                         //Cierro el ambito del subprograma
                         scopeManager.closeScope();
-                        
+                        syntaxErrorManager.syntaxInfo("Ambitos: " + scopeManager.getCurrentScope());
                         RESULT = proc;                                           
                         
                     :};
@@ -555,15 +556,15 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
                         {:
-                            String nombreFuncion = id.getLexema();
+                            String nombreSubprograma = id.getLexema();
                             
                             syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
                             //Comprobar si elsubprograma es visible desde el ámbito actual
-                            CompilerContext.getSemanticErrorManager().semanticDebug("CI parametros: " + parametros.getIntermediateCode());
-                            TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
-                            
-                            aserto(scopeManager.containsType(nombreFuncion), "El procedimiento o funcion " + nombreFuncion + " no existe. Ambito " + scopeManager.getCurrentScope());
-                            
+                            semanticErrorManager.semanticDebug("CI parametros: " + parametros.getIntermediateCode());
+                            TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, nombreSubprograma);
+
+                            aserto(scopeManager.containsType(nombreSubprograma), "El procedimiento o funcion " + nombreSubprograma + 
+                            " no existe. Ambitos " + scopeManager.getOpenScopes());
                             //comprobar los parametros si coinciden en orden, numero y tipo
                             TypeProcedure tipoSubprograma = (TypeProcedure)tipo;                              
                             aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");
@@ -723,6 +724,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             aserto(simbolo.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
                             "Los tipos de la funcion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
                             simbolo.getType() + ") no coinciden");
+                            
                          }else{
                             aserto(simbolo.getType().getName().equals(exp.getTipoInstruccion().getName()), 
                             "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
