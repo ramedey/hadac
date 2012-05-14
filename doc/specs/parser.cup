@@ -119,7 +119,7 @@ non terminal ListaIdentificadores lista_identificadores;
 non terminal TypeSimple tipo_retorno, tipo_parametro;
 non terminal Expresion  expresion, expresion_logica;
 non terminal Elemento   elemento;
-non terminal SymbolVariable acceso_registro;
+non terminal AccesoRegistro acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal SymbolFunction funcion;
@@ -303,11 +303,7 @@ lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                                 //syntaxErrorManager.syntaxInfo("Fin lista_identificadores, " + id.getLexema());
                             :};
 
-dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD
-{:
-                        syntaxErrorManager.syntaxInfo("Declaracion de registro " + id.getLexema() + ". Linea " + id.getLine());
-                    :}
- dec_campos_registro:declaraciones END RECORD PUNTOYCOMA 
+dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declaraciones END RECORD PUNTOYCOMA 
                     {:
                         syntaxErrorManager.syntaxInfo("Declaracion de registro " + id.getLexema() + ". Linea " + id.getLine());
                     
@@ -316,15 +312,9 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD
                         TypeTableIF typeTable = scope.getTypeTable();
                         TypeRecord tipoRecord = new TypeRecord(scope, id.getLexema(), declaraciones);
                         aserto(!typeTable.containsType(id.getLexema()), "El tipo ya esta declarado. Linea " + id.getLine());
-                        semanticErrorManager.semanticInfo("Agergo el tipo " + id.getLexema() + " a la tabla de tipos del ambito " + scope);
+                        semanticErrorManager.semanticInfo("Agrego el tipo " + id.getLexema() + " a la tabla de tipos del ambito " + scope);
                         typeTable.addType(tipoRecord);
-                        
-                        //SymbolTableIF symbolTable = scope.getSymbolTable();
-                        //if(!symbolTable.containsSymbol(id.getLexema()))
-                        //{
-                        //   symbolTable.addSymbol(new SymbolVariable(scope, id, tipoRecord));
-                        //}
-                    :};
+                     :};
 
 dec_subprograma ::= funcion  
                   | procedimiento;
@@ -512,11 +502,14 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
                         ScopeIF scope = scopeManager.getCurrentScope();
                         SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
                         
-                        SymbolVariableRecord accesoRegistro = (SymbolVariableRecord)acreg;
+                        AccesoRegistro accesoRegistro = (AccesoRegistro)acreg;
                         semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + variable.getType());
                         //El tipo en este caso debe ser TypeRecord
                         aserto(variable.getType() instanceof TypeRecord, "La variable " + variable.getName() + "no no es de tipo registro.", id.getLine());
                         //RESULT = new SymbolVariableRecord(variable, accesoRegistro.getCampoReferenciado().getName());
+                                        
+                        
+                        
                         RESULT = accesoRegistro;
                     :}
                   | IDENTIFICADOR:id1 PUNTO IDENTIFICADOR:id2
@@ -527,7 +520,7 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
                         aserto(variable.getType() != null, "El tipo es nulo " + variable);
                         
                         // Crear objeto SymbolVariableRecord indicando el campo del registro que se esta referenciando.
-                        RESULT = new SymbolVariableRecord(variable, id2.getLexema());
+                        RESULT = new AccesoRegistro(variable, id2.getLexema());
                     :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
@@ -573,22 +566,30 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
                         :}
                       |;
 
-elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
+elemento ::= acceso_registro:reg 
+                {: 
+                    semanticErrorManager.semanticDebug("Acceso a registro: " + reg.getCampoReferenciado().getName() + "(" + reg.getCampoReferenciado().getValor() + ")");
+                    Elemento e = new Elemento(reg); 
+                    e.generarCodigoIntermedio();
+                    RESULT = e;
+                :}
            | TRUE:id 
                 {: 
+                    semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                     Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope()));
                     e.generarCodigoIntermedio();
                     RESULT = e; 
                 :}
            | FALSE:id
                 {: 
+                    semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                     Elemento e = new Elemento(Util.convertirStringABoolean(id.getLexema()), new TypeSimpleBoolean(scopeManager.getCurrentScope())); 
                     e.generarCodigoIntermedio();
                     RESULT = e;
                 :}
            | CONSTANTE_NUMERICA:id
                 {:
-                    //syntaxErrorManager.syntaxInfo("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
+                    semanticErrorManager.semanticDebug("Cte numerica en linea " + id.getLine() +". Valor: " + id.getLexema());
                     Elemento e = new Elemento(Integer.parseInt(id.getLexema()), new TypeSimpleInteger(scopeManager.getCurrentScope()));
                     e.generarCodigoIntermedio();
                     RESULT = e;
@@ -602,10 +603,12 @@ elemento ::= acceso_registro:reg {: RESULT = new Elemento(reg); :}
             :}
             | IDENTIFICADOR:id
             {:
-                 
+                semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                 // Comprobar que el identificador es visible desde el ámbito actual
                 SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
-                RESULT = new Elemento(simbolo);
+                Elemento e = new Elemento(simbolo);
+                e.generarCodigoIntermedio();
+                RESULT = e;
                 
             :};
 
@@ -651,10 +654,10 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             symbolVariable.getType() + ") no coinciden");
                          }
                          //Realizo la asignacion
-                         //symbolVariable.setValor(exp.getValue());
+                         symbolVariable.setValor(exp.getValue());
                          
                         Sentencia sent = new Sentencia();
-
+                        syntaxErrorManager.syntaxInfo("generando codigo intermedio... ");
                         ScopeIF scope = scopeManager.getCurrentScope();
                         TemporalFactoryIF tF = new TemporalFactory(scope);
                         TemporalIF eTemp = exp.getTemporal();
@@ -671,9 +674,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                        | acceso_registro:reg ASIGNACION:id expresion:exp
                        {:
                             syntaxErrorManager.syntaxInfo("Asignacion a campo de registro en linea " + id.getLine());
-                            //Comprobar que el tipo registro existe y es visisble desde el ámbito actual
-                            syntaxErrorManager.syntaxInfo("Tipo del registrooo " + reg.getType());
-                            SymbolVariableRecord accesoRegistro = (SymbolVariableRecord) reg;
+                            AccesoRegistro accesoRegistro = (AccesoRegistro) reg;
                             
                             //Comprobar que el tipo de la expresion coincide con el del campo del registro.
                             
@@ -682,8 +683,25 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             
                             aserto(tipo.getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion y de la variable asignada no coinciden");
                             
-                            //Realiza la asignacion
                             
+                            Sentencia sent = new Sentencia();
+                            syntaxErrorManager.syntaxInfo("generando codigo intermedio... ");
+                            ScopeIF scope = scopeManager.getCurrentScope();
+                            TemporalFactoryIF tF = new TemporalFactory(scope);
+                            TemporalIF eTemp = exp.getTemporal();
+                            TemporalIF temp = tF.create();
+                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
+                            cb.addQuadruples(exp.getIntermediateCode());
+                            cb.addQuadruple("MV", temp, eTemp);
+                            sent.setIntermediateCode(cb.create()); 
+                            semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
+                            
+                            
+                            //Realiza la asignacion
+                            semanticErrorManager.semanticDebug(accesoRegistro.getCampoReferenciado().getName() + " := " + exp.getValue());
+                            accesoRegistro.setValorCampoReferenciado(exp.getValue());
+                            
+                            RESULT = sent;
                             
                        :};
 
@@ -789,10 +807,10 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS
                        {:
                             Sentencia sent = new Sentencia();
-                            semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + cad.getLexema());
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
                             cb.addQuadruple("ESCRIBE", cad.getLexema());
                             sent.setIntermediateCode(cb.create());
+                            semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + sent.getIntermediateCode());
                             RESULT = sent;
                        :};
 

@@ -39,6 +39,13 @@ public class Elemento extends Expresion {
 		resultado = valor;
 	}
 	
+	public Elemento(AccesoRegistro acreg)
+	{
+		super(acreg.getTipoDeCampoReferenciado());
+		resultado = acreg.getCampoReferenciado().getValor();
+		this.setIntermediateCode(acreg.getIntermediateCode());
+	}
+	
 //	public Elemento(SymbolVariable variable)
 //	{
 //		super(variable.getType());
@@ -76,9 +83,16 @@ public class Elemento extends Expresion {
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         TemporalIF temp = tF.create ();
+        CompilerContext.getSemanticErrorManager().semanticDebug("codigo intermedio elemento: " + this.getResultado());
+		
         cb.addQuadruple ("MV", temp, new Value(this.getResultado()));
         this.setTemporal(temp);
-        this.setIntermediateCode(cb.create());
+        if(this.getIntermediateCode() == null)
+        {
+        	this.setIntermediateCode(cb.create());
+        }else{
+        	this.getIntermediateCode().addAll(cb.create());
+        }
         CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
 	}
 
