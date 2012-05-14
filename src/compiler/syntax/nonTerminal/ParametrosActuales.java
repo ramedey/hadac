@@ -27,17 +27,6 @@ public class ParametrosActuales extends NonTerminal {
 		parametros.add(exp);		
 	}
 	
-	public ParametrosActuales(ParametrosActuales par)
-	{		
-		super();
-		parametros = new ArrayList<Expresion>();
-		
-		for(Expresion expresion : par.getParametros())
-		{
-			parametros.add(expresion);
-		}
-	}
-	
 	/**
 	 * 
 	 * @param exp
@@ -74,11 +63,13 @@ public class ParametrosActuales extends NonTerminal {
 		{
 			if(!parametroPreviamenteGenerado(parametro))
 			{
+				CompilerContext.getSemanticErrorManager().semanticDebug("Generando parametro: " + parametro.toString());
 				cb.addQuadruples(parametro.getIntermediateCode());
 				cb.addQuadruple ("PARAM", parametro.getTemporal ());
 			}
 		}
 		this.setIntermediateCode(cb.create());
+		
 	}
 	
 	//TODO: controlar que no se genere codigo intermedio dos veces para los parametros

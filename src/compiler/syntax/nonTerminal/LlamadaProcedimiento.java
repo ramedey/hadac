@@ -29,7 +29,7 @@ public class LlamadaProcedimiento extends NonTerminal {
 	public LlamadaProcedimiento(SymbolIF simbolo, ParametrosActuales parametros)
 	{
 		super();
-		parametrosActuales = new ParametrosActuales(parametros);
+		parametrosActuales = parametros;
 		this.simbolo = simbolo;
 	}
 	
@@ -41,5 +41,6 @@ public class LlamadaProcedimiento extends NonTerminal {
         Variable f = new Variable (simbolo.getName(), scope);
         cb.addQuadruple ("CALL", f);
         this.setIntermediateCode(cb.create());
+        CompilerContext.getSemanticErrorManager().semanticDebug("CI llamada: " + this.getIntermediateCode());
 	}
 }

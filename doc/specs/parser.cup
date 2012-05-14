@@ -533,7 +533,7 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                             
                             syntaxErrorManager.syntaxInfo("Llamada al subprograma " + id.getLexema());
                             //Comprobar si elsubprograma es visible desde el ámbito actual
-                            
+                            CompilerContext.getSemanticErrorManager().semanticDebug("CI parametros: " + parametros.getIntermediateCode());
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                             
                             aserto(scopeManager.containsSymbol(nombreFuncion), "El procedimiento o funcion " + nombreFuncion + " no existe. Ambito " + scopeManager.getCurrentScope());
@@ -634,7 +634,9 @@ elemento ::= acceso_registro:reg
                 syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
-                RESULT = new Elemento(llamada.getSimbolo());
+                Elemento e = new Elemento(llamada.getSimbolo());
+                e.setIntermediateCode(llamada.getIntermediateCode());
+                RESULT = e;
             :}
             | IDENTIFICADOR:id
             {:
