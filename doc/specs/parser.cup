@@ -706,27 +706,27 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          // Comprobar que el identificador es visible desde el ámbito actual
                          SymbolIF simbolo = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                          
-                         //Comprobar que el simbolo es una variable
-                         aserto(simbolo instanceof SymbolVariable, "El identificador a asignar debe ser una variable: " + simbolo);
+                         //Comprobar que el simbolo es una variable o un parametro
+                         aserto((simbolo instanceof SymbolVariable || simbolo instanceof SymbolParameter), "El identificador a asignar debe ser una variable o un parametro: " + simbolo);
                          
                          //Comprobar que le tipo de la expresión es compatible con el del
                          // símbolo que recibe el valor en la asignación.
                          
-                         SymbolVariable symbolVariable = (SymbolVariable) simbolo;
+                         
                          syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
-                         syntaxErrorManager.syntaxInfo("Variables: " + symbolVariable.getName() + ".\nTipos " + symbolVariable.getType() + " == " + exp.getTipoInstruccion());
+                         syntaxErrorManager.syntaxInfo("Variables: " + simbolo.getName() + ".\nTipos " + simbolo.getType() + " == " + exp.getTipoInstruccion());
                          //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
                          // tipos con el tipo de retorno de la funcion.
                          if(exp.getTipoInstruccion() instanceof TypeFunction)
                          {
-                            aserto(symbolVariable.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
+                            aserto(simbolo.getType().getName().equals(((TypeFunction)exp.getTipoInstruccion()).getTipoRetorno().getName()), 
                             "Los tipos de la funcion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
-                            symbolVariable.getType() + ") no coinciden");
+                            simbolo.getType() + ") no coinciden");
                          }else{
-                            aserto(symbolVariable.getType().getName().equals(exp.getTipoInstruccion().getName()), 
+                            aserto(simbolo.getType().getName().equals(exp.getTipoInstruccion().getName()), 
                             "Los tipos de la expresion (" + exp.getTipoInstruccion() + ") y de la variable asignada (" + 
-                            symbolVariable.getType() + ") no coinciden");
+                            simbolo.getType() + ") no coinciden");
                          }
                                                   
                         Sentencia sent = new Sentencia();
