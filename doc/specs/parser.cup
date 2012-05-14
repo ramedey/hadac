@@ -112,8 +112,7 @@ terminal Token TYPE;
 
 non terminal  			program;
 non terminal Axiom		axiom;
-non terminal            declaraciones;
-non terminal            dec_const_simbolica, dec_tipo_registro, dec_subprograma;
+non terminal Declaraciones  declaraciones, dec_const_simbolica, dec_tipo_registro, dec_subprograma, declaraciones_subprograma;
 non terminal DecVariables dec_variables, dec_campos_registro;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TypeSimple tipo_retorno, tipo_parametro;
@@ -123,7 +122,7 @@ non terminal AccesoRegistro acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
 non terminal SymbolFunction funcion;
-non terminal  procedimiento, declaraciones_subprograma;
+non terminal Declaraciones procedimiento;
 non terminal LlamadaProcedimiento llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -172,28 +171,34 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
                 scopeManager.openScope(name);
                 syntaxErrorManager.syntaxInfo("Ambito global " + name);
             :}
-        ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones BEGIN
-        {: syntaxErrorManager.syntaxInfo("Comienza cuerpo programa");:} 
-        lista_sentencias:lista
+        ABRE_PARENTESIS CIERRA_PARENTESIS IS declaraciones:decl BEGIN lista_sentencias:lista
         {:         
             syntaxErrorManager.syntaxInfo("Termina cuerpo programa");
             Axiom ax = new Axiom();
             syntaxErrorManager.syntaxInfo("Sentencias: " + lista);
+            
+            if(decl != null)
+            {
+                ax.setIntermediateCode(decl.getIntermediateCode());
+            }
             if(lista != null)
             {
-                ax.setIntermediateCode(lista.getIntermediateCode());
+                ax.getIntermediateCode().addAll(0, lista.getIntermediateCode());
             }
             RESULT = ax;
         :}
         END IDENTIFICADOR PUNTOYCOMA
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
-declaraciones ::= dec_const_simbolica declaraciones
-                | dec_variables declaraciones
-                | dec_tipo_registro declaraciones
-                | dec_subprograma declaraciones
+declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {: RESULT =  decl.addDeclaracion(dConst);:}
+                | dec_variables:dVar declaraciones:decl 
+                {: 
+                    semanticErrorManager.semanticInfo("Declaracion de variables " + decl);
+                    RESULT =  decl.addDeclaracion(dVar);:}
+                | dec_tipo_registro:dReg declaraciones:decl {: RESULT =  decl.addDeclaracion(dReg);:}
+                | dec_subprograma:dSub declaraciones:decl {: RESULT =  decl.addDeclaracion(dSub);:}
                 | error declaraciones {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
-                | {: syntaxErrorManager.syntaxInfo("Fin declaraciones"); :};
+                | {: syntaxErrorManager.syntaxInfo("Fin declaraciones"); RESULT = new Declaraciones(); :};
 
 dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNACION CONSTANTE_NUMERICA:numero PUNTOYCOMA
                         {:
@@ -321,7 +326,7 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declar
                      :};
 
 dec_subprograma ::= funcion  
-                  | procedimiento;
+                  | procedimiento:proc {: RESULT = proc;:};
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS 
             {:
@@ -408,24 +413,38 @@ tipo_retorno ::= INTEGER {: RESULT = new TypeSimpleInteger(scopeManager.getCurre
                | BOOLEAN {: RESULT = new TypeSimpleBoolean(scopeManager.getCurrentScope());:}
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
-declaraciones_subprograma ::= dec_const_simbolica declaraciones_subprograma
-                            | dec_variables declaraciones_subprograma
-                            | dec_subprograma declaraciones_subprograma
-                            |;
+declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dConst);:}
+                            | dec_variables:dVar declaraciones_subprograma:decs {: 
+                            semanticErrorManager.semanticInfo("Declaracion de variables en subprograma " + decs);
+                            RESULT = decs.addDeclaracion(dVar);:}
+                            | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
+                            | {: RESULT = new Declaraciones();:};
 
 procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS 
                     {:
                         //Abrir ambito de la funcion
                         scopeManager.openScope(id.getLexema());
+                        syntaxErrorManager.syntaxInfo("Declaracion de procedimiento " + id.getLexema());
                     :}
-                  parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma BEGIN lista_sentencias END IDENTIFICADOR PUNTOYCOMA
+                  parametros_formales:parametros CIERRA_PARENTESIS IS declaraciones_subprograma:decl BEGIN lista_sentencias:lista END IDENTIFICADOR PUNTOYCOMA
                     {:
                          // registrar la funcion en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope().getParentScope();
-                        TypeProcedure procedure = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
-                        Util.actualizarTablasSimbolosYTipos(scope, id, procedure);
-                                                                   
-                        //Registrar las declaraciones en el ambito actual
+                        TypeProcedure tipo = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
+                       
+                        TypeTableIF typeTable = scope.getTypeTable();
+                        aserto(!typeTable.containsType(tipo), "E tipo ya esta registrado en el ambito: " + scope);
+                       
+                        typeTable.addType(tipo);
+                        
+                        Declaraciones proc = new Declaraciones(decl);
+                        proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
+                        
+                        //Cierro el ambito del subprograma
+                        scopeManager.closeScope();
+                        
+                        RESULT = proc;                                           
+                        
                     :};
 
 lista_sentencias ::= sentencia:sent PUNTOYCOMA lista_sentencias:lista
@@ -542,20 +561,18 @@ llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:par
                             CompilerContext.getSemanticErrorManager().semanticDebug("CI parametros: " + parametros.getIntermediateCode());
                             TypeIF tipo = Util.buscarTipoPreviamenteDeclarado(scopeManager, id.getLexema());
                             
-                            aserto(scopeManager.containsSymbol(nombreFuncion), "El procedimiento o funcion " + nombreFuncion + " no existe. Ambito " + scopeManager.getCurrentScope());
+                            aserto(scopeManager.containsType(nombreFuncion), "El procedimiento o funcion " + nombreFuncion + " no existe. Ambito " + scopeManager.getCurrentScope());
                             
-                            SymbolIF s = scopeManager.searchSymbol(nombreFuncion);
-                                                       
                             //comprobar los parametros si coinciden en orden, numero y tipo
-                            TypeProcedure tipoSubprograma = (TypeProcedure)s.getType();                              
+                            TypeProcedure tipoSubprograma = (TypeProcedure)tipo;                              
                             aserto(tipoSubprograma.validarParametros(parametros.getParametros()), "Los parámetros no coinciden");
                             if(tipoSubprograma instanceof TypeFunction)
                             {
-                                LlamadaFuncion funcion = new LlamadaFuncion(s, parametros);
+                                LlamadaFuncion funcion = new LlamadaFuncion(tipoSubprograma, parametros);
                                 funcion.generarCodigoIntermedio();
                                 RESULT = funcion;
                             }else{
-                                LlamadaProcedimiento procedimiento = new LlamadaProcedimiento(s, parametros);
+                                LlamadaProcedimiento procedimiento = new LlamadaProcedimiento(tipoSubprograma, parametros);
                                 procedimiento.generarCodigoIntermedio();
                                 RESULT = procedimiento;
                             }
@@ -640,7 +657,7 @@ elemento ::= acceso_registro:reg
                 syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
-                Elemento e = new Elemento(llamada.getSimbolo());
+                Elemento e = new Elemento(llamada.getTipo());
                 e.setIntermediateCode(llamada.getIntermediateCode());
                 RESULT = e;
             :}

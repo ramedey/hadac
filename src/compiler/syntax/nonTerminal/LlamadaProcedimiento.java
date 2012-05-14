@@ -6,31 +6,32 @@ import compiler.intermediate.Variable;
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class LlamadaProcedimiento extends NonTerminal {
 
 	private ParametrosActuales parametrosActuales;
-	private SymbolIF simbolo;
+	private TypeIF tipo;
 	
 	/**
 	 * @return the simbolo
 	 */
-	public SymbolIF getSimbolo() {
-		return simbolo;
+	public TypeIF getTipo() {
+		return tipo;
 	}
 
 	/**
 	 * @param simbolo the simbolo to set
 	 */
-	public void setSimbolo(SymbolIF simbolo) {
-		this.simbolo = simbolo;
+	public void setTipo(TypeIF simbolo) {
+		this.tipo = simbolo;
 	}
 
-	public LlamadaProcedimiento(SymbolIF simbolo, ParametrosActuales parametros)
+	public LlamadaProcedimiento(TypeIF tipo, ParametrosActuales parametros)
 	{
 		super();
 		parametrosActuales = parametros;
-		this.simbolo = simbolo;
+		this.tipo = tipo;
 	}
 	
 	public void generarCodigoIntermedio()
@@ -38,7 +39,7 @@ public class LlamadaProcedimiento extends NonTerminal {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
         cb.addQuadruples(parametrosActuales.getIntermediateCode());
-        Variable f = new Variable (simbolo.getName(), scope);
+        Variable f = new Variable (tipo.getName(), scope);
         cb.addQuadruple ("CALL", f);
         this.setIntermediateCode(cb.create());
         CompilerContext.getSemanticErrorManager().semanticDebug("CI llamada: " + this.getIntermediateCode());

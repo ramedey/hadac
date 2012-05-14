@@ -61,10 +61,12 @@ public class ListaSentencias extends NonTerminal {
 		//CompilerContext.getSyntaxErrorManager().syntaxInfo("ListaSentencias, agregando sentencias a la lista. " + lista + noterminal);
 		if(noterminal instanceof Expresion)
 		{
-			lista.add(noterminal);
+			((ArrayList)lista).add(0, noterminal);
+			//lista.add(noterminal);
 		}else if(noterminal instanceof Sentencia)
 		{
-			lista.add(noterminal);
+			((ArrayList)lista).add(0, noterminal);
+			//lista.add(noterminal);
 			Sentencia sent = (Sentencia)noterminal;
 			// Si es una sentencia Return y no hay otra sentencia return previa,
 			// se almacena su indice en la lista de sentencias.
@@ -92,6 +94,6 @@ public class ListaSentencias extends NonTerminal {
         }
         
         this.setIntermediateCode(cb.create());
-        //CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
+        CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
 	}
 }

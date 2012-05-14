@@ -1,13 +1,11 @@
 package compiler.syntax.nonTerminal;
 
-import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
+import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class LlamadaFuncion extends LlamadaProcedimiento {
 
-	private Object retorno;
-	
-	public LlamadaFuncion(SymbolIF simbolo, ParametrosActuales parametros) {
-		super(simbolo, parametros);
+	public LlamadaFuncion(TypeIF tipo, ParametrosActuales parametros) {
+		super(tipo, parametros);
 		// TODO Auto-generated constructor stub
 	}
 
