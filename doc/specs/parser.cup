@@ -424,8 +424,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS
                         ScopeIF scope = scopeManager.getCurrentScope().getParentScope();
                         TypeProcedure procedure = new TypeProcedure(scope, id.getLexema(), parametros.getParametros());
                         Util.actualizarTablasSimbolosYTipos(scope, id, procedure);
-                        ScopeIF newScope = scopeManager.openScope(id.getLexema());
-                                           
+                                                                   
                         //Registrar las declaraciones en el ambito actual
                     :};
 
