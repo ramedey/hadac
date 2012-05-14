@@ -178,7 +178,11 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
         {:         
             syntaxErrorManager.syntaxInfo("Termina cuerpo programa");
             Axiom ax = new Axiom();
-            ax.setIntermediateCode(lista.getIntermediateCode());
+            syntaxErrorManager.syntaxInfo("Sentencias: " + lista);
+            if(lista != null)
+            {
+                ax.setIntermediateCode(lista.getIntermediateCode());
+            }
             RESULT = ax;
         :}
         END IDENTIFICADOR PUNTOYCOMA
