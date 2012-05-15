@@ -121,8 +121,7 @@ non terminal Elemento   elemento;
 non terminal AccesoRegistro acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
-non terminal SymbolFunction funcion;
-non terminal Declaraciones procedimiento;
+non terminal Declaraciones procedimiento, funcion;
 non terminal LlamadaProcedimiento llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -326,7 +325,7 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declar
                         typeTable.addType(tipoRecord);
                      :};
 
-dec_subprograma ::= funcion  
+dec_subprograma ::= funcion:fun {: RESULT = fun;:}
                   | procedimiento:proc {: RESULT = proc;:};
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS 
@@ -359,7 +358,7 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS
                     symbolTable.addSymbol(simbolo);                    
                    
             :} 
-            IS declaraciones_subprograma BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
+            IS declaraciones_subprograma:decl BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
                 {:
                     
                     TypeFunction function = (TypeFunction)scopeManager.searchType(id.getLexema());
@@ -379,7 +378,12 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS
                     // en la cabecera de la función.
                     aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
                     
+                    Declaraciones fun = new Declaraciones(decl);
+                    fun.getIntermediateCode().addAll(0, listaSentencias.getIntermediateCode());
+                    
                     scopeManager.closeScope();
+                    
+                    RESULT = fun;
                    
                 :};
 
