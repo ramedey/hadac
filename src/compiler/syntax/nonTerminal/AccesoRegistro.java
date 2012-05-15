@@ -78,8 +78,5 @@ public class AccesoRegistro extends NonTerminal {
 		return campoReferenciado;
 	}
 	
-	public void setValorCampoReferenciado(Object value)
-	{
-		campoReferenciado.setValor(value);
-	}
+
 }

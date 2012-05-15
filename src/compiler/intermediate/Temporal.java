@@ -26,6 +26,7 @@ public class Temporal
         super ();
         this.name = name;
         this.scope = scope;
+        this.size = 1;
     }
     
     

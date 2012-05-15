@@ -150,10 +150,34 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
+  		
+  		int gAddress = 0, lOffset = 0;
+  		
+  		 
+  		 List<ScopeIF> scopes = scopeManager.getAllScopes ();
+  		 for (ScopeIF scope: scopes) {
+            List<SymbolIF> symbols = scope.getSymbolTable ().getSymbols();
+            for (SymbolIF s: symbols) {
+                if (s instanceof SymbolVariable){
+                    SymbolVariable symbol = (SymbolVariable)s;
+                    if (scope.getLevel () == 0)
+                        symbol.setAddress(gAddress + symbol.getType ().getSize ());
+                    else 
+                        symbol.setAddress(lOffset + symbol.getType ().getSize ());
+                }
+            }
+            List<TemporalIF> temporals = scope.getTemporalTable ().getTemporals();
+            for (TemporalIF t: temporals)
+                t.setAddress (lOffset + ((Temporal)t).getSize ()); 
+  		 }
+  		 
+  		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+  		 cb.addQuadruple ("DATA", gAddress);
   		 List intermediateCode = ax.getIntermediateCode ();
-  		 semanticErrorManager.semanticDebug("Codigo final" + intermediateCode);
+  		 cb.addQuadruples (intermediateCode);
+  		 
   		 finalCodeFactory.setEnvironment(CompilerContext.getExecutionEnvironment());
-  		 finalCodeFactory.create (intermediateCode);
+  		 finalCodeFactory.create (cb.create());
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.
@@ -601,7 +625,7 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
 
 elemento ::= acceso_registro:reg 
                 {: 
-                    semanticErrorManager.semanticDebug("Acceso a registro: " + reg.getCampoReferenciado().getName() + "(" + reg.getCampoReferenciado().getValor() + ")");
+                    semanticErrorManager.semanticDebug("Acceso a registro: " + reg.getCampoReferenciado().getName());
                     Elemento e = new Elemento(reg); 
                     ScopeIF scope = scopeManager.getCurrentScope();
                     TemporalFactory tF = new TemporalFactory (scope);
@@ -884,7 +908,7 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                        {:
                             Sentencia sent = new Sentencia();
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
-                            cb.addQuadruple("ESCRIBE", cad.getLexema());
+                            cb.addQuadruple(InstructionSetArchitecture.ESCRIBE, cad.getLexema());
                             sent.setIntermediateCode(cb.create());
                             semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + sent.getIntermediateCode());
                             RESULT = sent;
