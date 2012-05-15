@@ -3,6 +3,8 @@ package compiler.code;
 import java.util.Arrays;
 import java.util.List;
 
+import compiler.code.translator.*;
+import compiler.intermediate.InstructionSetArchitecture;
 import compiler.semantic.type.TypeSimple;
 
 import es.uned.lsi.compiler.code.ExecutionEnvironmentIF;
@@ -93,7 +95,23 @@ public class ExecutionEnvironmentEns2001
     @Override
     public final String translate (QuadrupleIF quadruple)
     {      
-        //TODO: Student work
-        return quadruple.toString(); 
+    	TranslatorIF trans;
+    	String op = quadruple.getOperation();
+    	if(op.equals(InstructionSetArchitecture.ESCRIBE))
+    	{
+    		trans = new TranslatorIO();    		
+    	}else if(op.equals(InstructionSetArchitecture.INICIO)){
+    		
+    		trans = new TranslatorInitial();
+    	}else if(op.equals(InstructionSetArchitecture.FINAL)){
+    		
+    		trans = new TranslatorFinal();
+    	}else{
+    	
+    		return quadruple.toString(); 
+    	}
+    	
+    	return trans.createTranslation(quadruple);
+        
     }
 }

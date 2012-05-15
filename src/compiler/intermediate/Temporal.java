@@ -1,5 +1,7 @@
 package compiler.intermediate;
 
+import compiler.CompilerContext;
+
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
@@ -26,7 +28,7 @@ public class Temporal
         super ();
         this.name = name;
         this.scope = scope;
-        this.size = 1;
+        this.size = CompilerContext.getExecutionEnvironment().getTypeSize(null);
     }
     
     

@@ -29,7 +29,7 @@ public class Variable
         this.scope = scope;
     }
     
-    public Variable (String name, SymbolVariable simbolo)
+    public Variable (String name, SymbolIF simbolo)
     {
         super ();
         this.name = name;

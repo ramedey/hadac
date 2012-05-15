@@ -161,9 +161,13 @@ program ::=
                 if (s instanceof SymbolVariable){
                     SymbolVariable symbol = (SymbolVariable)s;
                     if (scope.getLevel () == 0)
+                    {
                         symbol.setAddress(gAddress + symbol.getType ().getSize ());
-                    else 
+                        gAddress += symbol.getAddress();
+                    }else {
                         symbol.setAddress(lOffset + symbol.getType ().getSize ());
+                        lOffset += symbol.getAddress();
+                    }
                 }
             }
             List<TemporalIF> temporals = scope.getTemporalTable ().getTemporals();
@@ -172,9 +176,12 @@ program ::=
   		 }
   		 
   		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-  		 cb.addQuadruple ("DATA", gAddress);
+  		 //cb.addQuadruple ("DATA", gAddress);
+  		 cb.addQuadruple (InstructionSetArchitecture.INICIO);
   		 List intermediateCode = ax.getIntermediateCode ();
+		 
   		 cb.addQuadruples (intermediateCode);
+         cb.addQuadruple (InstructionSetArchitecture.FINAL);
   		 
   		 finalCodeFactory.setEnvironment(CompilerContext.getExecutionEnvironment());
   		 finalCodeFactory.create (cb.create());
@@ -703,7 +710,7 @@ elemento ::= acceso_registro:reg
                 
                 e.setTipoInstruccion(symbol.getType());
                 
-                Variable var = new Variable (name, symbol.getScope ());
+                Variable var = new Variable (name, symbol);
                 ScopeIF scope = scopeManager.getCurrentScope();
                 TemporalFactory tF = new TemporalFactory (scope);
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
@@ -908,7 +915,7 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                        {:
                             Sentencia sent = new Sentencia();
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
-                            cb.addQuadruple(InstructionSetArchitecture.ESCRIBE, cad.getLexema());
+                            cb.addQuadruple(InstructionSetArchitecture.ESCRIBE, null, cad.getLexema());
                             sent.setIntermediateCode(cb.create());
                             semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + sent.getIntermediateCode());
                             RESULT = sent;
