@@ -151,29 +151,7 @@ program ::=
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
   		
-  		int gAddress = 0, lOffset = 0;
-  		
-  		 
-  		 List<ScopeIF> scopes = scopeManager.getAllScopes ();
-  		 for (ScopeIF scope: scopes) {
-            List<SymbolIF> symbols = scope.getSymbolTable ().getSymbols();
-            for (SymbolIF s: symbols) {
-                if (s instanceof SymbolVariable){
-                    SymbolVariable symbol = (SymbolVariable)s;
-                    if (scope.getLevel () == 0)
-                    {
-                        symbol.setAddress(gAddress + symbol.getType ().getSize ());
-                        gAddress += symbol.getAddress();
-                    }else {
-                        symbol.setAddress(lOffset + symbol.getType ().getSize ());
-                        lOffset += symbol.getAddress();
-                    }
-                }
-            }
-            List<TemporalIF> temporals = scope.getTemporalTable ().getTemporals();
-            for (TemporalIF t: temporals)
-                t.setAddress (lOffset + ((Temporal)t).getSize ()); 
-  		 }
+  		 MemoryManager.assignAddresses();
   		 
   		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
   		 //cb.addQuadruple ("DATA", gAddress);
@@ -221,7 +199,9 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
         END IDENTIFICADOR PUNTOYCOMA
         | error {: syntaxErrorManager.syntaxDebug ("Error en declaracion de procedimiento principal."); :};
 
-declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {: RESULT =  decl.addDeclaracion(dConst);:}
+declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {: 
+                semanticErrorManager.semanticInfo("Declaracion de constantes " + dConst);
+                RESULT =  decl.addDeclaracion(dConst);:}
                 | dec_variables:dVar declaraciones:decl 
                 {: 
                     semanticErrorManager.semanticInfo("Declaracion de variables " + decl);
@@ -260,7 +240,8 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                                                                 Integer.parseInt(numero.getLexema())));
                                 }
                             }
-                             
+                             Declaraciones dec = new Declaraciones();
+                             RESULT = dec;
                         :} 
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION TRUE:constante PUNTOYCOMA 
                         {:
@@ -273,6 +254,9 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
                             
                             Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
+                            
+                            Declaraciones dec = new Declaraciones();
+                             RESULT = dec;
                         :}
                       | lista_identificadores:lista DECLARACION CONSTANT ASIGNACION FALSE:constante PUNTOYCOMA 
                         {:
@@ -285,6 +269,9 @@ dec_const_simbolica ::= lista_identificadores:lista DECLARACION CONSTANT ASIGNAC
                             TypeIF tipo = new TypeSimpleBoolean(scopeManager.getCurrentScope());
                             
                             Util.agregarConstanteBooleanaATablasSimbolosYTipos(scope, lista.getListaIdentificadores(), tipo, constante);
+                            
+                            Declaraciones dec = new Declaraciones();
+                             RESULT = dec;
                         :};
 
 dec_campos_registro ::= dec_variables:dec dec_campos_registro:dec_reg 
@@ -475,8 +462,10 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                     {:
                                                 
                         Declaraciones proc = new Declaraciones(decl);
+                        Procedure procedure = new Procedure(id.getLexema(), scopeManager.getCurrentScope());
                         proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
-                        
+                        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getParentScope());
+                        cb.addQuadruple(InstructionSetArchitecture.INL, procedure.getCodeLabel());
                         //Cierro el ambito del subprograma
                         scopeManager.closeScope();
                         syntaxErrorManager.syntaxInfo("Ambitos: " + scopeManager.getCurrentScope());
@@ -709,14 +698,20 @@ elemento ::= acceso_registro:reg
                 SymbolIF symbol = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
                 
                 e.setTipoInstruccion(symbol.getType());
-                
-                Variable var = new Variable (name, symbol);
+                OperandIF o;
+                if(symbol.getType() instanceof SymbolVariable)
+                {
+                    o = new Variable (name, symbol);
+                }else{
+                    SymbolConstant constante = (SymbolConstant)symbol;
+                    o = new Value(constante.getValue());
+                }
                 ScopeIF scope = scopeManager.getCurrentScope();
                 TemporalFactory tF = new TemporalFactory (scope);
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
                 TemporalIF temp = tF.create ();
                 e.setTemporal(temp);
-                cb.addQuadruple ("MVA", temp, var);
+                cb.addQuadruple ("MV", temp, o);
                 e.setIntermediateCode(cb.create());
                 semanticErrorManager.semanticDebug(e.getIntermediateCode());
                 RESULT = e;
@@ -906,7 +901,7 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                             semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp);
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
                             cb.addQuadruples (exp.getIntermediateCode());
-                            cb.addQuadruple("ESCRIBE", exp.getTemporal());
+                            cb.addQuadruple("ESCRIBE", null, exp.getTemporal());
                             sent.setIntermediateCode(cb.create());
                             semanticErrorManager.semanticDebug(sent.getIntermediateCode());
                             RESULT = sent;

@@ -1,5 +1,6 @@
 package compiler.intermediate;
 
+import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -53,8 +54,9 @@ public class Procedure
     @Override
     public final LabelIF getCodeLabel ()
     {
-        // TODO : Student Work
-        return null;
+    	LabelFactory labelFactory = new LabelFactory();
+        // TODO : Label que marca el comienzo del procedimiento.
+        return labelFactory.create(getName());
     }
 
     /**

@@ -4,14 +4,23 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public class TranslatorInitial extends TranslatorBase {
 
+	/**********************************************
+	 * 
+	 * 1. Haz que la pila empiece en la 65000 y crezca hacia posiciones bajas
+de memoria (hacia 0)
+2. el código y las la memoria para las variables globales empiezan en 0
+y crece hacia posiciones altas de memoria (hacia 65000)
+3. Sitúa el display desde la 65001 en adelante hasta el final de la memoria
+	 **********************************************/
+	
 	@Override
 	public void translate(QuadrupleIF q) {
 		
 		getTranslation().append("ORG 0\n");
-		getTranslation().append("MOVE #65535,.SP\n");
-		getTranslation().append("MOVE #36864,.R0\n");
-		getTranslation().append("MOVE #36897,[.R0]\n");
-		//getTranslation().append("");
+		getTranslation().append("MOVE #65000,.SP ; la pila empieza en la 65000 y crezca hacia posiciones bajas de memoria (hacia 0)\n");
+		getTranslation().append("MOVE #65001,.R0 ; dirección del display almacenada en el registro 0\n");
+		//getTranslation().append("MOVE #36897,[.R0]\n");
+		getTranslation().append("MOVE #36897,.IX          ; Registro IX apuntando al RA del procedimiento principal");
 
 	}
 

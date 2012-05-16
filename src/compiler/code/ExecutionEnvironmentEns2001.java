@@ -106,12 +106,15 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.FINAL)){
     		
     		trans = new TranslatorFinal();
+    	}else if(op.equals(InstructionSetArchitecture.MOVE)){
+    		
+    		trans = new TranslatorMove();
     	}else{
     	
     		return quadruple.toString(); 
     	}
-    	
-    	return trans.createTranslation(quadruple);
-        
+//    	return quadruple.toString();
+    	//return  quadruple.toString() + "\n" + trans.createTranslation(quadruple);
+    	return  trans.createTranslation(quadruple);
     }
 }
