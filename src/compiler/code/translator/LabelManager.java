@@ -5,16 +5,12 @@ import java.util.List;
 
 public class LabelManager {
 
-	private static List<String> labels;
+	private static List<String> labels = new ArrayList<String>();
 	private static int i = 0;
 	private static final String saltoLinea = "\n";
 	
 	public static void addLabel(String label, String intruction)
 	{
-		if(labels == null)
-		{
-			labels = new ArrayList<String>();
-		}
 		labels.add(label + ": " + intruction + saltoLinea);
 	}
 	

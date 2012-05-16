@@ -8,7 +8,11 @@ public class TranslatorFinal extends TranslatorBase {
 	public void translate(QuadrupleIF q) {
 		getTranslation().append("HALT\n");
 		getTranslation().append("ORG 32768\n");
-		getTranslation().append(LabelManager.getLabels());
+		String labels = LabelManager.getLabels();
+		if(labels != null)
+		{
+			getTranslation().append(labels);
+		}
 		getTranslation().append("END");
 		
 	}
