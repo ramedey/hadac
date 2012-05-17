@@ -41,8 +41,8 @@ public class MemoryManager {
                    SymbolVariable symbol = (SymbolVariable)s;
                    if (scope.getLevel () == 0)
                    {
-                       symbol.setAddress(gAddress + symbol.getType ().getSize ());
-                       gAddress += symbol.getAddress();
+                       symbol.setAddress(gAddress + symbol.getType().getSize());
+                       gAddress += symbol.getType().getSize();
                    }else {
                        symbol.setAddress(lOffset + symbol.getType().getSize());
                        lOffset += symbol.getType().getSize();

@@ -1,6 +1,7 @@
 package compiler.syntax.nonTerminal;
 
 import compiler.CompilerContext;
+import compiler.intermediate.InstructionSetArchitecture;
 import compiler.semantic.type.TypeSimpleInteger;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 
@@ -36,7 +37,7 @@ public class ExpresionAritmetica extends ExpresionOperacion {
 	
 	@Override
 	public String getCodigoOperacion() {		
-		return "ADD";
+		return InstructionSetArchitecture.ADD;
 	}	
 
 	

@@ -705,7 +705,7 @@ elemento ::= acceso_registro:reg
                 
                 e.setTipoInstruccion(symbol.getType());
                 OperandIF o;
-                if(symbol.getType() instanceof SymbolVariable)
+                if(symbol instanceof SymbolVariable)
                 {
                     o = new Variable (name, symbol);
                 }else{
@@ -750,9 +750,9 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          // símbolo que recibe el valor en la asignación.
                          
                          
-                         syntaxErrorManager.syntaxInfo("Variable " + exp);
+                         //syntaxErrorManager.syntaxInfo("Variable " + exp);
                          
-                         syntaxErrorManager.syntaxInfo("Variables: " + simbolo.getName() + ".\nTipos " + simbolo.getType() + " == " + exp.getTipoInstruccion());
+                         //syntaxErrorManager.syntaxInfo("Variables: " + simbolo.getName() + ".\nTipos " + simbolo.getType() + " == " + exp.getTipoInstruccion());
                          //Si la expresion que asigna es una llamada a funcion, hay que comprarar los 
                          // tipos con el tipo de retorno de la funcion.
                          if(exp.getTipoInstruccion() instanceof TypeFunction)
@@ -775,7 +775,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                         TemporalIF temp = tF.create();
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
                         cb.addQuadruples(exp.getIntermediateCode());
-                        cb.addQuadruple("MV", temp, eTemp);
+                        cb.addQuadruple("MV", new Variable(id.getLexema(), simbolo), eTemp);
                         sent.setIntermediateCode(cb.create()); 
                         semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                         RESULT = sent;

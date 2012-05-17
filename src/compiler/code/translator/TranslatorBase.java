@@ -11,6 +11,7 @@ import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 public abstract class TranslatorBase implements TranslatorIF {
 
 	StringBuilder translation;
+	public final String SALTO_LINEA = "\n";
 	
 	/**
 	 * @return the translation

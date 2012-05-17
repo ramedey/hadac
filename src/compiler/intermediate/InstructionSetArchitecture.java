@@ -1,6 +1,7 @@
 package compiler.intermediate;
 
 public class InstructionSetArchitecture {
+	public static final String ADD = "ADD";
 	public static final String BRANCH = "BR";
 	public static final String BRANCH_FALSE = "BRF";
 	public static final String ESCRIBE = "ESCRIBE";

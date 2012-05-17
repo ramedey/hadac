@@ -1,5 +1,7 @@
 package compiler.code.translator;
 
+import compiler.code.MemoryManager;
+
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
 public class TranslatorInitial extends TranslatorBase {
@@ -20,7 +22,7 @@ y crece hacia posiciones altas de memoria (hacia 65000)
 	@Override
 	public void translate(QuadrupleIF q) {
 		
-		getTranslation().append("ORG 0\n");
+		getTranslation().append("ORG " + (MemoryManager.getgAddress()+1) + this.SALTO_LINEA);
 		//Posicionar el puntero de pila de llamadas, donse se almacenan las direcciones de llamada y retorno
 		getTranslation().append("MOVE " + STACK_ADDRESS + ",.SP ; la pila empieza en la 65000 y crezca hacia posiciones bajas de memoria (hacia 0)\n");
 		//Posicionar el puntero del display

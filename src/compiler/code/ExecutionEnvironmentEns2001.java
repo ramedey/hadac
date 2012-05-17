@@ -28,6 +28,7 @@ public class ExecutionEnvironmentEns2001
     
     private RegisterDescriptorIF registerDescriptor;
     private MemoryDescriptorIF   memoryDescriptor;
+    private boolean modoDebug = false;
     
     /**
      * Constructor for ENS2001Environment.
@@ -97,7 +98,10 @@ public class ExecutionEnvironmentEns2001
     {      
     	TranslatorIF trans;
     	String op = quadruple.getOperation();
-    	if(op.equals(InstructionSetArchitecture.BRANCH))
+    	if(op.equals(InstructionSetArchitecture.ADD))
+    	{
+    		trans = new TranslatorAdd();    		
+    	}else if(op.equals(InstructionSetArchitecture.BRANCH))
     	{
     		trans = new TranslatorBranch();    		
     	}else if(op.equals(InstructionSetArchitecture.BRANCH_FALSE))
@@ -125,7 +129,10 @@ public class ExecutionEnvironmentEns2001
     	
     		return quadruple.toString(); 
     	}
-//    	return quadruple.toString();
+    	if(modoDebug)
+    	{
+    		return quadruple.toString();
+    	}
     	//return  quadruple.toString() + "\n" + trans.createTranslation(quadruple);
     	return  trans.createTranslation(quadruple);
     }
