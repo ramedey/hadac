@@ -155,7 +155,8 @@ program ::=
   		 
   		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
   		 //cb.addQuadruple ("DATA", gAddress);
-  		 cb.addQuadruple (InstructionSetArchitecture.INICIO);
+  		 cb.addQuadruple (InstructionSetArchitecture.INICIO, MemoryManager.getgAddress());
+  		 
   		 List intermediateCode = ax.getIntermediateCode ();
 		 
   		 cb.addQuadruples (intermediateCode);
@@ -185,6 +186,11 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
             Axiom ax = new Axiom();
             syntaxErrorManager.syntaxInfo("Sentencias: " + lista);
             
+            LabelFactoryIF lF = new LabelFactory ();
+            LabelIF l1 = lF.create (id.getLexema());
+            IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
+            cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
+            ax.getIntermediateCode().addAll(cb.create());
             if(lista != null)
             {
                 ax.getIntermediateCode().addAll(lista.getIntermediateCode());
@@ -465,7 +471,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                         Procedure procedure = new Procedure(id.getLexema(), scopeManager.getCurrentScope());
                         proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getParentScope());
-                        cb.addQuadruple(InstructionSetArchitecture.INL, procedure.getCodeLabel());
+                        cb.addQuadruple(InstructionSetArchitecture.LABEL, procedure.getCodeLabel());
                         //Cierro el ambito del subprograma
                         scopeManager.closeScope();
                         syntaxErrorManager.syntaxInfo("Ambitos: " + scopeManager.getCurrentScope());
@@ -820,7 +826,7 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                     cb.addQuadruples (exp.getIntermediateCode());
                     cb.addQuadruple ("BRT", eTemp, l1);
                     cb.addQuadruples (lista.getIntermediateCode());
-                    cb.addQuadruple ("INL", l1);
+                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
                     sIF.setIntermediateCode(cb.create ());
                     semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
                     RESULT = sIF;
@@ -842,9 +848,9 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                     cb.addQuadruple ("BRT", eTemp, l1);
                     cb.addQuadruples (lista1.getIntermediateCode());
                     cb.addQuadruple ("BR", l2);
-                    cb.addQuadruple ("INL", l1);
+                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
                     cb.addQuadruples (lista2.getIntermediateCode());
-                    cb.addQuadruple ("INL", l2);
+                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l2);
                     sIF.setIntermediateCode(cb.create ());
                     semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
                     RESULT = sIF;
@@ -871,12 +877,12 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                     TemporalIF eTemp = exp3.getTemporal ();
                     IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
                     cb.addQuadruples (exp2.getIntermediateCode());
-                    cb.addQuadruple ("INL", l1);
+                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
                     cb.addQuadruples (exp3.getIntermediateCode());
                     cb.addQuadruple ("BRF", eTemp, l2);
                     cb.addQuadruples (lista.getIntermediateCode());
                     cb.addQuadruple ("BR", l1);
-                    cb.addQuadruple ("INL", l2);
+                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l2);
                     sFor.setIntermediateCode(cb.create ());
                     RESULT = sFor;
                     
@@ -897,21 +903,16 @@ sentencia_put_line ::= PUT_LINE ABRE_PARENTESIS expresion:exp CIERRA_PARENTESIS
                        {:
                         //Tras la impresión en pantalla se debe generar un salto de línea.
                         //Se permite una sentencia put_line sin argumentos.
-                            Sentencia sent = new Sentencia();
                             semanticErrorManager.semanticInfo("Sentencia put_line con expresion: " + exp);
-                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
-                            cb.addQuadruples (exp.getIntermediateCode());
-                            cb.addQuadruple("ESCRIBE", null, exp.getTemporal());
-                            sent.setIntermediateCode(cb.create());
+                            SentenciaPutLine sent = new SentenciaPutLine();
+                            sent.generarCodigoIntermedio(exp);
                             semanticErrorManager.semanticDebug(sent.getIntermediateCode());
                             RESULT = sent;
                        :}
                        | PUT_LINE ABRE_PARENTESIS CONSTANTE_CADENA:cad CIERRA_PARENTESIS
                        {:
-                            Sentencia sent = new Sentencia();
-                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scopeManager.getCurrentScope());
-                            cb.addQuadruple(InstructionSetArchitecture.ESCRIBE, null, cad.getLexema());
-                            sent.setIntermediateCode(cb.create());
+                            SentenciaPutLine sent = new SentenciaPutLine();
+                            sent.generarCodigoIntermedio(cad.getLexema());
                             semanticErrorManager.semanticInfo("Sentencia put_line con constante de cadena: " + sent.getIntermediateCode());
                             RESULT = sent;
                        :};

@@ -12,9 +12,25 @@ import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
 public class MemoryManager {
 
+	private static int gAddress = 0;
+	
+	/**
+	 * @return the gAddress
+	 */
+	public static int getgAddress() {
+		return gAddress;
+	}
+
+	/**
+	 * @param gAddress the gAddress to set
+	 */
+	public static void setgAddress(int gAddress) {
+		MemoryManager.gAddress = gAddress;
+	}
+
 	public static void assignAddresses()
     {
-    	int gAddress = 0, lOffset = 0;
+    	int lOffset = 0;
   		
  		 
  		 List<ScopeIF> scopes = CompilerContext.getScopeManager().getAllScopes ();

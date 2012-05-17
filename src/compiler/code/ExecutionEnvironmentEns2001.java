@@ -97,15 +97,27 @@ public class ExecutionEnvironmentEns2001
     {      
     	TranslatorIF trans;
     	String op = quadruple.getOperation();
-    	if(op.equals(InstructionSetArchitecture.ESCRIBE))
+    	if(op.equals(InstructionSetArchitecture.BRANCH))
     	{
-    		trans = new TranslatorIO();    		
+    		trans = new TranslatorBranch();    		
+    	}else if(op.equals(InstructionSetArchitecture.BRANCH_FALSE))
+    	{
+    		trans = new TranslatorBranchFalse();    		
+    	}else if(op.equals(InstructionSetArchitecture.ESCRIBE))
+    	{
+    		trans = new TranslatorWriteText();    		
+    	}else if(op.equals(InstructionSetArchitecture.ESCRIBE_VALOR))
+    	{
+    		trans = new TranslatorWriteExp();		
     	}else if(op.equals(InstructionSetArchitecture.INICIO)){
     		
     		trans = new TranslatorInitial();
     	}else if(op.equals(InstructionSetArchitecture.FINAL)){
     		
     		trans = new TranslatorFinal();
+    	}else if(op.equals(InstructionSetArchitecture.LABEL)){
+    		
+    		trans = new TranslatorLabel();
     	}else if(op.equals(InstructionSetArchitecture.MOVE)){
     		
     		trans = new TranslatorMove();

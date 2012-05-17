@@ -13,14 +13,21 @@ y crece hacia posiciones altas de memoria (hacia 65000)
 3. Sitúa el display desde la 65001 en adelante hasta el final de la memoria
 	 **********************************************/
 	
+	public final String STACK_ADDRESS = "#65000";
+	public final String DISPLAY_ADDRESS = "#65001";
+	public final String FRAME_POINTER_ADDRESS = "#36897";
+	
 	@Override
 	public void translate(QuadrupleIF q) {
 		
 		getTranslation().append("ORG 0\n");
-		getTranslation().append("MOVE #65000,.SP ; la pila empieza en la 65000 y crezca hacia posiciones bajas de memoria (hacia 0)\n");
-		getTranslation().append("MOVE #65001,.R0 ; dirección del display almacenada en el registro 0\n");
+		//Posicionar el puntero de pila de llamadas, donse se almacenan las direcciones de llamada y retorno
+		getTranslation().append("MOVE " + STACK_ADDRESS + ",.SP ; la pila empieza en la 65000 y crezca hacia posiciones bajas de memoria (hacia 0)\n");
+		//Posicionar el puntero del display
+		getTranslation().append("MOVE " + DISPLAY_ADDRESS + ",.R0 ; dirección del display almacenada en el registro 0\n");
 		//getTranslation().append("MOVE #36897,[.R0]\n");
-		getTranslation().append("MOVE #36897,.IX          ; Registro IX apuntando al RA del procedimiento principal");
+//		getTranslation().append("MOVE .SP, .IY");
+		getTranslation().append("MOVE " + FRAME_POINTER_ADDRESS + ",.IX          ; Registro IX apuntando al RA del procedimiento principal");
 
 	}
 

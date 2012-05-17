@@ -28,7 +28,8 @@ public class Temporal
         super ();
         this.name = name;
         this.scope = scope;
-        this.size = CompilerContext.getExecutionEnvironment().getTypeSize(null);
+        // Como todos los tipos simples tienen tamaño 1, se asigna este tamaño a los temporales
+        this.size = 1;
     }
     
     
