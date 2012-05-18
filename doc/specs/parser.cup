@@ -817,18 +817,8 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                     //Comprobar que la expresion sea logica
                     
                     aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
-                    Sentencia sIF = new Sentencia();                    
-                    ScopeIF scope = scopeManager.getCurrentScope ();
-                    LabelFactoryIF lF = new LabelFactory ();
-                    LabelIF l1 = lF.create ();
-                    TemporalIF eTemp = exp.getTemporal ();
-                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-                    cb.addQuadruples (exp.getIntermediateCode());
-                    cb.addQuadruple (InstructionSetArchitecture.BRANCH_FALSE, eTemp, l1);
-                    cb.addQuadruples (lista.getIntermediateCode());
-                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
-                    sIF.setIntermediateCode(cb.create ());
-                    semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
+                    SentenciaIf sIF = new SentenciaIf(exp, lista);                    
+                    sIF.generarCodigoIntermedio();
                     RESULT = sIF;
                 :}
                | IF expresion:exp THEN lista_sentencias:lista1 ELSE lista_sentencias:lista2 END IF
@@ -837,22 +827,8 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                     
                     aserto(exp instanceof ExpresionLogica, "La condición debe ser una expresión lógica.");
                     
-                    Sentencia sIF = new Sentencia();                    
-                    ScopeIF scope = scopeManager.getCurrentScope ();
-                    LabelFactoryIF lF = new LabelFactory ();
-                    LabelIF l1 = lF.create ();
-                    LabelIF l2 = lF.create ();
-                    TemporalIF eTemp = exp.getTemporal ();
-                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-                    cb.addQuadruples (exp.getIntermediateCode());
-                    cb.addQuadruple ("BRT", eTemp, l1);
-                    cb.addQuadruples (lista1.getIntermediateCode());
-                    cb.addQuadruple ("BR", l2);
-                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
-                    cb.addQuadruples (lista2.getIntermediateCode());
-                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l2);
-                    sIF.setIntermediateCode(cb.create ());
-                    semanticErrorManager.semanticDebug(sIF.getIntermediateCode());
+                    SentenciaIf sIF = new SentenciaIf(exp, lista1, lista2);                    
+                    sIF.generarCodigoIntermedio();
                     RESULT = sIF;
                 :};
 
