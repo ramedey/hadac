@@ -1,5 +1,6 @@
 package compiler.syntax.nonTerminal;
 
+import compiler.intermediate.InstructionSetArchitecture;
 import compiler.semantic.type.TypeSimpleBoolean;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -50,11 +51,11 @@ public class ExpresionLogica extends ExpresionOperacion {
 	public String getCodigoOperacion() {
 		switch(operacion){
 		case Eq:
-			return "EQ";
+			return InstructionSetArchitecture.EQUAL;
 		case Gt:
-			return "GT";
+			return InstructionSetArchitecture.GREATER_THAN;
 		case Or:
-			return "OR";
+			return InstructionSetArchitecture.OR;
 		default:
 			return null;
 		}		

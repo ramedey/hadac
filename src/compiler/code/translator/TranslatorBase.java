@@ -33,8 +33,8 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	public String createTranslation(QuadrupleIF q)
 	{
-		CompilerContext.getSemanticErrorManager().semanticDebug("Primer operando: " + q.getFirstOperand() == null);
-		CompilerContext.getSemanticErrorManager().semanticDebug("Resultado: " + q.getResult() == null);
+//		CompilerContext.getSemanticErrorManager().semanticDebug("Primer operando: " + q.getFirstOperand() == null);
+//		CompilerContext.getSemanticErrorManager().semanticDebug("Resultado: " + q.getResult() == null);
 		translate(q);
 		return getTranslation().toString();
 	}
@@ -68,7 +68,7 @@ public abstract class TranslatorBase implements TranslatorIF {
 				
 			return "#" + v.getValue();
 		}
-		return "NO IMPLEMENTADO" + o;
+		return "NO IMPLEMENTADO: " + o;
 	}
 
 }

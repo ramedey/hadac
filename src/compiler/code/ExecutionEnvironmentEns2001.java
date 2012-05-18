@@ -106,7 +106,13 @@ public class ExecutionEnvironmentEns2001
     		trans = new TranslatorBranch();    		
     	}else if(op.equals(InstructionSetArchitecture.BRANCH_FALSE))
     	{
-    		trans = new TranslatorBranchFalse();    		
+    		trans = new TranslatorBranch();    		
+    	}else if(op.equals(InstructionSetArchitecture.BRANCH_TRUE))
+    	{
+    		trans = new TranslatorBranch();    		
+    	}else if(op.equals(InstructionSetArchitecture.EQUAL))
+    	{
+    		trans = new TranslatorLogical();   		
     	}else if(op.equals(InstructionSetArchitecture.ESCRIBE))
     	{
     		trans = new TranslatorWriteText();    		
@@ -119,12 +125,18 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.FINAL)){
     		
     		trans = new TranslatorFinal();
+    	}else if(op.equals(InstructionSetArchitecture.GREATER_THAN)){
+    		
+    		trans = new TranslatorLogical();
     	}else if(op.equals(InstructionSetArchitecture.LABEL)){
     		
     		trans = new TranslatorLabel();
     	}else if(op.equals(InstructionSetArchitecture.MOVE)){
     		
     		trans = new TranslatorMove();
+    	}else if(op.equals(InstructionSetArchitecture.OR)){
+    		
+    		trans = new TranslatorLogical();
     	}else{
     	
     		return quadruple.toString(); 
