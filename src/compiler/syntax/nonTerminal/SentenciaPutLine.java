@@ -3,6 +3,7 @@ package compiler.syntax.nonTerminal;
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSetArchitecture;
 import compiler.intermediate.Value;
+import compiler.semantic.type.TypeRecord;
 import compiler.semantic.type.TypeSimpleBoolean;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
@@ -17,7 +18,8 @@ public class SentenciaPutLine extends Sentencia {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder (CompilerContext.getScopeManager().getCurrentScope());
         cb.addQuadruples (exp.getIntermediateCode());
         //cb.addQuadruple(InstructionSetArchitecture.ESCRIBE_VALOR, exp.getTemporal());
-        if(exp.getTipoInstruccion() instanceof TypeSimpleBoolean)
+        CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE " + exp.getTipoInstruccion());
+        if(esValorBooleano(exp))
         {
 	        LabelFactoryIF lF = new LabelFactory ();
 	        LabelIF l1 = lF.create ();
@@ -29,7 +31,6 @@ public class SentenciaPutLine extends Sentencia {
 	        cb.addQuadruple (InstructionSetArchitecture.ESCRIBE, new Value("\"false\""));
 	        cb.addQuadruple (InstructionSetArchitecture.LABEL, l2);
         }else{
-        	//CompilerContext.getSemanticErrorManager().semanticDebug("Tipo PUT_LINE: " + exp.getTipoInstruccion());
         	cb.addQuadruple(InstructionSetArchitecture.ESCRIBE_VALOR, exp.getTemporal());
         }
         this.setIntermediateCode(cb.create());
@@ -40,5 +41,31 @@ public class SentenciaPutLine extends Sentencia {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder (CompilerContext.getScopeManager().getCurrentScope());
         cb.addQuadruple(InstructionSetArchitecture.ESCRIBE, new Value(cadena));
         this.setIntermediateCode(cb.create());
+	}
+	
+	/**
+	 * Devuelve true si el tipo de la expresión es booleano o es un campo de registro
+	 * cuyo tipo es booleano.
+	 * @param exp
+	 * @return
+	 */
+	public boolean esValorBooleano(Expresion exp)
+	{
+		CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES NULL? " + exp.getTipoInstruccion());
+		if(exp.getTipoInstruccion() instanceof TypeSimpleBoolean)
+		{
+			return true;
+		}
+		if(exp.getTipoInstruccion() instanceof TypeRecord)
+		{
+			AccesoRegistro acreg = (AccesoRegistro)exp;
+			CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO:" + acreg.getTipoDeCampoReferenciado());
+			if(acreg.getTipoDeCampoReferenciado() instanceof TypeSimpleBoolean)
+			{
+				CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO");
+				return true;
+			}
+		}
+		return false;
 	}
 }

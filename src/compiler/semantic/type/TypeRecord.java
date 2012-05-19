@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import compiler.CompilerContext;
 import compiler.semantic.symbol.SymbolVariable;
 import compiler.syntax.nonTerminal.DecVariable;
 import compiler.syntax.nonTerminal.DecVariables;
@@ -91,8 +92,13 @@ public class TypeRecord
     @Override
     public int getSize ()
     {
-        // TODO: Student work
-        return 1;
+    	int size = 0;
+    	for(TypeIF tipo : getCampos().values())
+    	{
+    		size += tipo.getSize();
+    	}
+    	//CompilerContext.getSemanticErrorManager().semanticDebug("Tamaño de variable registro: " + size);
+        return size;
     }
     
     public void addCampo(String nombre, TypeIF tipo)

@@ -12,8 +12,8 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class DecVariable extends NonTerminal {
 
-	TypeIF tipo;
-	List<SymbolVariable> listaVariables;
+	private TypeIF tipo;
+	private List<SymbolVariable> listaVariables;
 	
 	/**
 	 * @return the listaVariables
@@ -43,16 +43,16 @@ public class DecVariable extends NonTerminal {
 		listaVariables = new ArrayList<SymbolVariable>();
 		for(Token token : lista.getListaIdentificadores())
 		{
-			if(!this.existeIdentificadorEnAmbito(scope, token.getLexema()))
-			{
-				//Registra cada símbolo en el ámbito pasado como parámetro
-				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrando simbolo " + token.getLexema() + " en ambito " + scope.getName());
-				scope.getSymbolTable().addSymbol(new SymbolVariable(scope, token, tipo));
+//			if(!this.existeIdentificadorEnAmbito(scope, token.getLexema()))
+//			{
+//				//Registra cada símbolo en el ámbito pasado como parámetro
+//				CompilerContext.getSyntaxErrorManager().syntaxInfo("Registrando simbolo " + token.getLexema() + " en ambito " + scope.getName());
+//				scope.getSymbolTable().addSymbol(new SymbolVariable(scope, token, tipo));
 				listaVariables.add(new SymbolVariable(scope, token, tipo));
-				CompilerContext.getSyntaxErrorManager().syntaxInfo("Fin Registro simbolo");
-			}else{
-				CompilerContext.getSemanticErrorManager().semanticError("El identificador " + token.getLexema() + " ya existe.");
-			}
+//				CompilerContext.getSyntaxErrorManager().syntaxInfo("Fin Registro simbolo");
+//			}else{
+//				CompilerContext.getSemanticErrorManager().semanticError("El identificador " + token.getLexema() + " ya existe.");
+//			}
 		}
 	}
 	

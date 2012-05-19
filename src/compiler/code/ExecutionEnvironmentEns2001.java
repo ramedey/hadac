@@ -134,6 +134,9 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.MOVE)){
     		
     		trans = new TranslatorMove();
+    	}else if(op.equals(InstructionSetArchitecture.MOVE_REG)){
+    		
+    		trans = new TranslatorMoveReg();
     	}else if(op.equals(InstructionSetArchitecture.OR)){
     		
     		trans = new TranslatorLogical();

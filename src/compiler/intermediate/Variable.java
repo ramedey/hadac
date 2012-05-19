@@ -36,6 +36,14 @@ public class Variable
         this.scope = simbolo.getScope();
         this.simbolo = simbolo;
     }
+    
+    public Variable (SymbolIF simbolo)
+    {
+        super ();
+        this.name = simbolo.getName();
+        this.scope = simbolo.getScope();
+        this.simbolo = simbolo;
+    }
 
     /**
      * Returns the name.

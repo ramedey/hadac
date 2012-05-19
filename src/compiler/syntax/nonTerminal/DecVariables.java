@@ -15,8 +15,7 @@ public class DecVariables extends NonTerminal {
 	
 	public DecVariables(DecVariable declaracion)
 	{
-		super();
-		declaraciones = new ArrayList<DecVariable>();
+		this();
 		declaraciones.add(declaracion);
 	}
 	

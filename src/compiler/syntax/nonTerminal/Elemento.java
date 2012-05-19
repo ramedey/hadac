@@ -30,6 +30,7 @@ public class Elemento extends Expresion {
 	public Elemento(AccesoRegistro acreg)
 	{
 		super(acreg.getVariableRegistro().getType());
+		this.setTemporal(acreg.getTemporal());
 		this.setIntermediateCode(acreg.getIntermediateCode());
 	}
 	

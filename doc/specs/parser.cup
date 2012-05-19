@@ -210,9 +210,11 @@ declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {:
                 RESULT =  decl.addDeclaracion(dConst);:}
                 | dec_variables:dVar declaraciones:decl 
                 {: 
-                    semanticErrorManager.semanticInfo("Declaracion de variables " + decl);
+                    semanticErrorManager.semanticInfo("Declaracion de variables" + dVar);
                     RESULT =  decl.addDeclaracion(dVar);:}
-                | dec_tipo_registro:dReg declaraciones:decl {: RESULT =  decl.addDeclaracion(dReg);:}
+                | dec_tipo_registro declaraciones:decl {: 
+                    //Las declaraciones de tipo registro no producen CI 
+                    RESULT =  decl;:}
                 | dec_subprograma:dSub declaraciones:decl {: RESULT =  decl.addDeclaracion(dSub);:}
                 | error declaraciones {: syntaxErrorManager.syntaxDebug ("Error en declaracion."); :}  
                 | {: syntaxErrorManager.syntaxInfo("Fin declaraciones"); RESULT = new Declaraciones(); :};
@@ -321,19 +323,17 @@ dec_variables ::= lista_identificadores:lista DECLARACION INTEGER:id PUNTOYCOMA
 
 lista_identificadores ::= IDENTIFICADOR:id COMA lista_identificadores:lista
                             {:
-                                //syntaxErrorManager.syntaxInfo("Varios identificadores, " + id.getLexema());
                                 // necesito ámbito, tipo y el token identifocador (me falta el tipo!)
                                 aserto(!lista.contiene(id), "El identificador " + id.getLexema() + " ya está declarado en el ámbito actual. linea " + id.getLine());
                                 lista.addIdentificador(id);
                                 RESULT = lista;
                             :} 
                         | IDENTIFICADOR:id
-                            {:
-                                //syntaxErrorManager.syntaxInfo("Un solo identificador, " + id.getLexema());
+                            {:                                
                                 ListaIdentificadores resultado = new ListaIdentificadores();
                                 resultado.addIdentificador(id);
                                 RESULT = resultado;
-                                //syntaxErrorManager.syntaxInfo("Fin lista_identificadores, " + id.getLexema());
+                                
                             :};
 
 dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declaraciones END RECORD PUNTOYCOMA 
@@ -556,20 +556,20 @@ expresion_logica ::= expresion:e1 IGUAL expresion:e2
                         RESULT = e;
                      :};
 
-acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
+acceso_registro ::= acceso_registro:acreg PUNTO IDENTIFICADOR:id 
                     {:
-                        semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + id.getLexema());
+                        String nombreCampo = id.getLexema();
+                        semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + nombreCampo);
                         // Comprobar que existe el identificador en el ambito actual
                         ScopeIF scope = scopeManager.getCurrentScope();
-                        SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scope);
+                        SymbolVariable variable = (SymbolVariable)Util.comprobarExisteSimboloEnAmbito(nombreCampo, scope);
                         
                         AccesoRegistro accesoRegistro = (AccesoRegistro)acreg;
                         semanticErrorManager.semanticInfo("Acceso a registro dentro de registro " + variable.getType());
                         //El tipo en este caso debe ser TypeRecord
                         aserto(variable.getType() instanceof TypeRecord, "La variable " + variable.getName() + "no no es de tipo registro.", id.getLine());
-                        //RESULT = new SymbolVariableRecord(variable, accesoRegistro.getCampoReferenciado().getName());
                                         
-                        
+                        accesoRegistro.referenciarCampo(nombreCampo);
                         
                         RESULT = accesoRegistro;
                     :}
@@ -581,7 +581,13 @@ acceso_registro ::= IDENTIFICADOR:id PUNTO acceso_registro:acreg
                         aserto(variable.getType() != null, "El tipo es nulo " + variable);
                         
                         // Crear objeto SymbolVariableRecord indicando el campo del registro que se esta referenciando.
-                        RESULT = new AccesoRegistro(variable, id2.getLexema());
+                        AccesoRegistro acreg = new AccesoRegistro(variable, id2.getLexema());
+                        
+                        acreg.generarCodigoIntermedio();
+                        
+                        RESULT = acreg;
+                        
+                        
                     :};
 
 llamada_subprograma ::= IDENTIFICADOR:id ABRE_PARENTESIS parametros_actuales:parametros CIERRA_PARENTESIS
@@ -628,19 +634,8 @@ parametros_actuales ::= expresion:exp COMA parametros_actuales:par
 elemento ::= acceso_registro:reg 
                 {: 
                     semanticErrorManager.semanticDebug("Acceso a registro: " + reg.getCampoReferenciado().getName());
-                    Elemento e = new Elemento(reg); 
-                    ScopeIF scope = scopeManager.getCurrentScope();
-                    TemporalFactory tF = new TemporalFactory (scope);
-                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-                    TemporalIF temp = tF.create ();
-                   
-                    TypeRecord rType = (TypeRecord)e.getTipoInstruccion();
-                    int idOffset = rType.getOffset (reg.getCampoReferenciado().getName());
-                    cb.addQuadruple ("MV", temp, idOffset);
-                    e.setTemporal(temp);
-                    e.setIntermediateCode(cb.create());
-        
-                    RESULT = e;
+                                                
+                    RESULT = reg;
                 :}
            | TRUE:id 
                 {: 
@@ -717,7 +712,7 @@ elemento ::= acceso_registro:reg
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
                 TemporalIF temp = tF.create ();
                 e.setTemporal(temp);
-                cb.addQuadruple ("MV", temp, o);
+                cb.addQuadruple (InstructionSetArchitecture.MOVE, temp, o);
                 e.setIntermediateCode(cb.create());
                 semanticErrorManager.semanticDebug(e.getIntermediateCode());
                 RESULT = e;
@@ -796,11 +791,11 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             
                             
                             Sentencia sent = new Sentencia();
-                            syntaxErrorManager.syntaxInfo("generando codigo intermedio... ");
                             ScopeIF scope = scopeManager.getCurrentScope();
                             TemporalFactoryIF tF = new TemporalFactory(scope);
                             TemporalIF eTemp = exp.getTemporal();
-                            TemporalIF temp = tF.create();
+                            TemporalIF temp = reg.getTemporal();
+                            //TemporalIF temp = tF.create();
                             IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
                             cb.addQuadruples(exp.getIntermediateCode());
                             cb.addQuadruple("MV", temp, eTemp);

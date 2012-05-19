@@ -33,9 +33,9 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	public String createTranslation(QuadrupleIF q)
 	{
-//		CompilerContext.getSemanticErrorManager().semanticDebug("Primer operando: " + q.getFirstOperand() == null);
-//		CompilerContext.getSemanticErrorManager().semanticDebug("Resultado: " + q.getResult() == null);
+		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
 		translate(q);
+		getTranslation().append(SALTO_LINEA + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
 		return getTranslation().toString();
 	}
 	

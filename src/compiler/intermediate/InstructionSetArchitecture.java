@@ -12,7 +12,12 @@ public class InstructionSetArchitecture {
 	public static final String GREATER_THAN = "GT";
 	public static final String INICIO = "INICIO";
 	public static final String LABEL = "INL";
+	public static final String MOVE = "MV";
+	/**
+	 * Hace un movimiento de un campo de un registro a un temporal.
+	 */
+	public static final String MOVE_REG = "MVR";
 	public static final String OR = "OR";
 	public static final String PREPARE = "PREPARE";
-	public static final String MOVE = "MV";
+	
 }
