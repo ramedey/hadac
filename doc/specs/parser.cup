@@ -121,8 +121,7 @@ non terminal Elemento   elemento;
 non terminal AccesoRegistro acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
-non terminal Declaraciones procedimiento;
-non terminal DecSubprograma dec_subprograma, funcion;
+non terminal DecSubprograma dec_subprograma, funcion, procedimiento;
 non terminal LlamadaProcedimiento llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -353,7 +352,7 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declar
                      :};
 
 dec_subprograma ::= funcion:fun {: RESULT = fun;:}
-                  | procedimiento:proc {: //RESULT = proc;:};
+                  | procedimiento:proc {: RESULT = proc;:};
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS 
             {:
@@ -452,10 +451,13 @@ declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprogra
                             | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
                             | {: RESULT = new Declaraciones();:};
 
-procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales:parametros
+procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS
                     {:
                         //Abrir ambito de la funcion
                         scopeManager.openScope(id.getLexema());
+                    :} 
+                    parametros_formales:parametros
+                    {:
                         syntaxErrorManager.syntaxInfo("Declaracion de procedimiento " + id.getLexema());
                         
                          // registrar el procedimiento en el ambito actual
@@ -469,13 +471,9 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                     :}
                     CIERRA_PARENTESIS IS declaraciones_subprograma:decl BEGIN lista_sentencias:lista END IDENTIFICADOR PUNTOYCOMA
                     {:
-                                                
-                        Declaraciones proc = new Declaraciones(decl);
-                        Procedure procedure = new Procedure(id.getLexema(), scopeManager.getCurrentScope());
-                        proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
-                        IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getParentScope());
-                        cb.addQuadruple(InstructionSetArchitecture.LABEL, procedure.getCodeLabel());
-                        proc.getIntermediateCode().addAll(cb.create());
+                        DecSubprograma proc = new DecSubprograma(id.getLexema(), decl, lista);
+                        proc.generarCodigoIntermedio();                                                
+                        
                         //Cierro el ambito del subprograma
                         scopeManager.closeScope();
                         syntaxErrorManager.syntaxInfo("Ambitos: " + scopeManager.getCurrentScope());

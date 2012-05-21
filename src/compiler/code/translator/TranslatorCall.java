@@ -22,11 +22,14 @@ public class TranslatorCall extends TranslatorBase {
 	public void translate(QuadrupleIF q) {
 		
 		OperandIF subprograma = q.getResult();
-		Function fun = (Function)subprograma;
+		Procedure sub = (Procedure)subprograma;
 		
-		int size = ((Function)subprograma).getSizeOfParameters();
-		size++; // dejo una posición extra para el valor de retorno de la función. El valor de retorno estará en #-1[IX]
-		ScopeIF scope = ((Function)subprograma).getScope();
+		int size = sub.getSizeOfParameters();
+		if(isFunction(sub))
+		{
+			size++; // dejo una posición extra para el valor de retorno de la función. El valor de retorno estará en #-1[IX]
+		}
+		ScopeIF scope = sub.getScope();
 		int espacioVaryTemp = MemoryManager.getSizeOfScope(scope.getLevel());
 				
 		getTranslation().append(";--Creacion RA--" + SALTO_LINEA);
@@ -37,15 +40,19 @@ public class TranslatorCall extends TranslatorBase {
 		this.createInstruction("MOVE .A,.IY", "ahora IY apunta a la posición que va a contener vinculo de control del RA");
 		this.createInstruction("MOVE .IX,.R0", "Se guarda la direccion del RA anterior en el display");
 		this.createInstruction("INC .R0", "incremento el display a la siguiente posición libre");
-		addParameters(fun);
+		addParameters(sub);
 		this.createInstruction("MOVE .IY,.IX", "Ahora el puntero de marco (FP) apunta al RA actual");
 		this.createInstruction("MOVE .SP, #-" + (espacioVaryTemp + 1) + "[.IX]", "Muevo el putero de pila a la primera posición libre, contando las variables y temporales.");
-		this.createInstruction("CALL /" + ((Function)subprograma).getCodeLabel(), "Salto al código del procedimiento, agregando la direccion de retorno al RA");
+		this.createInstruction("CALL /" + sub.getCodeLabel(), "Salto al código del procedimiento, agregando la direccion de retorno al RA");
 		getTranslation().append(";--Fin Creacion RA--" + SALTO_LINEA);
 		//Incremento el contador de ámbitos.
 		scopeCount++;
 	}
 
+	public boolean isFunction(OperandIF sub)
+	{
+		return (sub instanceof Function);
+	}
 	
 	private int addParameters(Procedure sub)
 	{

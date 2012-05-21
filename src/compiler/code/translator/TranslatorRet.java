@@ -12,9 +12,12 @@ public class TranslatorRet extends TranslatorBase {
 	public void translate(QuadrupleIF q) {
 		//getTranslation().append("POP .R1	;1- Recuperar direccion de retorno del tope de la pila" + SALTO_LINEA);
 		//getTranslation().append("MOVE #-1[IX] .R1	;Mueve dirección de retorno a R1" + SALTO_LINEA);
-		createInstruction("MOVE "+ translate(q.getResult()) + 
+		//Esta instrucción solo es válida para las funciones
+		if(q.getResult() != null)
+		{
+			createInstruction("MOVE "+ translate(q.getResult()) + 
 				", .R1", "Muevo el valor de retorno al registro 1 para tenerlo accesible desde el llamador");
-		
+		}
 		createInstruction("RET");
 	}
 
