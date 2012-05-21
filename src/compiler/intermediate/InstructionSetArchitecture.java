@@ -5,6 +5,7 @@ public class InstructionSetArchitecture {
 	public static final String BRANCH = "BR";
 	public static final String BRANCH_FALSE = "BRF";
 	public static final String BRANCH_TRUE = "BRT";
+	public static final String CALL = "CALL";
 	public static final String EQUAL = "EQ";
 	public static final String ESCRIBE = "ESCRIBE";
 	public static final String ESCRIBE_VALOR = "ESCRIBEVAL";
@@ -18,6 +19,8 @@ public class InstructionSetArchitecture {
 	 */
 	public static final String MOVE_REG = "MVR";
 	public static final String OR = "OR";
+	public static final String PARAM = "PARAM";
 	public static final String PREPARE = "PREPARE";
+	public static final String RET = "RET";
 	
 }

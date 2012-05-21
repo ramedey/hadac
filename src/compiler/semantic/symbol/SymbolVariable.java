@@ -14,7 +14,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 //       Include properties to characterize variables
 
 public class SymbolVariable
-    extends SymbolBase
+    extends SymbolBase implements SymbolAddressIF
 {  
 
     private int address;

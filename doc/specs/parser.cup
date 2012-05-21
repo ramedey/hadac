@@ -112,7 +112,7 @@ terminal Token TYPE;
 
 non terminal  			program;
 non terminal Axiom		axiom;
-non terminal Declaraciones  declaraciones, dec_const_simbolica, dec_tipo_registro, dec_subprograma, declaraciones_subprograma;
+non terminal Declaraciones  declaraciones, dec_const_simbolica, dec_tipo_registro, declaraciones_subprograma;
 non terminal DecVariables dec_variables, dec_campos_registro;
 non terminal ListaIdentificadores lista_identificadores;
 non terminal TypeSimple tipo_retorno, tipo_parametro;
@@ -121,7 +121,8 @@ non terminal Elemento   elemento;
 non terminal AccesoRegistro acceso_registro;
 non terminal ExpresionAritmetica expresion_aritmetica;
 non terminal ParametrosFormales parametros_formales;
-non terminal Declaraciones procedimiento, funcion;
+non terminal Declaraciones procedimiento;
+non terminal DecSubprograma dec_subprograma, funcion;
 non terminal LlamadaProcedimiento llamada_subprograma;
 non terminal ParametrosActuales parametros_actuales;
 non terminal ListaSentencias lista_sentencias;
@@ -155,7 +156,7 @@ program ::=
   		 
   		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
   		 //cb.addQuadruple ("DATA", gAddress);
-  		 cb.addQuadruple (InstructionSetArchitecture.INICIO, MemoryManager.getgAddress());
+  		 cb.addQuadruple (InstructionSetArchitecture.INICIO, MemoryManager.getgAddress(), ax.getMainLabel());
   		 
   		 List intermediateCode = ax.getIntermediateCode ();
 		 
@@ -188,6 +189,11 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
             
             LabelFactoryIF lF = new LabelFactory ();
             LabelIF l1 = lF.create (id.getLexema());
+            ax.setMainLabel(l1);
+            if(decl != null)
+            {
+                ax.getIntermediateCode().addAll(decl.getIntermediateCode());
+            }
             IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
             cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
             ax.getIntermediateCode().addAll(cb.create());
@@ -195,10 +201,7 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
             {
                 ax.getIntermediateCode().addAll(lista.getIntermediateCode());
             }
-            if(decl != null)
-            {
-                ax.getIntermediateCode().addAll(decl.getIntermediateCode());
-            }
+
             
             RESULT = ax;
         :}
@@ -350,11 +353,11 @@ dec_tipo_registro ::= TYPE IDENTIFICADOR:id IS RECORD dec_campos_registro:declar
                      :};
 
 dec_subprograma ::= funcion:fun {: RESULT = fun;:}
-                  | procedimiento:proc {: RESULT = proc;:};
+                  | procedimiento:proc {: //RESULT = proc;:};
 
 funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS 
             {:
-                //Abrir ambito de la funcion
+                    //Abrir ambito de la funcion
                     scopeManager.openScope(id.getLexema());
             :}
             parametros_formales:parametros CIERRA_PARENTESIS RETURN tipo_retorno:tipoRetorno
@@ -374,12 +377,6 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS
                     
                     typeTable.addType(function);
                     semanticErrorManager.semanticInfo("Funcion " + id.getLexema() + ". Linea " + id.getLine() + ". Agregando tipo al ambito " + scope);
-                    SymbolTableIF symbolTable = scope.getSymbolTable();
-                    
-                    SymbolFunction simbolo = new SymbolFunction(scope, id.getLexema(), function);
-                     aserto(!symbolTable.containsSymbol(simbolo), "La funcion " + id.getLexema() + " ya existe en el ambito actual.");
-                    
-                    symbolTable.addSymbol(simbolo);                    
                    
             :} 
             IS declaraciones_subprograma:decl BEGIN lista_sentencias:listaSentencias END IDENTIFICADOR PUNTOYCOMA
@@ -400,10 +397,16 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS
                     aserto(sent != null, "La funcion declarada no tiene sentencia Return");
                     // Comprobar que su tipo coincide con el tipo de retorno declarado
                     // en la cabecera de la función.
-                    aserto(sent.getTipoDevolucion() != function.getTipoRetorno(), "El tipo de retorno no coincide con el tipo de la sentencia Return");
+                    aserto(sent.getTipoDevolucion().getName().equals(function.getTipoRetorno().getName()), "El tipo de retorno no coincide con el tipo de la sentencia Return: " + 
+                    sent.getTipoDevolucion() + " == " + function.getTipoRetorno());
                     
-                    Declaraciones fun = new Declaraciones(decl);
-                    fun.getIntermediateCode().addAll(0, listaSentencias.getIntermediateCode());
+                    //Agrego la sentencia return al tipo para poder propagar la expresion 
+                    // de la sentencia de retorno al contexto donde se usa (por ejemplo una
+                    // sentencia de asignacion)
+                    function.setSentenciaReturn(sent);
+                    
+                    DecSubprograma fun = new DecSubprograma(id.getLexema(), decl, listaSentencias);
+                    fun.generarCodigoIntermedio();
                     
                     scopeManager.closeScope();
                     
@@ -472,6 +475,7 @@ procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS parametros_formales
                         proc.getIntermediateCode().addAll(0, lista.getIntermediateCode());
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getParentScope());
                         cb.addQuadruple(InstructionSetArchitecture.LABEL, procedure.getCodeLabel());
+                        proc.getIntermediateCode().addAll(cb.create());
                         //Cierro el ambito del subprograma
                         scopeManager.closeScope();
                         syntaxErrorManager.syntaxInfo("Ambitos: " + scopeManager.getCurrentScope());
@@ -684,9 +688,7 @@ elemento ::= acceso_registro:reg
                 syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
-                Elemento e = new Elemento(llamada.getTipo());
-                e.setIntermediateCode(llamada.getIntermediateCode());
-                RESULT = e;
+                RESULT = new Elemento((LlamadaFuncion)llamada);
             :}
             | IDENTIFICADOR:id
             {:
@@ -700,10 +702,11 @@ elemento ::= acceso_registro:reg
                 
                 e.setTipoInstruccion(symbol.getType());
                 OperandIF o;
-                if(symbol instanceof SymbolVariable)
+                if(symbol instanceof SymbolVariable || symbol instanceof SymbolParameter)
                 {
                     o = new Variable (name, symbol);
                 }else{
+                    semanticErrorManager.semanticDebug("Es parametro?: " + id.getLine() +". Valor: " + id.getLexema());
                     SymbolConstant constante = (SymbolConstant)symbol;
                     o = new Value(constante.getValue());
                 }
@@ -763,11 +766,10 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                          }
                                                   
                         Sentencia sent = new Sentencia();
-                        syntaxErrorManager.syntaxInfo("generando codigo intermedio... ");
                         ScopeIF scope = scopeManager.getCurrentScope();
                         TemporalFactoryIF tF = new TemporalFactory(scope);
                         TemporalIF eTemp = exp.getTemporal();
-                        TemporalIF temp = tF.create();
+                        //TemporalIF temp = tF.create();
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
                         cb.addQuadruples(exp.getIntermediateCode());
                         cb.addQuadruple("MV", new Variable(id.getLexema(), simbolo), eTemp);

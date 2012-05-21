@@ -1,17 +1,7 @@
 package compiler.syntax.nonTerminal;
 
-import compiler.CompilerContext;
-import compiler.intermediate.Value;
-import compiler.semantic.symbol.SymbolBooleanConstant;
-import compiler.semantic.symbol.SymbolFunction;
-import compiler.semantic.symbol.SymbolIntegerConstant;
-import compiler.semantic.symbol.SymbolParameter;
-import compiler.semantic.symbol.SymbolVariable;
+import compiler.semantic.type.TypeFunction;
 
-import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
-import es.uned.lsi.compiler.intermediate.TemporalFactory;
-import es.uned.lsi.compiler.intermediate.TemporalIF;
-import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -34,16 +24,23 @@ public class Elemento extends Expresion {
 		this.setIntermediateCode(acreg.getIntermediateCode());
 	}
 	
-//	public Elemento(SymbolVariable variable)
-//	{
-//		super(variable.getType());
-//		resultado = variable.getValor();
-//	}
-	
 	public Elemento(SymbolIF simbolo)
 	{
 		super(simbolo.getType());
 		
+	}
+	
+	/**
+	 * Construye un elemento a partir de una llamada a función.
+	 * Propaga el valor de retorno de la llamada (como un temporal)
+	 * @param llamada
+	 */
+	public Elemento (LlamadaFuncion llamada)
+	{
+		super(llamada.getTipoRetorno());
+		TypeFunction function = (TypeFunction)llamada.getTipo();
+		this.setTemporal(function.getSentenciaReturn().getExpresion().getTemporal());
+		this.setIntermediateCode(llamada.getIntermediateCode());
 	}
 	
 	@Override

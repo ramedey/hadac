@@ -1,5 +1,6 @@
 package compiler.code;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import compiler.CompilerContext;
@@ -13,6 +14,7 @@ import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 public class MemoryManager {
 
 	private static int gAddress = 0;
+	private static List<Integer> sizeOfScopes = new ArrayList<Integer>();
 	
 	/**
 	 * @return the gAddress
@@ -30,8 +32,7 @@ public class MemoryManager {
 
 	public static void assignAddresses()
     {
-    	int lOffset = 0;
-  		
+    	int lOffset = 0;  		
  		 
  		 List<ScopeIF> scopes = CompilerContext.getScopeManager().getAllScopes ();
  		 for (ScopeIF scope: scopes) {
@@ -49,14 +50,21 @@ public class MemoryManager {
                    }
                }
            }
-           List<TemporalIF> temporals = scope.getTemporalTable ().getTemporals();
+           List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
            for (TemporalIF t: temporals)
            {
         	   Temporal temp = (Temporal)t;
-               t.setAddress (lOffset + temp.getSize ());
-               lOffset += temp.getSize ();
-                   
+               t.setAddress (lOffset + temp.getSize());
+               lOffset += temp.getSize();                   
            } 
+           //Guardar el tamaño que ocupan las variables y temporales en cada ambito.
+           sizeOfScopes.add(lOffset);
+           lOffset = 0;
  		 }
     }
+	
+	public static int getSizeOfScope(int levelOfScope)
+	{
+		return sizeOfScopes.get(levelOfScope);
+	}
 }

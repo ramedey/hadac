@@ -1,6 +1,5 @@
 package compiler.code.translator;
 
-import compiler.CompilerContext;
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
@@ -12,6 +11,11 @@ public abstract class TranslatorBase implements TranslatorIF {
 
 	StringBuilder translation;
 	public final String SALTO_LINEA = "\n";
+	public final String DISPLAY_ADDRESS = "#65001";
+	/**
+	 * Contador de ámbitos para calcular el desplazamiento del Display
+	 */
+	public static int scopeCount = 0;
 	
 	/**
 	 * @return the translation
@@ -49,11 +53,11 @@ public abstract class TranslatorBase implements TranslatorIF {
 			{
 				return "/" + v.getAddress();
 			}
-			return "#" + v.getAddress() + "[.IX]";
+			return "#-" + v.getAddress() + "[.IX]";
 		}else if(o instanceof Temporal)
 		{
 			Temporal t = (Temporal)o;
-			return "#" + t.getAddress() + "[.IX]";
+			return "#-" + t.getAddress() + "[.IX]";
 		}else if(o instanceof Value)
 		{
 			Value v = (Value)o;
@@ -71,4 +75,18 @@ public abstract class TranslatorBase implements TranslatorIF {
 		return "NO IMPLEMENTADO: " + o;
 	}
 
+	protected void createInstruction(String Instruction, String comments)
+	{
+		getTranslation().append(Instruction);
+		getTranslation().append("	;" + comments + SALTO_LINEA);
+	}
+	
+	protected void createInstruction(String Instruction)
+	{
+		getTranslation().append(Instruction + SALTO_LINEA);		
+	}
+	
+	protected void createComment(String comment) {
+		getTranslation().append("	;" + comment + SALTO_LINEA);
+	}
 }

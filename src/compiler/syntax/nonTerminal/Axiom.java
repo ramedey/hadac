@@ -1,5 +1,7 @@
 package compiler.syntax.nonTerminal;
 
+import es.uned.lsi.compiler.intermediate.LabelIF;
+
 
 /**
  * Abstract Class for Axiom non terminal.
@@ -7,6 +9,7 @@ package compiler.syntax.nonTerminal;
 public class Axiom
     extends NonTerminal
 {
+	private LabelIF mainLabel;
     /**
      * Constructor for Axiom.
      */
@@ -14,4 +17,10 @@ public class Axiom
     {
         super (); 
     }
+	public void setMainLabel(LabelIF mainLabel) {
+		this.mainLabel = mainLabel;
+	}
+	public LabelIF getMainLabel() {
+		return mainLabel;
+	}
 }

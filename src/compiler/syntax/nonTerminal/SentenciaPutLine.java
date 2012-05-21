@@ -18,7 +18,7 @@ public class SentenciaPutLine extends Sentencia {
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder (CompilerContext.getScopeManager().getCurrentScope());
         cb.addQuadruples (exp.getIntermediateCode());
         //cb.addQuadruple(InstructionSetArchitecture.ESCRIBE_VALOR, exp.getTemporal());
-        CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE " + exp.getTipoInstruccion());
+//        CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE " + exp.getTipoInstruccion());
         if(esValorBooleano(exp))
         {
 	        LabelFactoryIF lF = new LabelFactory ();
@@ -51,7 +51,7 @@ public class SentenciaPutLine extends Sentencia {
 	 */
 	public boolean esValorBooleano(Expresion exp)
 	{
-		CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES NULL? " + exp.getTipoInstruccion());
+//		CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES NULL? " + exp.getTipoInstruccion());
 		if(exp.getTipoInstruccion() instanceof TypeSimpleBoolean)
 		{
 			return true;
@@ -59,10 +59,10 @@ public class SentenciaPutLine extends Sentencia {
 		if(exp.getTipoInstruccion() instanceof TypeRecord)
 		{
 			AccesoRegistro acreg = (AccesoRegistro)exp;
-			CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO:" + acreg.getTipoDeCampoReferenciado());
+//			CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO:" + acreg.getTipoDeCampoReferenciado());
 			if(acreg.getTipoDeCampoReferenciado() instanceof TypeSimpleBoolean)
 			{
-				CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO");
+//				CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE ES BOOLEANO");
 				return true;
 			}
 		}

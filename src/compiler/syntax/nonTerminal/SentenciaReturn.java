@@ -1,7 +1,7 @@
 package compiler.syntax.nonTerminal;
 
 import compiler.CompilerContext;
-import compiler.intermediate.Value;
+import compiler.intermediate.InstructionSetArchitecture;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.TemporalFactory;
@@ -13,6 +13,20 @@ public class SentenciaReturn extends Sentencia {
 
 	private Expresion expresion;
 	
+	/**
+	 * @return the expresion
+	 */
+	public Expresion getExpresion() {
+		return expresion;
+	}
+
+	/**
+	 * @param expresion the expresion to set
+	 */
+	public void setExpresion(Expresion expresion) {
+		this.expresion = expresion;
+	}
+
 	public SentenciaReturn(){
 		super();
 	}
@@ -34,9 +48,10 @@ public class SentenciaReturn extends Sentencia {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         TemporalFactory tF = new TemporalFactory (scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        TemporalIF temp = tF.create ();
-        cb.addQuadruple ("RET", temp, expresion.getTemporal());
-        expresion.setTemporal(temp);
+        //TemporalIF temp = tF.create ();
+        cb.addQuadruples(expresion.getIntermediateCode());
+        cb.addQuadruple (InstructionSetArchitecture.RET, expresion.getTemporal());
+        //expresion.setTemporal(temp);
         this.setIntermediateCode(cb.create());
         CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
 	}

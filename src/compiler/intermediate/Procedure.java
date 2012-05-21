@@ -1,5 +1,9 @@
 package compiler.intermediate;
 
+import java.util.List;
+
+import compiler.semantic.symbol.SymbolParameter;
+
 import es.uned.lsi.compiler.intermediate.LabelFactory;
 import es.uned.lsi.compiler.intermediate.LabelIF;
 import es.uned.lsi.compiler.intermediate.ProcedureIF;
@@ -14,7 +18,8 @@ public class Procedure
 {
     private String  name     = null;
     private ScopeIF scope    = null;
-        
+    private LabelIF label = null;   
+    private List<SymbolParameter> parametros;
     /**
      * Constructor for Variable.
      * @param name The name.
@@ -54,9 +59,12 @@ public class Procedure
     @Override
     public final LabelIF getCodeLabel ()
     {
-    	LabelFactory labelFactory = new LabelFactory();
-        // TODO : Label que marca el comienzo del procedimiento.
-        return labelFactory.create(getName());
+    	if(label == null)
+    	{
+    		LabelFactory labelFactory = new LabelFactory();
+    		return labelFactory.create(getName());
+    	}
+    	return label;
     }
 
     /**
@@ -95,6 +103,12 @@ public class Procedure
                   ((name == null)? 0 : name.hashCode ());
     } 
 
+    public int getSizeOfParameters()
+    {
+    	//TODO: implementar tamaño de parametros
+    	return 2;
+    }
+    
     /**
      * Return a string representing the object.
      * @return a string representing the object.
@@ -104,4 +118,12 @@ public class Procedure
     {    
         return name;
     }
+
+	public void setParametros(List<SymbolParameter> parametros) {
+		this.parametros = parametros;
+	}
+
+	public List<SymbolParameter> getParametros() {
+		return parametros;
+	}
 }

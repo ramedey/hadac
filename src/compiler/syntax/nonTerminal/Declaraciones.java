@@ -44,4 +44,10 @@ public class Declaraciones extends  NonTerminal{
 		}
 		return this;
 	}
+	
+	public Declaraciones addDeclaracion(DecSubprograma otro)
+	{
+		this.getIntermediateCode().addAll(0, otro.getIntermediateCode());
+		return this;
+	}
 }

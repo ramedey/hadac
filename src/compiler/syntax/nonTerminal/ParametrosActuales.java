@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import compiler.CompilerContext;
+import compiler.intermediate.InstructionSetArchitecture;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
@@ -39,7 +40,6 @@ public class ParametrosActuales extends NonTerminal {
 		parametros = new ArrayList<Expresion>();
 		
 		parametros.add(exp);
-		
 		for(Expresion expresion : par.getParametros())
 		{
 			parametros.add(expresion);
@@ -65,7 +65,9 @@ public class ParametrosActuales extends NonTerminal {
 			{
 				CompilerContext.getSemanticErrorManager().semanticDebug("Generando parametro: " + parametro.toString());
 				cb.addQuadruples(parametro.getIntermediateCode());
-				cb.addQuadruple ("PARAM", parametro.getTemporal ());
+				//La instrucción define el temporal que contiene el parametro y su desplazamiento
+				// para localizarlo en el area de datos del subprograma
+				cb.addQuadruple(InstructionSetArchitecture.PARAM, parametro.getTemporal(), parametros.indexOf(parametro)+1);
 			}
 		}
 		this.setIntermediateCode(cb.create());

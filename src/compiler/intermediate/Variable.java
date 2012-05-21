@@ -1,6 +1,6 @@
 package compiler.intermediate;
 
-import compiler.semantic.symbol.SymbolVariable;
+import compiler.semantic.symbol.SymbolAddressIF;
 
 import es.uned.lsi.compiler.intermediate.VariableIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -15,7 +15,7 @@ public class Variable
 {
     private String  name     = null;
     private ScopeIF scope    = null;
-    SymbolIF simbolo		 = null;
+    SymbolAddressIF simbolo		 = null;
         
     /**
      * Constructor for Variable.
@@ -31,18 +31,14 @@ public class Variable
     
     public Variable (String name, SymbolIF simbolo)
     {
-        super ();
-        this.name = name;
-        this.scope = simbolo.getScope();
-        this.simbolo = simbolo;
+        this(simbolo);
+        this.name = name;        
     }
     
     public Variable (SymbolIF simbolo)
     {
-        super ();
-        this.name = simbolo.getName();
-        this.scope = simbolo.getScope();
-        this.simbolo = simbolo;
+        this(simbolo.getName(), simbolo.getScope());
+        this.simbolo = (SymbolAddressIF)simbolo;
     }
 
     /**
@@ -72,7 +68,7 @@ public class Variable
     @Override
     public final int getAddress ()
     {
-        return ((SymbolVariable)simbolo).getAddress();
+        return ((SymbolAddressIF)simbolo).getAddress();
     }
 
     /**

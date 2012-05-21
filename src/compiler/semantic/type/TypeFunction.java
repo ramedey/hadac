@@ -2,6 +2,8 @@ package compiler.semantic.type;
 
 import java.util.HashMap;
 
+import compiler.syntax.nonTerminal.SentenciaReturn;
+
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
@@ -15,7 +17,8 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 public class TypeFunction
     extends TypeProcedure
 {   
-    TypeIF tipoRetorno;
+    private TypeIF tipoRetorno;
+    private SentenciaReturn sentenciaReturn;
 	/**
      * Constructor for TypeFunction.
      * @param scope The declaration scope.
@@ -65,6 +68,14 @@ public class TypeFunction
 	 */
 	public void setTipoRetorno(TypeIF tipoRetorno) {
 		this.tipoRetorno = tipoRetorno;
+	}
+
+	public void setSentenciaReturn(SentenciaReturn sentenciaReturn) {
+		this.sentenciaReturn = sentenciaReturn;
+	}
+
+	public SentenciaReturn getSentenciaReturn() {
+		return sentenciaReturn;
 	}
 
 }
