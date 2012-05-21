@@ -1,8 +1,13 @@
 package compiler.syntax.nonTerminal;
 
+import java.util.List;
+
 import compiler.CompilerContext;
 import compiler.intermediate.InstructionSetArchitecture;
 import compiler.intermediate.Procedure;
+import compiler.intermediate.Temporal;
+import compiler.semantic.symbol.SymbolParameter;
+import compiler.semantic.type.TypeProcedure;
 
 import es.uned.lsi.compiler.intermediate.IntermediateCodeBuilder;
 import es.uned.lsi.compiler.intermediate.OperandIF;
@@ -36,8 +41,8 @@ public class LlamadaProcedimiento extends NonTerminal {
 	{
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        //cb.addQuadruples(parametrosActuales.getIntermediateCode());
-        
+        cb.addQuadruples(parametrosActuales.getIntermediateCode());
+        this.asignarParametrosActualesAParametrosFormales();
         cb.addQuadruple (InstructionSetArchitecture.CALL, operacion);
         this.setIntermediateCode(cb.create());
         CompilerContext.getSemanticErrorManager().semanticDebug("CI llamada: " + this.getIntermediateCode());
@@ -53,7 +58,25 @@ public class LlamadaProcedimiento extends NonTerminal {
 	/**
 	 * @param simbolo the simbolo to set
 	 */
-	public void setTipo(TypeIF simbolo) {
-		this.tipo = simbolo;
+	public void setTipo(TypeIF tipo) {
+		this.tipo = tipo;
+	}
+	
+	private void asignarParametrosActualesAParametrosFormales()
+	{
+		TypeProcedure tproc = (TypeProcedure) getTipo();
+		List<SymbolParameter> parameters = tproc.getParametros();
+		CompilerContext.getSemanticErrorManager().semanticDebug("**********PARAMETROS********");
+		for(int i = 0; i < parameters.size(); i++)
+		{
+			
+			Temporal temp = (Temporal) parametrosActuales.getParametros().get(i).getTemporal();
+//			temp.setParameter(true);
+			parameters.get(i).setTemporal(temp);
+			CompilerContext.getSemanticErrorManager().semanticDebug("PARAM --> " + temp);
+		}
+		
+		Procedure proc = (Procedure) operacion;
+		proc.setParametros(parameters);
 	}
 }

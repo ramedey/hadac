@@ -1,7 +1,10 @@
 package compiler.semantic.type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import compiler.semantic.symbol.SymbolParameter;
 import compiler.syntax.nonTerminal.SentenciaReturn;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -26,7 +29,6 @@ public class TypeFunction
     public TypeFunction (ScopeIF scope)
     {
         super (scope);
-        parametros = new HashMap<String, TypeIF>();
     }
 
     /**
@@ -37,10 +39,9 @@ public class TypeFunction
     public TypeFunction (ScopeIF scope, String name)
     {
         super (scope, name);
-        parametros = new HashMap<String, TypeIF>();
-    }
+        }
     
-    public TypeFunction (ScopeIF scope, String name, HashMap<String, TypeIF> parametros)
+    public TypeFunction (ScopeIF scope, String name, List<SymbolParameter> parametros)
     {
         super (scope, name, parametros);
     }

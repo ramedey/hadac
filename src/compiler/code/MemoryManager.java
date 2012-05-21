@@ -5,6 +5,7 @@ import java.util.List;
 
 import compiler.CompilerContext;
 import compiler.intermediate.Temporal;
+import compiler.semantic.symbol.SymbolParameter;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.intermediate.TemporalIF;
@@ -33,7 +34,7 @@ public class MemoryManager {
 	public static void assignAddresses()
     {
     	int lOffset = 0;  		
- 		 
+ 		int parameterOffset = 0; 
  		 List<ScopeIF> scopes = CompilerContext.getScopeManager().getAllScopes ();
  		 for (ScopeIF scope: scopes) {
            List<SymbolIF> symbols = scope.getSymbolTable ().getSymbols();
@@ -45,9 +46,13 @@ public class MemoryManager {
                        symbol.setAddress(gAddress + symbol.getType().getSize());
                        gAddress += symbol.getType().getSize();
                    }else {
-                       symbol.setAddress(lOffset + symbol.getType().getSize());
-                       lOffset += symbol.getType().getSize();
+                	   symbol.setAddress(lOffset + symbol.getType().getSize());
+                	   lOffset += symbol.getType().getSize();
                    }
+               }else if(s instanceof SymbolParameter) {
+            	   SymbolParameter symbol = (SymbolParameter) s;
+                   symbol.setAddress(parameterOffset + symbol.getType().getSize());
+                   parameterOffset += symbol.getType().getSize();
                }
            }
            List<TemporalIF> temporals = scope.getTemporalTable().getTemporals();
@@ -60,6 +65,7 @@ public class MemoryManager {
            //Guardar el tamaño que ocupan las variables y temporales en cada ambito.
            sizeOfScopes.add(lOffset);
            lOffset = 0;
+           parameterOffset = 0;
  		 }
     }
 	

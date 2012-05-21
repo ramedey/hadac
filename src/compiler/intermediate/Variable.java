@@ -16,6 +16,7 @@ public class Variable
     private String  name     = null;
     private ScopeIF scope    = null;
     SymbolAddressIF simbolo		 = null;
+    private boolean isParameter = false;
         
     /**
      * Constructor for Variable.
@@ -126,5 +127,16 @@ public class Variable
     {    
         return name;
     }
+    
+
+
+	public void setParameter(boolean isParameter) {
+		this.isParameter = isParameter;
+	}
+
+
+	public boolean isParameter() {
+		return isParameter;
+	}
 
 }

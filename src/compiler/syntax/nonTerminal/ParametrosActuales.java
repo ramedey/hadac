@@ -14,6 +14,13 @@ public class ParametrosActuales extends NonTerminal {
 
 	private List<Expresion> parametros;
 	
+	/**
+	 * @param parametros the parametros to set
+	 */
+	public void setParametros(List<Expresion> parametros) {
+		this.parametros = parametros;
+	}
+
 	public ParametrosActuales()
 	{
 		super();
@@ -63,11 +70,11 @@ public class ParametrosActuales extends NonTerminal {
 		{
 			if(!parametroPreviamenteGenerado(parametro))
 			{
-				CompilerContext.getSemanticErrorManager().semanticDebug("Generando parametro: " + parametro.toString());
+//				CompilerContext.getSemanticErrorManager().semanticDebug("Generando parametro: " + parametro.toString());
 				cb.addQuadruples(parametro.getIntermediateCode());
-				//La instrucción define el temporal que contiene el parametro y su desplazamiento
-				// para localizarlo en el area de datos del subprograma
-				cb.addQuadruple(InstructionSetArchitecture.PARAM, parametro.getTemporal(), parametros.indexOf(parametro)+1);
+//				//La instrucción define el temporal que contiene el parametro y su desplazamiento
+//				// para localizarlo en el area de datos del subprograma
+//				cb.addQuadruple(InstructionSetArchitecture.PARAM, parametro.getTemporal(), parametros.indexOf(parametro)+1);
 			}
 		}
 		this.setIntermediateCode(cb.create());

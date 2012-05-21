@@ -692,7 +692,7 @@ elemento ::= acceso_registro:reg
             :}
             | IDENTIFICADOR:id
             {:
-                //Puede ser una variable o una constante. En ambos casos se utiliza Variable para generar el CI
+                //Puede ser una variable, una constante o un parametro. En ambos casos se utiliza Variable para generar el CI
                 Elemento e = new Elemento();
                 String name = id.getLexema();
                 
@@ -705,8 +705,11 @@ elemento ::= acceso_registro:reg
                 if(symbol instanceof SymbolVariable || symbol instanceof SymbolParameter)
                 {
                     o = new Variable (name, symbol);
+                    if(symbol instanceof SymbolParameter)
+                    {
+                        ((Variable)o).setParameter(true);
+                    }
                 }else{
-                    semanticErrorManager.semanticDebug("Es parametro?: " + id.getLine() +". Valor: " + id.getLexema());
                     SymbolConstant constante = (SymbolConstant)symbol;
                     o = new Value(constante.getValue());
                 }

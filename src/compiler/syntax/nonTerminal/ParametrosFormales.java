@@ -1,6 +1,7 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import compiler.CompilerContext;
 import compiler.lexical.Token;
@@ -11,7 +12,7 @@ import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class ParametrosFormales extends NonTerminal {
 	
-	HashMap<String, TypeIF> parametros;
+	List<SymbolParameter> parametros;
 
 	/**
 	 * Ambito donde se registrarán los identificadores
@@ -20,7 +21,7 @@ public class ParametrosFormales extends NonTerminal {
 	
 	public ParametrosFormales(ListaIdentificadores lista, TypeIF tipo)
 	{
-		parametros = new HashMap<String, TypeIF>();
+		parametros = new ArrayList<SymbolParameter>();
 		scope = CompilerContext.getScopeManager().getCurrentScope();
 		addParametros(lista, tipo);
 		
@@ -29,14 +30,14 @@ public class ParametrosFormales extends NonTerminal {
 	/**
 	 * @return the parametros
 	 */
-	public HashMap<String, TypeIF> getParametros() {
+	public List<SymbolParameter> getParametros() {
 		return parametros;
 	}
 
 	/**
 	 * @param parametros the parametros to set
 	 */
-	public void setParametros(HashMap<String, TypeIF> parametros) {
+	public void setParametros(List<SymbolParameter> parametros) {
 		this.parametros = parametros;
 	}
 
@@ -52,7 +53,7 @@ public class ParametrosFormales extends NonTerminal {
 		{
 			SymbolParameter parametro = new SymbolParameter(scope, t.getLexema(), tipo);
 			scope.getSymbolTable().addSymbol(parametro);
-			parametros.put(t.getLexema(), tipo);			
+			parametros.add(parametro);			
 		}
 	}
 }

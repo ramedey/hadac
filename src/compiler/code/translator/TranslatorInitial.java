@@ -29,7 +29,7 @@ public class TranslatorInitial extends TranslatorBase {
 		//Posicionar el puntero del display
 		getTranslation().append("MOVE " + DISPLAY_ADDRESS + ",.R0 		;dirección del display almacenada en el registro 0\n");
 		//Guardar el Display[0] el FP del primer RA
-		createInstruction("MOVE " + FRAME_POINTER_ADDRESS + ", [R0]", 
+		createInstruction("MOVE " + FRAME_POINTER_ADDRESS + ", [.R0]", 
 				"Almaceno la direccion del puntero de marco (IX) en Display[0](en R0)");
 		createInstruction("MOVE " + FRAME_POINTER_ADDRESS + ",.IX          ; Registro IX apuntando al RA del procedimiento principal");
 		createInstruction("BR /" + q.getFirstOperand(), "Salto a la etiqueta del procedimiento principal");
