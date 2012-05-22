@@ -46,6 +46,9 @@ public class TranslatorCall extends TranslatorBase {
 		this.createInstruction("MOVE .A,.SP");
 		this.createInstruction("CALL /" + sub.getCodeLabel(), "Salto al código del procedimiento, agregando la direccion de retorno al RA");
 		getTranslation().append(";--Fin Creacion RA--" + SALTO_LINEA);
+		this.createInstruction("ADD .SP, #" + (size + espacioVaryTemp + 1), "Devuelvo el puntero de pila a la dirección inicial del RA padre");
+		this.createInstruction("MOVE .A,.SP");
+		this.createInstruction("DEC .R0", "decremento el display para que apunte al ambito padre ");
 		
 		//this.createComment("Ambito " + getScopeCount());
 		//Incremento el contador de ámbitos.
