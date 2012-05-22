@@ -122,6 +122,9 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.ESCRIBE_VALOR))
     	{
     		trans = new TranslatorWriteExp();		
+    	}else if(op.equals(InstructionSetArchitecture.INCREMENT)){
+    		
+    		trans = new TranslatorIncrement();
     	}else if(op.equals(InstructionSetArchitecture.INICIO)){
     		
     		trans = new TranslatorInitial();

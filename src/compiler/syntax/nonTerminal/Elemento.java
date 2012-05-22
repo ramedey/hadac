@@ -2,11 +2,16 @@ package compiler.syntax.nonTerminal;
 
 import compiler.semantic.type.TypeFunction;
 
+import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 
 public class Elemento extends Expresion {
 
+	
+	private OperandIF operand;
+	
+	
 	public Elemento()
 	{
 		super();
@@ -61,6 +66,14 @@ public class Elemento extends Expresion {
 //        }
 //        CompilerContext.getSemanticErrorManager().semanticDebug("El codigo intermedio es nulo: " + this.getIntermediateCode() == null);
 //        CompilerContext.getSemanticErrorManager().semanticDebug(this.getIntermediateCode());
+	}
+
+	public void setOperand(OperandIF operand) {
+		this.operand = operand;
+	}
+
+	public OperandIF getOperand() {
+		return operand;
 	}
 
 	

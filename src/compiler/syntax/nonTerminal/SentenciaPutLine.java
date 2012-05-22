@@ -17,8 +17,6 @@ public class SentenciaPutLine extends Sentencia {
 	{
 		IntermediateCodeBuilder cb = new IntermediateCodeBuilder (CompilerContext.getScopeManager().getCurrentScope());
         cb.addQuadruples (exp.getIntermediateCode());
-        //cb.addQuadruple(InstructionSetArchitecture.ESCRIBE_VALOR, exp.getTemporal());
-//        CompilerContext.getSemanticErrorManager().semanticDebug("PUT_LINE " + exp.getTipoInstruccion());
         if(esValorBooleano(exp))
         {
 	        LabelFactoryIF lF = new LabelFactory ();

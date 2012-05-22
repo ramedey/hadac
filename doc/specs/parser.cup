@@ -716,6 +716,7 @@ elemento ::= acceso_registro:reg
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
                 TemporalIF temp = tF.create ();
                 e.setTemporal(temp);
+                e.setOperand(o);
                 cb.addQuadruple (InstructionSetArchitecture.MOVE, temp, o);
                 e.setIntermediateCode(cb.create());
                 semanticErrorManager.semanticDebug(e.getIntermediateCode());
@@ -831,10 +832,7 @@ sentencia_if ::= IF expresion:exp THEN lista_sentencias:lista END IF
                 :};
 
 sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias:lista END LOOP
-                  {:
-                     // se abre un nuevo ámbito
-                    ScopeIF newScope = scopeManager.openScope();
-                    
+                  {:                    
                   
                      //Comprobar que la condicion del bucle es un entero.
                     aserto(exp.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle.");
@@ -843,28 +841,13 @@ sentencia_for ::= FOR expresion:exp IN expresion:exp2 PUNTOPUNTO expresion:exp3 
                     aserto(exp2.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     aserto(exp3.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
                     
-                    Sentencia sFor = new Sentencia();
-                    ScopeIF scope = scopeManager.getCurrentScope ();
-                    LabelFactoryIF lF = new LabelFactory();
-                    LabelIF l1 = lF.create ();
-                    LabelIF l2 = lF.create ();
-                    TemporalIF eTemp = exp3.getTemporal ();
-                    IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-                    cb.addQuadruples (exp2.getIntermediateCode());
-                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
-                    cb.addQuadruples (exp3.getIntermediateCode());
-                    cb.addQuadruple ("BRF", eTemp, l2);
-                    cb.addQuadruples (lista.getIntermediateCode());
-                    cb.addQuadruple ("BR", l1);
-                    cb.addQuadruple (InstructionSetArchitecture.LABEL, l2);
-                    sFor.setIntermediateCode(cb.create ());
+                    SentenciaFor sFor = new SentenciaFor(exp, exp2, exp3, lista);
+                    sFor.generarCodigoIntermedio();
                     RESULT = sFor;
                     
                   :}
                   | FOR sentencia_asignacion:sent IN expresion:exp2 PUNTOPUNTO expresion:exp3 LOOP lista_sentencias END LOOP
                   {:
-                    // se abre un nuevo ámbito
-                    ScopeIF newScope = scopeManager.openScope();
                     
                     // comprobar que las expresiones que indican el número de iteraciones también son enteros
                     aserto(exp2.getTipoInstruccion() instanceof TypeSimpleInteger, "Se esperaba un entero en la codición del bucle");
