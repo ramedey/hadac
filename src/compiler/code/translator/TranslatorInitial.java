@@ -23,9 +23,11 @@ public class TranslatorInitial extends TranslatorBase {
 		
 		getTranslation().append("ORG " + (MemoryManager.getgAddress()+1) + this.SALTO_LINEA);
 		//Posicionar el puntero de pila de llamadas, donse se almacenan las direcciones de llamada y retorno
-		createComment("la pila empieza en la 65000 y crece hacia posiciones bajas de memoria (hacia 0). Se reserva espacio para "
-				+ MemoryManager.getSizeOfScope(0) + " temporales.\n");
-		createInstruction("MOVE #" + (STACK_ADDRESS - MemoryManager.getSizeOfScope(0)) + ",.SP");
+		createComment("la pila empieza en la 65000 y crece hacia posiciones bajas de memoria (hacia 0).");
+		createComment("Se reserva espacio para " + MemoryManager.getSizeOfScope(0) + " temporales.\n");
+		
+		createInstruction("MOVE #" + (STACK_ADDRESS - (MemoryManager.getSizeOfScope(0)+1)) + ",.SP",
+				"Se suma 1 a la reserva de espacio para que apunte a la primera posición libre.");
 		//Posicionar el puntero del display
 		getTranslation().append("MOVE " + DISPLAY_ADDRESS + ",.R0 		;dirección del display almacenada en el registro 0\n");
 		//Guardar el Display[0] el FP del primer RA

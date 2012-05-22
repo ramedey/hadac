@@ -1,5 +1,7 @@
 package compiler.code.translator;
 
+import compiler.CompilerContext;
+import compiler.code.ExecutionEnvironmentEns2001;
 import compiler.intermediate.Temporal;
 import compiler.intermediate.Value;
 import compiler.intermediate.Variable;
@@ -17,6 +19,20 @@ public abstract class TranslatorBase implements TranslatorIF {
 	 */
 	public static int scopeCount = 0;
 	
+	/**
+	 * @return the scopeCount
+	 */
+	public int getScopeCount() {
+		return scopeCount;
+	}
+
+	/**
+	 * @param scopeCount the scopeCount to set
+	 */
+	public void setScopeCount(int scopeCount) {
+		TranslatorBase.scopeCount = scopeCount;
+	}
+
 	/**
 	 * @return the translation
 	 */
@@ -37,9 +53,9 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	public String createTranslation(QuadrupleIF q)
 	{
-//		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
+		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
 		translate(q);
-//		getTranslation().append(SALTO_LINEA + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
+		getTranslation().append(SALTO_LINEA);// + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
 		return getTranslation().toString();
 	}
 	
@@ -57,6 +73,10 @@ public abstract class TranslatorBase implements TranslatorIF {
 			if(v.isParameter())
 			{
 				return "#" + v.getAddress() + "[.IX]";
+			}
+			if(isNoLocal(v))
+			{
+				return getNoLocalAddress(v);
 			}
 			return "#-" + v.getAddress() + "[.IX]";
 		}else if(o instanceof Temporal)
@@ -93,5 +113,23 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	protected void createComment(String comment) {
 		getTranslation().append("	;" + comment + SALTO_LINEA);
+	}
+
+	private String getNoLocalAddress(Variable var)
+	{		
+		//return "#-" + var.getAddress() + "[.R1]";
+		return "[.R1]";
+	}
+	
+	protected boolean isVariable(OperandIF op)
+	{
+		return (op instanceof Variable);
+	}
+	
+	protected boolean isNoLocal(Variable var)
+	{
+//		createComment("La variable " + var.getName() + " es no-local?" + (var.getScope().getLevel() != scopeCount));
+//		createComment("ScopeConut = " + getScopeCount() + ". Ambito de " + var.getName() + " = " + var.getScope().getLevel());
+		return (var.getScope().getLevel() != getScopeCount());		
 	}
 }

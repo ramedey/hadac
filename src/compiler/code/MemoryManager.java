@@ -49,7 +49,8 @@ public class MemoryManager {
                 	   symbol.setAddress(lOffset + symbol.getType().getSize());
                 	   lOffset += symbol.getType().getSize();
                    }
-               }else if(s instanceof SymbolParameter) {
+               }
+               else if(s instanceof SymbolParameter) {
             	   SymbolParameter symbol = (SymbolParameter) s;
                    symbol.setAddress(parameterOffset + symbol.getType().getSize());
                    parameterOffset += symbol.getType().getSize();

@@ -416,16 +416,16 @@ funcion ::= FUNCTION IDENTIFICADOR:id ABRE_PARENTESIS
 
 parametros_formales ::= lista_identificadores:lista DECLARACION tipo_parametro:tipo PUNTOYCOMA parametros_formales:parametros
                         {:
-                        syntaxErrorManager.syntaxInfo("Declaracion de parametros formales");
+                        //syntaxErrorManager.syntaxInfo("Declaracion de parametros formales");
                             parametros.addParametros(lista, tipo);
                             RESULT = parametros;
                         :}
                       | lista_identificadores:lista DECLARACION tipo_parametro:tipo 
                         {:
-                            syntaxErrorManager.syntaxInfo("Declaracion de parametro formal");
+                            //syntaxErrorManager.syntaxInfo("Declaracion de parametro formal");
                             ParametrosFormales parametros = new ParametrosFormales(lista, tipo);
                             RESULT = parametros;
-                            syntaxErrorManager.syntaxInfo("Fin Declaracion de parametro formal");
+                            //syntaxErrorManager.syntaxInfo("Fin Declaracion de parametro formal");
                         :}
                       | ;
                         
@@ -449,7 +449,10 @@ declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprogra
                             semanticErrorManager.semanticInfo("Declaracion de variables en subprograma " + decs);
                             RESULT = decs.addDeclaracion(dVar);:}
                             | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
-                            | {: RESULT = new Declaraciones();:};
+                            | 
+                            {: 
+                                semanticErrorManager.semanticInfo(" Fin Declaraciones en subprograma ");
+                            RESULT = new Declaraciones();:};
 
 procedimiento ::= PROCEDURE IDENTIFICADOR:id ABRE_PARENTESIS
                     {:
@@ -696,7 +699,7 @@ elemento ::= acceso_registro:reg
                 
                 semanticErrorManager.semanticDebug("Elto. Linea: " + id.getLine() +". Valor: " + id.getLexema());
                 // Comprobar que el identificador es visible desde el ámbito actual
-                SymbolIF symbol = Util.comprobarExisteSimboloEnAmbito(id.getLexema(), scopeManager.getCurrentScope());
+                SymbolIF symbol = Util.comprobarExisteSimboloEnAmbito(id.getLexema());
                 
                 e.setTipoInstruccion(symbol.getType());
                 OperandIF o;

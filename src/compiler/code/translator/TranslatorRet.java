@@ -16,9 +16,12 @@ public class TranslatorRet extends TranslatorBase {
 		if(q.getResult() != null)
 		{
 			createInstruction("MOVE "+ translate(q.getResult()) + 
-				", .R1", "Muevo el valor de retorno al registro 1 para tenerlo accesible desde el llamador");
+				", .R2", "Muevo el valor de retorno al registro 2 para tenerlo accesible desde el llamador");
 		}
 		createInstruction("RET");
+		//Se vuelve al ambito de nivel superior
+//		setScopeCount(getScopeCount() - 1);
+		createComment("Scope: " + getScopeCount());
 	}
 
 }

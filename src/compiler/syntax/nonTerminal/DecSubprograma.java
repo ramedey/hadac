@@ -26,7 +26,8 @@ public class DecSubprograma extends NonTerminal {
 		ScopeIF scope = CompilerContext.getScopeManager().getCurrentScope();
         Procedure sub = new Procedure(name, scope);
         IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
-        cb.addQuadruple(InstructionSetArchitecture.LABEL, sub.getCodeLabel());
+        cb.addQuadruples(decSub.getIntermediateCode());
+        cb.addQuadruple(InstructionSetArchitecture.LABEL, sub.getCodeLabel(), scope.getLevel());
         cb.addQuadruples(sentencias.getIntermediateCode());
         //Si es un procedimiento añado la instrucción de retorno
         if(!sentencias.tieneSentenciaReturn())

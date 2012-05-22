@@ -30,6 +30,7 @@ public class ExecutionEnvironmentEns2001
     private MemoryDescriptorIF   memoryDescriptor;
     private boolean modoDebug = false;
     
+    
     /**
      * Constructor for ENS2001Environment.
      */

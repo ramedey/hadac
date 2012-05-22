@@ -8,6 +8,7 @@ import compiler.semantic.symbol.SymbolBooleanConstant;
 import compiler.semantic.symbol.SymbolVariable;
 
 import es.uned.lsi.compiler.semantic.ScopeIF;
+import es.uned.lsi.compiler.semantic.ScopeManager;
 import es.uned.lsi.compiler.semantic.ScopeManagerIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolTableIF;
@@ -104,6 +105,16 @@ public class Util {
 //		{
 //			CompilerContext.getSemanticErrorManager().semanticFatalError("El símbolo " + textoSimbolo + " no existe en el ámbito actual");
 //		}
+	}
+	
+	public static SymbolIF comprobarExisteSimboloEnAmbito(String textoSimbolo)
+	{
+		SymbolIF symbol = CompilerContext.getScopeManager().searchSymbol(textoSimbolo);
+		if(symbol == null)
+		{
+			CompilerContext.getSemanticErrorManager().semanticFatalError("El simbolo " + textoSimbolo + " no existe o no es accesible desde este ambito");
+		}
+		return symbol;
 	}
 	
 	/**

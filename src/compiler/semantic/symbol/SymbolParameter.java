@@ -16,6 +16,7 @@ public class SymbolParameter
     extends SymbolBase implements SymbolAddressIF
 {  
 	TemporalIF temporal;
+	int address = 0;
 /**
 	 * @return the temporal
 	 */
@@ -52,11 +53,11 @@ public class SymbolParameter
 
 	@Override
 	public int getAddress() {
-		return temporal.getAddress();
+		return address;
 	}
 
 	@Override
 	public void setAddress(int address) {
-		temporal.setAddress(address);		
+		this.address = address;		
 	}
 }

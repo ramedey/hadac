@@ -76,14 +76,10 @@ public class TypeProcedure
 	 * @param parametros the parametros to set
 	 */
 	public void setParametros(List<SymbolParameter> parametros) {
-		CompilerContext.getSemanticErrorManager().semanticDebug("Numero de parametros: " + parametros.size());
+//		CompilerContext.getSemanticErrorManager().semanticDebug("Numero de parametros: " + parametros.size());
 		this.parametros = new ArrayList<SymbolParameter>(parametros);
 	}
 
-//	public void setParametro(String nombre, TypeIF tipo) {
-//		this.parametros.put(nombre, tipo);
-//	}
-//	
 	/**
 	 * Comprueba el número, orden y tipo de los parámetros actuales pasados como
 	 * parámetro de acuerdo con la definición del tipo de subprograma.
