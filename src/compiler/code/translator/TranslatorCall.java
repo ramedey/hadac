@@ -69,7 +69,7 @@ public class TranslatorCall extends TranslatorBase {
 		for(SymbolParameter param : sub.getParametros())
 		{
 				this.createInstruction("MOVE " + translate(param.getTemporal()) + ", #" + i + "[.IY]",
-						"Copio parametro a su zona dentro del RA(en el puntero de marco provisional IY");
+						"Copio parametro " + param.getTemporal() + " a su zona dentro del RA(en el puntero de marco provisional IY");
 				param.getTemporal().setAddress(i);
 				i++;
 			
