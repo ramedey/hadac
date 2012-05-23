@@ -70,8 +70,19 @@ public class MemoryManager {
  		 }
     }
 	
+	/**
+	 * Si el nivel del ámbito es mayor a los registrados por MemoryManager,
+	 * devuelve el tamaño del últimoámbito registrado, ya que se trata de una 
+	 * llamada recursiva.
+	 * @param levelOfScope
+	 * @return
+	 */
 	public static int getSizeOfScope(int levelOfScope)
 	{
+		if(levelOfScope >= sizeOfScopes.size())
+		{
+			return sizeOfScopes.get(sizeOfScopes.size()-1);
+		}
 		return sizeOfScopes.get(levelOfScope);
 	}
 }

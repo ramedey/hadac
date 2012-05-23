@@ -777,7 +777,13 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                         //TemporalIF temp = tF.create();
                         IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
                         cb.addQuadruples(exp.getIntermediateCode());
-                        cb.addQuadruple("MV", new Variable(id.getLexema(), simbolo), eTemp);
+                        Variable var = new Variable (id.getLexema(), simbolo);
+                        if(simbolo instanceof SymbolParameter)
+                        {
+                            ((SymbolParameter)simbolo).setTemporal(eTemp);
+                            var.setParameter(true);
+                        }
+                        cb.addQuadruple("MV", var, eTemp);
                         sent.setIntermediateCode(cb.create()); 
                         semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                         RESULT = sent;

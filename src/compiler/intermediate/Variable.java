@@ -16,7 +16,22 @@ public class Variable
     private String  name     = null;
     private ScopeIF scope    = null;
     SymbolAddressIF simbolo		 = null;
-    private boolean isParameter = false;
+    /**
+	 * @return the simbolo
+	 */
+	public SymbolAddressIF getSimbolo() {
+		return simbolo;
+	}
+
+	/**
+	 * @param simbolo the simbolo to set
+	 */
+	public void setSimbolo(SymbolAddressIF simbolo) {
+		this.simbolo = simbolo;
+	}
+
+
+	private boolean isParameter = false;
         
     /**
      * Constructor for Variable.
