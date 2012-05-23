@@ -106,7 +106,7 @@ public class Procedure
     public int getSizeOfParameters()
     {
     	//TODO: implementar tamaño de parametros
-    	return 2;
+    	return parametros.size();
     }
     
     /**

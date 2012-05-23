@@ -194,7 +194,7 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
                 ax.getIntermediateCode().addAll(decl.getIntermediateCode());
             }
             IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-            cb.addQuadruple (InstructionSetArchitecture.LABEL, l1);
+            cb.addQuadruple (InstructionSetArchitecture.LABEL, l1, 0);//0 es el nivel del ámbito
             ax.getIntermediateCode().addAll(cb.create());
             if(lista != null)
             {
@@ -694,7 +694,20 @@ elemento ::= acceso_registro:reg
                 syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
                 aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
-                RESULT = new Elemento((LlamadaFuncion)llamada);
+                
+                ScopeIF scope = scopeManager.getCurrentScope();
+                IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
+                TemporalFactory tF = new TemporalFactory (scope);
+                TemporalIF temp = tF.create ();
+                Elemento e = new Elemento((LlamadaFuncion)llamada);
+                e.setTemporal(temp);
+                //Indica que el valor de retorno lo guarde en el temporal del Elemento.
+                cb.addQuadruples(((LlamadaFuncion)llamada).getIntermediateCode());
+                cb.addQuadruple (InstructionSetArchitecture.RET_VALUE, temp);
+                e.setIntermediateCode(cb.create());
+                RESULT = e;
+                
+                
             :}
             | IDENTIFICADOR:id
             {:

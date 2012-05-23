@@ -14,7 +14,7 @@ public class TranslatorMove extends TranslatorBase {
 		if(isVariable(q.getFirstOperand()))
 		{
 			Variable v = (Variable)q.getFirstOperand();
-			if(isNoLocal((Variable) q.getFirstOperand())){
+			if(isNoLocal(v)){
 				int display = 65001 + ((Variable) q.getFirstOperand()).getScope().getLevel();
 				createInstruction("MOVE #" + display + ", .R1");
 				createInstruction("SUB [.R1], #" + ((Variable) q.getFirstOperand()).getAddress());

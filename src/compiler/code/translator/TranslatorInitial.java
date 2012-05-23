@@ -16,7 +16,7 @@ public class TranslatorInitial extends TranslatorBase {
 	 **********************************************/
 	
 	public final int STACK_ADDRESS = 65000;
-	public final String FRAME_POINTER_ADDRESS = "#65000";
+	public final String FRAME_POINTER_ADDRESS = "#64999";//la posicion (#65000) es para el valor de retorno
 	
 	@Override
 	public void translate(QuadrupleIF q) {

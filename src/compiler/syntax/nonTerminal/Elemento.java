@@ -43,9 +43,9 @@ public class Elemento extends Expresion {
 	public Elemento (LlamadaFuncion llamada)
 	{
 		super(llamada.getTipoRetorno());
-		TypeFunction function = (TypeFunction)llamada.getTipo();
-		this.setTemporal(function.getSentenciaReturn().getExpresion().getTemporal());
-		this.setIntermediateCode(llamada.getIntermediateCode());
+//		TypeFunction function = (TypeFunction)llamada.getTipo();
+//		this.setTemporal(function.getSentenciaReturn().getExpresion().getTemporal());
+//		this.setIntermediateCode(llamada.getIntermediateCode());
 	}
 	
 	@Override

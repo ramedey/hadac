@@ -25,10 +25,8 @@ public class TranslatorCall extends TranslatorBase {
 		Procedure sub = (Procedure)subprograma;
 		
 		int size = sub.getSizeOfParameters();
-		if(isFunction(sub))
-		{
-			size++; // dejo una posición extra para el valor de retorno de la función. El valor de retorno estará en #-1[IX]
-		}
+		size++; // dejo una posición extra para el valor de retorno de la función. El valor de retorno estará en #-1[IX]
+		
 		ScopeIF scope = sub.getScope();
 		int espacioVaryTemp = MemoryManager.getSizeOfScope(scope.getLevel()+1);
 				
@@ -50,6 +48,9 @@ public class TranslatorCall extends TranslatorBase {
 		this.createInstruction("MOVE .A,.SP");
 		this.createInstruction("DEC .R0", "decremento el display para que apunte al ambito padre ");
 		this.createInstruction("MOVE [.R0],.IX");
+		
+		
+		
 		//this.createComment("Ambito " + getScopeCount());
 		//Incremento el contador de ámbitos.
 		//setScopeCount(scope.getLevel() + 1);
@@ -64,7 +65,7 @@ public class TranslatorCall extends TranslatorBase {
 	
 	private int addParameters(Procedure sub)
 	{
-		int i = 1;
+		int i = 2; //la primera posición es para el valor de retorno.
 		for(SymbolParameter param : sub.getParametros())
 		{
 				this.createInstruction("MOVE " + translate(param.getTemporal()) + ", #" + i + "[.IY]",

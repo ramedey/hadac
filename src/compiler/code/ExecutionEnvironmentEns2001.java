@@ -153,6 +153,9 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.RET)){
     		
     		trans = new TranslatorRet();
+    	}else if(op.equals(InstructionSetArchitecture.RET_VALUE)){
+    		
+    		trans = new TranslatorRetValue();
     	}else{
     	
     		return quadruple.toString(); 

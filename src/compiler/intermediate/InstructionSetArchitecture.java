@@ -23,5 +23,6 @@ public class InstructionSetArchitecture {
 	public static final String PARAM = "PARAM";
 	public static final String PREPARE = "PREPARE";
 	public static final String RET = "RET";
+	public static final String RET_VALUE = "RET_VALUE";
 	
 }

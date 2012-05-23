@@ -53,9 +53,9 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	public String createTranslation(QuadrupleIF q)
 	{
-//		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
+		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
 		translate(q);
-//		getTranslation().append(SALTO_LINEA);// + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
+		getTranslation().append(SALTO_LINEA);// + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
 		return getTranslation().toString();
 	}
 	
@@ -72,7 +72,7 @@ public abstract class TranslatorBase implements TranslatorIF {
 			//Los parámetros se posicionan en las direcciones superiores al puntero de marco
 			if(v.isParameter())
 			{
-				return "#" + v.getAddress() + "[.IX]";
+				return "#" + (v.getAddress()+1) + "[.IX]";
 			}
 			if(isNoLocal(v))
 			{
