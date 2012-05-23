@@ -213,7 +213,9 @@ declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {:
                 | dec_variables:dVar declaraciones:decl 
                 {: 
                     semanticErrorManager.semanticInfo("Declaracion de variables" + dVar);
-                    RESULT =  decl.addDeclaracion(dVar);:}
+                    dVar.registrarDeclaraciones();
+                    RESULT =  decl.addDeclaracion(dVar);
+                :}
                 | dec_tipo_registro declaraciones:decl {: 
                     //Las declaraciones de tipo registro no producen CI 
                     RESULT =  decl;:}
@@ -445,9 +447,12 @@ tipo_retorno ::= INTEGER {: RESULT = new TypeSimpleInteger(scopeManager.getCurre
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dConst);:}
-                            | dec_variables:dVar declaraciones_subprograma:decs {: 
-                            semanticErrorManager.semanticInfo("Declaracion de variables en subprograma " + decs);
-                            RESULT = decs.addDeclaracion(dVar);:}
+                            | dec_variables:dVar declaraciones_subprograma:decs 
+                            {: 
+                                semanticErrorManager.semanticInfo("Declaracion de variables en subprograma " + decs);
+                                dVar.registrarDeclaraciones();
+                                RESULT = decs.addDeclaracion(dVar);
+                            :}
                             | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
                             | 
                             {: 
@@ -803,16 +808,8 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             aserto(tipo.getName().equals(exp.getTipoInstruccion().getName()), "Los tipos de la expresion y de la variable asignada no coinciden");
                             
                             
-                            Sentencia sent = new Sentencia();
-                            ScopeIF scope = scopeManager.getCurrentScope();
-                            TemporalFactoryIF tF = new TemporalFactory(scope);
-                            TemporalIF eTemp = exp.getTemporal();
-                            TemporalIF temp = reg.getTemporal();
-                            //TemporalIF temp = tF.create();
-                            IntermediateCodeBuilder cb = new IntermediateCodeBuilder (scope);
-                            cb.addQuadruples(exp.getIntermediateCode());
-                            cb.addQuadruple("MV", temp, eTemp);
-                            sent.setIntermediateCode(cb.create()); 
+                            SentenciaAsignacion sent = new SentenciaAsignacion(reg, exp);
+                            sent.generarCodigoIntermedio(); 
                             semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                             
                             

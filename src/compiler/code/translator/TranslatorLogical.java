@@ -32,7 +32,7 @@ public class TranslatorLogical extends TranslatorBase {
 			String label = LabelManager.getLabelText();
 			String label2 = LabelManager.getLabelText();
 			createInstruction("BZ /" + label, "Salto si el resultado es 0, es decir, op1 == op2");
-			getTranslation().append("BN /" + label + "	;Salto si el resultado es negativo"  + SALTO_LINEA);
+			getTranslation().append("BN /" + label + "	;Salto si el resultado es negativo, es decir, op1 < op2"  + SALTO_LINEA);
 			getTranslation().append("MOVE #1, " + translate(q.getResult()) + SALTO_LINEA);
 			getTranslation().append("BR /" + label2 + SALTO_LINEA);
 			getTranslation().append(label + " : " + SALTO_LINEA);

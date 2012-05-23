@@ -31,4 +31,12 @@ public class DecVariables extends NonTerminal {
 		return declaraciones;
 	}
 	
+	public void registrarDeclaraciones()
+	{
+		for(DecVariable dec : declaraciones)
+		{
+			dec.registrarVariables();
+		}
+	}
+	
 }

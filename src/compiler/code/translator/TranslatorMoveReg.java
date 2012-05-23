@@ -1,6 +1,8 @@
 package compiler.code.translator;
 
 import compiler.intermediate.Variable;
+import compiler.semantic.symbol.SymbolVariable;
+import compiler.semantic.type.TypeRecord;
 
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 
@@ -11,14 +13,33 @@ public class TranslatorMoveReg extends TranslatorBase {
 	@Override
 	public void translate(QuadrupleIF q) {
 		
-		Variable var = (Variable)q.getSecondOperand(); 
-		
-		//Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo
-		getTranslation().append("ADD " + translate(q.getFirstOperand()) 
-				+ ", #" + var.getAddress() + SALTO_LINEA);
-		//Guardo el temporal en la direccion del campo
-		getTranslation().append("MOVE [.A], " + translate(q.getResult()) + SALTO_LINEA);
-		
+		Variable var;
+		String offset = translate(q.getFirstOperand());
+		if(q.getSecondOperand() instanceof Variable)
+		{
+			var = (Variable)q.getSecondOperand(); 
+			createComment("Acceso a campo " + var.getName() + ". Direccion: " + var.getAddress());
+			SymbolVariable s = (SymbolVariable)var.getSimbolo();
+			TypeRecord t = (TypeRecord)s.getType(); 
+			createComment("Registro: " + t);
+			//Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo
+			createInstruction("ADD " + offset 
+				+ ", #" + var.getAddress(), "Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo");
+			//Guardo el temporal en la direccion del campo
+			createInstruction("MOVE [.A], " + translate(q.getResult()), "Guardo el campo en el temporal");
+		}else {
+			var = (Variable)q.getResult(); 
+			createComment("Acceso a campo " + var.getName() + ". Direccion: " + var.getAddress());
+			SymbolVariable s = (SymbolVariable)var.getSimbolo();
+			TypeRecord t = (TypeRecord)s.getType(); 
+			createComment("Registro: " + t);
+			
+			//Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo
+			createInstruction("ADD " + offset 
+				+ ", #" + var.getAddress(), "Sumo la direccion de la variable mas el desplazamiento para obtener la dir del campo");
+			//Guardo el temporal en la direccion del campo
+			createInstruction("MOVE " + translate(q.getSecondOperand()) + ", [.A]", "Guardo el temporal en la direccion del campo");
+		}
 	}
 
 }
