@@ -84,6 +84,8 @@ public class DecVariable extends NonTerminal {
 	{
 		for(SymbolVariable sVar: listaVariables)
 		{
+			CompilerContext.getSemanticErrorManager().semanticDebug("Registro variable " + sVar.getName() +
+					" en ambito " + sVar.getScope().getName());
 			sVar.getScope().getSymbolTable().addSymbol(sVar);
 		}
 	}

@@ -210,10 +210,14 @@ axiom ::= PROCEDURE IDENTIFICADOR:id
 declaraciones ::= dec_const_simbolica:dConst declaraciones:decl {: 
                 semanticErrorManager.semanticInfo("Declaracion de constantes " + dConst);
                 RESULT =  decl.addDeclaracion(dConst);:}
-                | dec_variables:dVar declaraciones:decl 
+                | dec_variables:dVar 
+                {:
+                    dVar.registrarDeclaraciones();
+                :}
+                declaraciones:decl 
                 {: 
                     semanticErrorManager.semanticInfo("Declaracion de variables" + dVar);
-                    dVar.registrarDeclaraciones();
+                    
                     RESULT =  decl.addDeclaracion(dVar);
                 :}
                 | dec_tipo_registro declaraciones:decl {: 
@@ -447,10 +451,14 @@ tipo_retorno ::= INTEGER {: RESULT = new TypeSimpleInteger(scopeManager.getCurre
                | error {: syntaxErrorManager.syntaxDebug ("Error en tipo de retorno."); :};
 
 declaraciones_subprograma ::= dec_const_simbolica:dConst declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dConst);:}
-                            | dec_variables:dVar declaraciones_subprograma:decs 
+                            | dec_variables:dVar                            
+                            {:
+                                dVar.registrarDeclaraciones();
+                            :} 
+                            declaraciones_subprograma:decs 
                             {: 
                                 semanticErrorManager.semanticInfo("Declaracion de variables en subprograma " + decs);
-                                dVar.registrarDeclaraciones();
+                                
                                 RESULT = decs.addDeclaracion(dVar);
                             :}
                             | dec_subprograma:dSub declaraciones_subprograma:decs {: RESULT = decs.addDeclaracion(dSub);:}
