@@ -38,6 +38,18 @@ public class TranslatorLogical extends TranslatorBase {
 			getTranslation().append(label + " : " + SALTO_LINEA);
 			getTranslation().append("MOVE #0, " + translate(q.getResult()) + SALTO_LINEA);
 			getTranslation().append(label2 + " : " + SALTO_LINEA);
+		}else if(q.getOperation().equals(InstructionSetArchitecture.GREATER_EQUAL))
+		{
+			getTranslation().append("SUB " + translate(q.getFirstOperand())+ 
+					", " + translate(q.getSecondOperand()) + SALTO_LINEA);
+			String label = LabelManager.getLabelText();
+			String label2 = LabelManager.getLabelText();
+			getTranslation().append("BN /" + label + "	;Salto si el resultado es negativo, es decir, op1 < op2"  + SALTO_LINEA);
+			getTranslation().append("MOVE #1, " + translate(q.getResult()) + SALTO_LINEA);
+			getTranslation().append("BR /" + label2 + SALTO_LINEA);
+			getTranslation().append(label + " : " + SALTO_LINEA);
+			getTranslation().append("MOVE #0, " + translate(q.getResult()) + SALTO_LINEA);
+			getTranslation().append(label2 + " : " + SALTO_LINEA);
 		}
 
 	}

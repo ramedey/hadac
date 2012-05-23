@@ -11,6 +11,7 @@ public class InstructionSetArchitecture {
 	public static final String ESCRIBE_VALOR = "ESCRIBEVAL";
 	public static final String FINAL = "FINAL";
 	public static final String GREATER_THAN = "GT";
+	public static final String GREATER_EQUAL = "GE";
 	public static final String INCREMENT = "INC";
 	public static final String INICIO = "INICIO";
 	public static final String LABEL = "INL";

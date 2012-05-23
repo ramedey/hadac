@@ -69,7 +69,8 @@ public abstract class TranslatorBase implements TranslatorIF {
 			{
 				return "/" + v.getAddress();
 			}
-			//Los parámetros se posicionan en las direcciones superiores al puntero de marco
+			//Los parámetros se posicionan en las direcciones superiores al puntero de marco.
+			//Se deja un espacio para el valor de retorno en las funciones
 			if(v.isParameter())
 			{
 				return "#" + (v.getAddress()+1) + "[.IX]";

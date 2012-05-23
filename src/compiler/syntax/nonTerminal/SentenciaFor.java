@@ -41,7 +41,7 @@ public class SentenciaFor extends Sentencia {
         cb.addQuadruple(InstructionSetArchitecture.MOVE, varIterator, inicio.getTemporal());
         cb.addQuadruples(fin.getIntermediateCode());
         cb.addQuadruple(InstructionSetArchitecture.LABEL, l1);
-        cb.addQuadruple(InstructionSetArchitecture.GREATER_THAN, tempCondicion, fin.getTemporal(), varIterator);
+        cb.addQuadruple(InstructionSetArchitecture.GREATER_EQUAL, tempCondicion, fin.getTemporal(), varIterator);
         cb.addQuadruple(InstructionSetArchitecture.BRANCH_FALSE, tempCondicion, l2);
         cb.addQuadruples(lista.getIntermediateCode());
         cb.addQuadruple(InstructionSetArchitecture.INCREMENT, varIterator);

@@ -135,6 +135,9 @@ public class ExecutionEnvironmentEns2001
     	}else if(op.equals(InstructionSetArchitecture.GREATER_THAN)){
     		
     		trans = new TranslatorLogical();
+    	}else if(op.equals(InstructionSetArchitecture.GREATER_EQUAL)){
+    		
+    		trans = new TranslatorLogical();
     	}else if(op.equals(InstructionSetArchitecture.LABEL)){
     		
     		trans = new TranslatorLabel();
