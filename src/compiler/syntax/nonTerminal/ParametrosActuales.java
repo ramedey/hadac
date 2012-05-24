@@ -74,7 +74,7 @@ public class ParametrosActuales extends NonTerminal {
 				cb.addQuadruples(parametro.getIntermediateCode());
 //				//La instrucción define el temporal que contiene el parametro y su desplazamiento
 //				// para localizarlo en el area de datos del subprograma
-//				cb.addQuadruple(InstructionSetArchitecture.PARAM, parametro.getTemporal(), parametros.indexOf(parametro)+1);
+				cb.addQuadruple(InstructionSetArchitecture.PARAM, parametro.getTemporal(), parametros.indexOf(parametro));
 			}
 		}
 		this.setIntermediateCode(cb.create());

@@ -26,8 +26,8 @@ public class TranslatorInitial extends TranslatorBase {
 		createComment("la pila empieza en la 65000 y crece hacia posiciones bajas de memoria (hacia 0).");
 		createComment("Se reserva espacio para " + MemoryManager.getSizeOfScope(0) + " temporales.\n");
 		
-		createInstruction("MOVE #" + (STACK_ADDRESS - (MemoryManager.getSizeOfScope(0)+2)) + ",.SP",
-				"Se suma 1 a la reserva de espacio para que apunte a la primera posición libre.");
+		createInstruction("MOVE #" + (STACK_ADDRESS - (MemoryManager.getSizeOfScope(0)+3)) + ",.SP",
+				"Se suma 1 a la reserva de espacio para que apunte a la primera posición libre(+1 del valor de retorno).");
 		//Posicionar el puntero del display
 		getTranslation().append("MOVE " + DISPLAY_ADDRESS + ",.R0 		;dirección del display almacenada en el registro 0\n");
 		//Guardar el Display[0] el FP del primer RA
