@@ -1,9 +1,7 @@
 package compiler.code.translator;
 
 import compiler.code.MemoryManager;
-import compiler.intermediate.Function;
 import compiler.intermediate.Procedure;
-import compiler.semantic.symbol.SymbolParameter;
 import es.uned.lsi.compiler.intermediate.OperandIF;
 import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
@@ -41,43 +39,21 @@ public class TranslatorCall extends TranslatorBase {
 		this.createInstruction("MOVE .A,.IY", "ahora IY apunta a la posición que va a contener vinculo de control del RA");
 		this.createInstruction("MOVE .IX,[.R0]", "Se guarda la direccion del RA anterior en el display");
 		this.createInstruction("INC .R0", "incremento el display a la siguiente posición libre");
-//		addParameters(sub);
 		this.createInstruction("MOVE .IY,.IX", "Ahora el puntero de marco (FP) apunta al RA actual");
 		this.createInstruction("SUB .IX, #" + (espacioVaryTemp + 2), "Muevo el putero de pila a la primera posición libre, contando las variables y temporales.");
 		this.createInstruction("MOVE .A,.SP");
 		this.createInstruction("CALL /" + sub.getCodeLabel(), "Salto al código del procedimiento, agregando la direccion de retorno al RA");
 		getTranslation().append(";--Fin Creacion RA--" + SALTO_LINEA);
+		//Espacio del RA: tamaño parámetros (size)
+		// +1 (valor de retorno)
+		// +1 (vínculo de control)
+		// tamaño de variables y temporales (espacioVaryTemp)
+		// El RA también contiene la dirección de retorno en la posición mas baja del registro
+		// de activación, pero al devolver la llamada (instrucción RET) se hace POP del puntero de pila
+		// y se adelanta el puntero .SP una posición, por lo que ahora no hay que sumarla.
 		this.createInstruction("ADD .SP, #" + (size + espacioVaryTemp + 2), "Devuelvo el puntero de pila a la dirección inicial del RA padre");
 		this.createInstruction("MOVE .A,.SP");
 		this.createInstruction("DEC .R0", "decremento el display para que apunte al ambito padre ");
 		this.createInstruction("MOVE [.R0],.IX");
-		
-		
-		
-		//this.createComment("Ambito " + getScopeCount());
-		//Incremento el contador de ámbitos.
-		//setScopeCount(scope.getLevel() + 1);
-		
-//		this.createComment("Ambito " + getScopeCount());
-	}
-
-	public boolean isFunction(OperandIF sub)
-	{
-		return (sub instanceof Function);
-	}
-	
-	private int addParameters(Procedure sub)
-	{
-		int i = 2; //la primera posición es para el valor de retorno.
-		for(SymbolParameter param : sub.getParametros())
-		{
-				this.createInstruction("MOVE " + translate(param.getTemporal()) + ", #" + i + "[.IY]",
-						"Copio parametro " + param.getTemporal() + 
-						" a su zona dentro del RA(en el puntero de marco provisional IY");
-				//param.getTemporal().setAddress(i);
-				i++;
-			
-		}
-		return i;
 	}
 }
