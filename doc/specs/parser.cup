@@ -150,11 +150,11 @@ program ::=
   {: 
   		// No modificar esta estructura, aunque se pueden añadir más acciones semánticas
   		// Para la entrega de febrero pueden comentarse las dos sentencias siguientes:
-  		
+  		 
+  		 //Asignar direcciones de memoria
   		 MemoryManager.assignAddresses();
   		 
   		 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scopeManager.getCurrentScope());
-  		 //cb.addQuadruple ("DATA", gAddress);
   		 cb.addQuadruple (InstructionSetArchitecture.INICIO, MemoryManager.getgAddress(), ax.getMainLabel());
   		 
   		 List intermediateCode = ax.getIntermediateCode ();
@@ -163,7 +163,7 @@ program ::=
          cb.addQuadruple (InstructionSetArchitecture.FINAL);
   		 
   		 finalCodeFactory.setEnvironment(CompilerContext.getExecutionEnvironment());
-  		 finalCodeFactory.create (cb.create());
+  		 finalCodeFactory.create(cb.create());
   		// En caso de no comentarse las sentencias anteriores puede generar una excepcion
   		// en las llamadas a cupTest en la entrega de Febrero. Esto es debido a que 
   		// aún no se tendrá implementada la generación de código intermedio ni final.
@@ -701,7 +701,7 @@ elemento ::= acceso_registro:reg
             {: 
                 syntaxErrorManager.syntaxInfo("Llamada subprograma " + (llamada instanceof LlamadaFuncion));
                 //Comprobar que no se está llamando a un procedimiento
-                aserto(llamada instanceof LlamadaFuncion,"La función debe devolver una valor");
+                aserto(llamada instanceof LlamadaFuncion,"La función debe devolver un valor");
                 
                 ScopeIF scope = scopeManager.getCurrentScope();
                 IntermediateCodeBuilder cb = new IntermediateCodeBuilder(scope);
@@ -809,7 +809,7 @@ sentencia_asignacion ::= IDENTIFICADOR:id ASIGNACION expresion:exp
                             ((SymbolParameter)simbolo).setTemporal(eTemp);
                             var.setParameter(true);
                         }
-                        cb.addQuadruple("MV", var, eTemp);
+                        cb.addQuadruple(InstructionSetArchitecture.MOVE, var, eTemp);
                         sent.setIntermediateCode(cb.create()); 
                         semanticErrorManager.semanticDebug("Sentencia asignacion: " + sent.getIntermediateCode());
                         RESULT = sent;
