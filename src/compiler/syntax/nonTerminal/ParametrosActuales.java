@@ -81,7 +81,7 @@ public class ParametrosActuales extends NonTerminal {
 		
 	}
 	
-	//TODO: controlar que no se genere codigo intermedio dos veces para los parametros
+	//Controlar que no se genere codigo intermedio dos veces para los parametros
 	// que provienen de la otra clase (parametro par);
 	private boolean parametroPreviamenteGenerado(Expresion parametro)
 	{

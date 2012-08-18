@@ -12,6 +12,12 @@ import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.ScopeIF;
 import es.uned.lsi.compiler.semantic.symbol.SymbolIF;
 
+/**
+ * gestiona las direcciones de memoria de variables, temporales
+ * y parámetros.
+ * @author amedey
+ *
+ */
 public class MemoryManager {
 
 	private static int gAddress = 0;
@@ -63,7 +69,7 @@ public class MemoryManager {
                t.setAddress (lOffset + temp.getSize());
                lOffset += temp.getSize();                   
            } 
-           //Guardar el tamaño que ocupan las variables y temporales en cada ambito.
+           //Registrar el tamaño que ocupan las variables y temporales en cada ambito.
            sizeOfScopes.add(lOffset);
            lOffset = 0;
            parameterOffset = 0;
@@ -79,6 +85,8 @@ public class MemoryManager {
 	 */
 	public static int getSizeOfScope(int levelOfScope)
 	{
+		//El número de elementos de sizeOfScopes es el número de ámbitos
+		// registrados.
 		if(levelOfScope >= sizeOfScopes.size())
 		{
 			return sizeOfScopes.get(sizeOfScopes.size()-1);

@@ -1,11 +1,6 @@
 package compiler.syntax.nonTerminal;
 
-import java.util.List;
-
 import compiler.CompilerContext;
-import compiler.intermediate.Temporal;
-
-import es.uned.lsi.compiler.intermediate.QuadrupleIF;
 import es.uned.lsi.compiler.intermediate.TemporalIF;
 import es.uned.lsi.compiler.semantic.type.TypeIF;
 

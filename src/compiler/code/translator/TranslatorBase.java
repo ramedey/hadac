@@ -53,9 +53,9 @@ public abstract class TranslatorBase implements TranslatorIF {
 	
 	public String createTranslation(QuadrupleIF q)
 	{
-		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
+//		getTranslation().append(";;;;;;;;;;;" + q + SALTO_LINEA);
 		translate(q);
-		getTranslation().append(SALTO_LINEA);// + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
+//		getTranslation().append(SALTO_LINEA);// + ";;;;;;FIN;;;;;" + q + SALTO_LINEA);
 		return getTranslation().toString();
 	}
 	
@@ -77,6 +77,9 @@ public abstract class TranslatorBase implements TranslatorIF {
 			}
 			if(isNoLocal(v))
 			{
+				//Si la variable es no local su direción está en el registro R1.
+				// Esta dirección se calcula en la clase TranslatorMove cuando se detecta
+				// que la variable es no local
 				return getNoLocalAddress(v);
 			}
 			return "#-" + v.getAddress() + "[.IX]";

@@ -28,7 +28,7 @@ public class ExecutionEnvironmentEns2001
     
     private RegisterDescriptorIF registerDescriptor;
     private MemoryDescriptorIF   memoryDescriptor;
-    private boolean modoDebug = false;
+    private boolean debugMode = false;
     
     
     /**
@@ -163,7 +163,7 @@ public class ExecutionEnvironmentEns2001
     	
     		return quadruple.toString(); 
     	}
-    	if(modoDebug)
+    	if(debugMode)
     	{
     		return quadruple.toString();
     	}

@@ -20,13 +20,6 @@ public class TranslatorMove extends TranslatorBase {
 				createInstruction("SUB [.R1], #" + ((Variable) q.getFirstOperand()).getAddress());
 				createInstruction("MOVE .A, .R1");
 			}
-//			if(v.isParameter())
-//			{
-//				//Actualizo el temporal asociado al parametro para tomar el valor
-//				// mas actual en el paso de marámetros a un subprograma
-//				SymbolParameter param = (SymbolParameter)v.getSimbolo();
-//				param.setTemporal((Temporal)q.getResult());
-//			}
 		}
 		getTranslation().append("MOVE ");
 		getTranslation().append(translate(q.getFirstOperand()));

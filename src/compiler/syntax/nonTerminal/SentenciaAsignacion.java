@@ -39,7 +39,6 @@ public class SentenciaAsignacion extends Sentencia {
 	}
 
 	private int getOffset(AccesoRegistro reg) {
-		// TODO Auto-generated method stub
 		return ((TypeRecord)reg.getVariableRegistro().getType()).getOffset(reg.getCampoReferenciado().getName());
 	}
 	

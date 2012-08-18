@@ -10,9 +10,7 @@ public class TranslatorRet extends TranslatorBase {
 	
 	@Override
 	public void translate(QuadrupleIF q) {
-		//getTranslation().append("POP .R1	;1- Recuperar direccion de retorno del tope de la pila" + SALTO_LINEA);
-		//getTranslation().append("MOVE #-1[IX] .R1	;Mueve dirección de retorno a R1" + SALTO_LINEA);
-		//Esta instrucción solo es válida para las funciones
+		//Esta parte solo es válida para las funciones
 		if(q.getResult() != null)
 		{
 			this.createInstruction("DEC .R0", "decremento el display para que R0 apunte al ambito padre ");
@@ -23,8 +21,7 @@ public class TranslatorRet extends TranslatorBase {
 		}
 		createInstruction("RET");
 		//Se vuelve al ambito de nivel superior
-//		setScopeCount(getScopeCount() - 1);
-		createComment("Scope: " + getScopeCount());
+//		createComment("Scope: " + getScopeCount());
 	}
 
 }
